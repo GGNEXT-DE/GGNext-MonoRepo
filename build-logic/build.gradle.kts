@@ -18,5 +18,4 @@ dependencies {
     implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.4.0")
     implementation("org.jetbrains.kotlin.kapt:org.jetbrains.kotlin.kapt.gradle.plugin:2.4.0")
     implementation("xyz.jpenilla.run-velocity:xyz.jpenilla.run-velocity.gradle.plugin:3.0.2")
-    implementation("com.gradleup.shadow:shadow-gradle-plugin:9.5.1")
 }
