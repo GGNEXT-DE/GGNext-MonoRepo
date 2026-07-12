@@ -7,12 +7,14 @@ dependencies {
 
     compileOnly(libs.fawe.core)
     compileOnly(libs.fawe.bukkit) { isTransitive = false }
+    compileOnly(libs.anvil.gui)
 }
 
 tasks {
     runServer {
         downloadPlugins {
             modrinth("fastasyncworldedit", "2.15.2")
+            modrinth("luckperms", "v5.5.53-bukkit")
         }
     }
 

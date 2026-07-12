@@ -112,12 +112,12 @@ class RailwayProfileManager(
 
     suspend fun addDollars(
         profile: RailwayProfile,
-        amount: Int,
+        amount: Double,
     ) = profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", amount))
 
     suspend fun removeDollars(
         profile: RailwayProfile,
-        amount: Int,
+        amount: Double,
     ): Boolean {
         if (profile.railwayDollars < amount) return false
         profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", -amount))

@@ -4,6 +4,7 @@ mongodb = "5.8.0"
 mccoroutine = "2.22.0"
 interfaces = "2.1.0-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
+anvil-gui = "1.10.13-SNAPSHOT"
 
 [libraries]
 # Fawe
@@ -24,6 +25,8 @@ mccoroutine-velocity-core = { module = "com.github.shynixn.mccoroutine:mccorouti
 interfaces = { module = "com.noxcrew.interfaces:interfaces", version.ref = "interfaces" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+anvil-gui = { module = "net.wesjd:anvilgui", version.ref = "anvil-gui" }
 
 [bundles]
 ggnext-core = [
