@@ -1,8 +1,5 @@
 plugins {
-    id("ggnext.kotlin-conventions")
-    kotlin("kapt") version "2.4.0"
-    id("xyz.jpenilla.run-velocity") version "3.0.2"
-    id("com.gradleup.shadow") version "9.4.1"
+    id("ggnext.velocity-conventions")
 }
 
 dependencies {
