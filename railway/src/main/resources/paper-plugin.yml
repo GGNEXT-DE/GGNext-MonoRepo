@@ -1,0 +1,17 @@
+name: Railway
+version: '${version}'
+
+main: de.ggnext.railway.Railway
+api-version: '1.21.11'
+load: POSTWORLD
+
+dependencies:
+  server:
+    GGNextCore:
+      required: true
+      load: BEFORE
+      join-classpath: true
+    FastAsyncWorldEdit:
+      load: BEFORE
+      required: true
+      join-classpath: true

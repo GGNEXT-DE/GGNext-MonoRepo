@@ -1,0 +1,126 @@
+package de.ggnext.railway.profile
+
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.UpdateOptions
+import com.mongodb.client.model.Updates
+import de.ggnext.contentsystem.value.store.NumberStore
+import de.ggnext.core.db.MongoManager
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
+import org.bukkit.entity.Player
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+
+class RailwayProfileManager(
+    private val mongoManager: MongoManager,
+) {
+    private val profileCollection = mongoManager.database.getCollection<RailwayProfile>("railway_profiles")
+    private val profileIndexCollection = mongoManager.database.getCollection<RailwayProfileIndex>("railway_profile_index")
+    private val maxRailwayAccounts by NumberStore("railway.profile.max_railway_accounts")
+    private val defaultRailwayDollars by NumberStore("railway.profile.default_railway_dollars")
+    private val maxNameLength by NumberStore("railway.profile.max_name_length")
+
+    private val activeProfiles = ConcurrentHashMap<UUID, RailwayProfile>()
+
+    suspend fun createProfile(
+        player: Player,
+        name: String,
+    ): RailwayProfile? {
+        val currentProfileAmount =
+            profileIndexCollection
+                .find(Filters.eq("_id", player.uniqueId))
+                .firstOrNull()
+                ?.profileIds
+                ?.size
+                ?: 0
+
+        if (currentProfileAmount >= maxRailwayAccounts) return null
+        if (name.length >= maxNameLength) return null
+
+        val profileId = UUID.randomUUID()
+        val railwayProfile =
+            RailwayProfile(
+                profileId,
+                createdAt = System.currentTimeMillis(),
+                lastPlayed = System.currentTimeMillis(),
+                railwayDollars = defaultRailwayDollars,
+                name = name,
+            )
+
+        profileCollection.insertOne(railwayProfile)
+        profileIndexCollection.updateOne(
+            Filters.eq("_id", player.uniqueId),
+            Updates.addToSet("profileIds", profileId),
+            UpdateOptions().upsert(true),
+        )
+        return railwayProfile
+    }
+
+    suspend fun getProfile(profileId: UUID): RailwayProfile? = profileCollection.find(Filters.eq("_id", profileId)).firstOrNull()
+
+    suspend fun getProfiles(player: Player): List<RailwayProfile> {
+        val profileIds =
+            profileIndexCollection
+                .find(Filters.eq("_id", player.uniqueId))
+                .firstOrNull()
+                ?.profileIds
+                ?: return emptyList()
+
+        if (profileIds.isEmpty()) return emptyList()
+
+        return profileCollection
+            .find(Filters.`in`("_id", profileIds))
+            .toList()
+    }
+
+    suspend fun getProfileByName(
+        player: Player,
+        name: String,
+    ): RailwayProfile? {
+        val profiles = getProfiles(player)
+        if (profiles.isEmpty()) return null
+
+        profiles.firstOrNull { it.name == name }?.let { return it }
+        return null
+    }
+
+    suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
+
+    suspend fun deleteProfile(
+        player: Player,
+        profileId: UUID,
+    ) {
+        profileCollection.deleteOne(Filters.eq("_id", profileId))
+        profileIndexCollection.updateOne(
+            Filters.eq("_id", player.uniqueId),
+            Updates.pull("profileIds", profileId),
+        )
+
+        if (activeProfiles[player.uniqueId]?.id == profileId) activeProfiles.remove(player.uniqueId)
+    }
+
+    fun setActiveProfile(
+        player: Player,
+        activeProfile: RailwayProfile,
+    ) {
+        activeProfiles[player.uniqueId] = activeProfile
+    }
+
+    fun getActiveProfile(player: Player): RailwayProfile? = activeProfiles[player.uniqueId]
+
+    fun deleteActiveProfile(player: Player) = activeProfiles.remove(player.uniqueId)
+
+    suspend fun addDollars(
+        profile: RailwayProfile,
+        amount: Int,
+    ) = profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", amount))
+
+    suspend fun removeDollars(
+        profile: RailwayProfile,
+        amount: Int,
+    ): Boolean {
+        if (profile.railwayDollars < amount) return false
+        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", -amount))
+        return true
+    }
+}

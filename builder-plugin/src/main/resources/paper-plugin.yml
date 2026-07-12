@@ -1,0 +1,13 @@
+name: BuilderPlugin
+version: '${version}'
+
+main: de.ggnext.builder.BuilderPlugin
+api-version: '1.21.11'
+load: POSTWORLD
+
+dependencies:
+  server:
+    FastAsyncWorldEdit:
+      load: BEFORE
+      required: true
+      join-classpath: true

@@ -1,0 +1,25 @@
+plugins {
+    id("ggnext.paper-conventions")
+}
+
+dependencies {
+    compileOnly(project(":ggnext-core"))
+
+    compileOnly(libs.fawe.core)
+    compileOnly(libs.fawe.bukkit) { isTransitive = false }
+}
+
+tasks {
+    runServer {
+        downloadPlugins {
+            modrinth("fastasyncworldedit", "2.15.2")
+        }
+    }
+
+    shadowJar {
+        dependencies {
+            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
+            exclude(dependency("org.jetbrains.kotlinx:kotlinx-coroutines-core.*"))
+        }
+    }
+}
