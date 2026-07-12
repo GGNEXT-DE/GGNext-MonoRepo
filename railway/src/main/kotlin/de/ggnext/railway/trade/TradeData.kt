@@ -41,29 +41,11 @@ class TradeSession(
 
         offerChangedProperty.value += 1
     }
-
-    fun triggerMoneyUpdate() {
-        player1.accept =
-            false
-
-        player2.accept =
-            false
-
-        accepted1 =
-            false
-
-        accepted2 =
-            false
-
-        lastChanged =
-            System.currentTimeMillis()
-    }
 }
 
 data class TradePlayer(
     val player: Player,
     val offer: MutableList<ItemStack>,
-    var money: Double,
     var accept: Boolean,
     val profile: RailwayProfile,
 )

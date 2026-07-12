@@ -55,8 +55,8 @@ class TradeManager(
         val senderProfile = profileManager.getActiveProfile(sender) ?: throw IllegalStateException("Sender hat kein aktives Profil!")
         val targetProfile = profileManager.getActiveProfile(target) ?: throw IllegalStateException("Target hat kein aktives Profil!")
 
-        val tradePlayer1 = TradePlayer(sender, mutableListOf(), 0.0, false, senderProfile)
-        val tradePlayer2 = TradePlayer(target, mutableListOf(), 0.0, false, targetProfile)
+        val tradePlayer1 = TradePlayer(sender, mutableListOf(), false, senderProfile)
+        val tradePlayer2 = TradePlayer(target, mutableListOf(), false, targetProfile)
         val session = TradeSession(tradePlayer1, tradePlayer2)
 
         activeSessions[sender.uniqueId] = session

@@ -1,6 +1,7 @@
 package de.ggnext.core.utils
 
 import net.kyori.adventure.text.Component
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 public fun ItemStack.name(name: Component): ItemStack {
@@ -18,3 +19,5 @@ public fun ItemStack.description(description: List<Component>): ItemStack {
         }
     return this
 }
+
+public fun createFiller(material: Material = Material.BLACK_STAINED_GLASS_PANE): ItemStack = ItemStack(material).name(Component.text(""))

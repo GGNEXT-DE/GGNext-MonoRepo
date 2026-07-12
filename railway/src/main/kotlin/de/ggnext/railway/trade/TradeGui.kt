@@ -6,6 +6,7 @@ import com.noxcrew.interfaces.element.StaticElement
 import com.noxcrew.interfaces.interfaces.buildChestInterface
 import com.noxcrew.interfaces.utilities.forEachInGrid
 import de.ggnext.contentsystem.value.store.TranslationStore
+import de.ggnext.core.utils.createFiller
 import de.ggnext.core.utils.language
 import de.ggnext.core.utils.name
 import de.ggnext.railway.profile.RailwayProfileManager
@@ -20,22 +21,6 @@ class TradeGui(
     private val plugin: JavaPlugin,
     private val tradeManager: TradeManager,
 ) {
-    private fun createItem(
-        material: Material,
-        name: Component? = null,
-        amount: Int = 1,
-    ): ItemStack {
-        val item = ItemStack(material, amount)
-
-        if (name != null) {
-            item.name(name)
-        }
-
-        return item
-    }
-
-    private fun createGlass(material: Material): ItemStack = ItemStack(material).name(Component.text(""))
-
     fun openTrade(session: TradeSession) {
         plugin.launch {
             openSinglePlayerGui(
@@ -127,9 +112,7 @@ class TradeGui(
                             pane[row, column] =
                                 StaticElement(
                                     drawable(
-                                        createGlass(
-                                            Material.BLACK_STAINED_GLASS_PANE,
-                                        ),
+                                        createFiller(),
                                     ),
                                 )
                         }
@@ -149,14 +132,7 @@ class TradeGui(
                     pane[5, 2] =
                         StaticElement(
                             drawable(
-                                createItem(
-                                    if (self.accept) {
-                                        Material.GREEN_WOOL
-                                    } else {
-                                        Material.RED_WOOL
-                                    },
-                                    ownStatus,
-                                ),
+                                ItemStack(if (self.accept) Material.GREEN_WOOL else Material.RED_WOOL).name(ownStatus),
                             ),
                         ) {
                             self.accept =
@@ -196,14 +172,9 @@ class TradeGui(
                     pane[5, 6] =
                         StaticElement(
                             drawable(
-                                createItem(
-                                    if (other.accept) {
-                                        Material.LIME_STAINED_GLASS_PANE
-                                    } else {
-                                        Material.RED_STAINED_GLASS_PANE
-                                    },
-                                    partnerStatus,
-                                ),
+                                ItemStack(
+                                    if (other.accept) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE,
+                                ).name(partnerStatus),
                             ),
                         )
 
@@ -213,9 +184,7 @@ class TradeGui(
                             pane[row, column] =
                                 StaticElement(
                                     drawable(
-                                        createGlass(
-                                            Material.GRAY_STAINED_GLASS_PANE,
-                                        ),
+                                        createFiller(Material.GRAY_STAINED_GLASS_PANE),
                                     ),
                                 )
                         }
