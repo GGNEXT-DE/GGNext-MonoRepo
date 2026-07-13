@@ -13,6 +13,7 @@ tasks {
     runServer {
         downloadPlugins {
             modrinth("fastasyncworldedit", "2.15.2")
+            modrinth("luckperms", "v5.5.53-bukkit")
         }
     }
 
