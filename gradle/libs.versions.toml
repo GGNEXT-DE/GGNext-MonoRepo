@@ -4,6 +4,7 @@ mongodb = "5.9.0"
 mccoroutine = "2.22.0"
 interfaces = "2.1.0-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
+scoreboard = "2.8.0"
 
 [libraries]
 # Fawe
@@ -25,13 +26,20 @@ interfaces = { module = "com.noxcrew.interfaces:interfaces", version.ref = "inte
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
+# Megavex Scoreboard Library
+scoreboard-library-api = { module = "net.megavex:scoreboard-library-api", version.ref = "scoreboard" }
+scoreboard-library-implementation = { module = "net.megavex:scoreboard-library-implementation", version.ref = "scoreboard" }
+scoreboard-library-extra-kotlin = { module = "net.megavex:scoreboard-library-extra-kotlin", version.ref = "scoreboard" }
+
 [bundles]
 ggnext-core = [
     "mccoroutine-bukkit-api",
     "mccoroutine-bukkit-core",
     "mongodb",
     "interfaces",
-    "kotlinx-serialization-json"
+    "kotlinx-serialization-json",
+    "scoreboard-library-api",
+    "scoreboard-library-extra-kotlin"
 ]
 
 ggnext-velocity = [

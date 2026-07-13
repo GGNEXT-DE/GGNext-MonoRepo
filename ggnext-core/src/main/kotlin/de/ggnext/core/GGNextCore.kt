@@ -7,14 +7,20 @@ import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.core.db.MongoManager
 import de.ggnext.core.economy.EconomyService
+import de.ggnext.core.scoreboard.ScoreBoardListener
+import de.ggnext.core.scoreboard.ScoreBoardManager
 import de.ggnext.core.vanish.VanishCommand
 import de.ggnext.core.vanish.VanishManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
+import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
 
 class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var mongoManager: MongoManager
     private lateinit var economyService: EconomyService
     private lateinit var contentSystem: ContentSystem
+    private lateinit var scoreboardLibrary: ScoreboardLibrary
+    private lateinit var scoreBoardManager: ScoreBoardManager
 
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
@@ -30,12 +36,26 @@ class GGNextCore : SuspendingJavaPlugin() {
         economyService = EconomyService(mongoManager.database)
         GGNextAPI.economyService = economyService
 
+        runCatching {
+            System.setProperty("net.megavex.scoreboardlibrary.forceModern", "true")
+            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this)
+        }.onFailure {
+            scoreboardLibrary = NoopScoreboardLibrary()
+            logger.warning("Could not load scoreboard library")
+        }
+
+        scoreBoardManager = ScoreBoardManager(scoreboardLibrary)
+        GGNextAPI.scoreBoardManager = scoreBoardManager
+
+        server.pluginManager.registerEvents(ScoreBoardListener(scoreBoardManager), this)
+
         logger.info("GGNext Core enabled!")
     }
 
     override suspend fun onDisableAsync() {
         contentSystem.shutdown()
         mongoManager.close()
+        scoreBoardManager.shutdown()
 
         logger.info("GGNext Core disabled!")
     }
