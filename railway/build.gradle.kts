@@ -7,7 +7,6 @@ dependencies {
 
     compileOnly(libs.fawe.core)
     compileOnly(libs.fawe.bukkit) { isTransitive = false }
-    compileOnly(libs.anvil.gui)
 }
 
 tasks {

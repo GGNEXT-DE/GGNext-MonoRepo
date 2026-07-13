@@ -12,7 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://maven.noxcrew.com/public")
-        maven("https://mvn.wesjd.net/")
     }
 }
 
