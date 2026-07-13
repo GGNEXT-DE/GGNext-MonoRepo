@@ -9,7 +9,7 @@ import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.createFiller
 import de.ggnext.core.utils.language
 import de.ggnext.core.utils.name
-import de.ggnext.core.utils.player
+import de.ggnext.core.utils.toPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -24,14 +24,12 @@ class TradeGui(
     fun openTrade(session: TradeSession) {
         plugin.launch {
             openSinglePlayerGui(
-                viewer = session.player1.player,
                 self = session.player1,
                 other = session.player2,
                 session = session,
             )
 
             openSinglePlayerGui(
-                viewer = session.player2.player,
                 self = session.player2,
                 other = session.player1,
                 session = session,
@@ -40,12 +38,11 @@ class TradeGui(
     }
 
     private suspend fun openSinglePlayerGui(
-        viewer: UUID,
         self: TradePlayer,
         other: TradePlayer,
         session: TradeSession,
     ) {
-        val viewer = viewer.player() ?: return
+        val viewer = self.playerUUID.toPlayer() ?: return
 
         val title by TranslationStore(
             "translations.railway.trade.gui.title",
@@ -67,7 +64,7 @@ class TradeGui(
                     title.get(
                         viewer.language(),
                         listOf(
-                            other.player.player()?.name ?: "",
+                            other.playerUUID.toPlayer()?.name ?: "",
                         ),
                     )
                 }
@@ -156,7 +153,7 @@ class TradeGui(
                     val partnerStatus =
                         Component
                             .text(
-                                "${other.player.player()?.name}: ",
+                                "${other.playerUUID.toPlayer()?.name}: ",
                             ).color(
                                 NamedTextColor.GREEN,
                             ).append(
@@ -209,8 +206,8 @@ class TradeGui(
             return
         }
 
-        val p1 = session.player1.player.player() ?: return
-        val p2 = session.player2.player.player() ?: return
+        val p1 = session.player1.playerUUID.toPlayer() ?: return
+        val p2 = session.player2.playerUUID.toPlayer() ?: return
 
         val p1SimulatedInv =
             p1.inventory.storageContents
@@ -251,11 +248,11 @@ class TradeGui(
                 session,
             )
 
-            session.player1.player
-                .player()
+            session.player1.playerUUID
+                .toPlayer()
                 ?.closeInventory()
-            session.player2.player
-                .player()
+            session.player2.playerUUID
+                .toPlayer()
                 ?.closeInventory()
             return
         }
@@ -267,21 +264,13 @@ class TradeGui(
             "translations.railway.trade.success",
         )
 
-        session.player1.player.player()?.sendMessage(
-            success.get(
-                session.player1.player
-                    .player()
-                    ?.language() ?: return,
-            ),
-        )
+        session.player1.playerUUID.toPlayer()?.let {
+            it.sendMessage(success.get(it.language()))
+        }
 
-        session.player2.player.player()?.sendMessage(
-            success.get(
-                session.player2.player
-                    .player()
-                    ?.language() ?: return,
-            ),
-        )
+        session.player2.playerUUID.toPlayer()?.let {
+            it.sendMessage(success.get(it.language()))
+        }
 
         session.player1.offer.clear()
         session.player2.offer.clear()
@@ -290,11 +279,11 @@ class TradeGui(
             session,
         )
 
-        session.player1.player
-            .player()
+        session.player1.playerUUID
+            .toPlayer()
             ?.closeInventory()
-        session.player2.player
-            .player()
+        session.player2.playerUUID
+            .toPlayer()
             ?.closeInventory()
     }
 }

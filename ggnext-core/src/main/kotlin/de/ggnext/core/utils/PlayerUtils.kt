@@ -10,4 +10,4 @@ fun Player.language(): String =
         else -> "en"
     }
 
-fun UUID.player(): Player? = Bukkit.getPlayer(this)
+fun UUID.toPlayer(): Player? = Bukkit.getPlayer(this)

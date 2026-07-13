@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.suggestion.Suggestions
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
-import de.ggnext.core.utils.player
+import de.ggnext.core.utils.toPlayer
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -124,7 +124,7 @@ class TradeCommand(
             return
         }
 
-        val sender = request.sender.player() ?: return
+        val sender = request.sender.toPlayer() ?: return
         if (!sender.isOnline) {
             val msg by TranslationStore("translations.railway.trade.sender_offline")
             player.sendMessage(msg.get(player.language()))
@@ -153,7 +153,7 @@ class TradeCommand(
             return
         }
 
-        val sender = request.sender.player() ?: return
+        val sender = request.sender.toPlayer() ?: return
         tradeManager.removeRequest(sender.uniqueId, player.uniqueId)
 
         val msgTarget by TranslationStore("translations.railway.trade.denied_target")

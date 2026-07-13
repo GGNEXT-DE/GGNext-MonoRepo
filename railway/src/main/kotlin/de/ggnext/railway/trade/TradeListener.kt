@@ -2,7 +2,7 @@ package de.ggnext.railway.trade
 
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
-import de.ggnext.core.utils.player
+import de.ggnext.core.utils.toPlayer
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -20,6 +20,15 @@ class TradeListener(
 ) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     fun onInventoryClick(event: InventoryClickEvent) {
+        if (event.clickedInventory == null) {
+            return
+        }
+
+        if (event.clickedInventory?.type != InventoryType.PLAYER) {
+            event.isCancelled = true
+            return
+        }
+
         when (event.action) {
             InventoryAction.MOVE_TO_OTHER_INVENTORY,
             InventoryAction.HOTBAR_SWAP,
@@ -36,22 +45,11 @@ class TradeListener(
             else -> {}
         }
 
-        val player =
-            event.whoClicked as? Player
-                ?: return
+        val player = event.whoClicked.toPlayer() ?: return
 
         val session =
             tradeManager.getSession(player.uniqueId)
                 ?: return
-
-        if (event.clickedInventory == null) {
-            return
-        }
-
-        if (event.clickedInventory!!.type != InventoryType.PLAYER) {
-            event.isCancelled = true
-            return
-        }
 
         val item =
             event.currentItem
@@ -77,7 +75,7 @@ class TradeListener(
         }
 
         val tradePlayer =
-            if (session.player1.player.player() == player) {
+            if (session.player1.playerUUID.toPlayer() == player) {
                 session.player1
             } else {
                 session.player2
@@ -94,7 +92,7 @@ class TradeListener(
             item.clone(),
         )
 
-        event.clickedInventory!!.setItem(
+        event.clickedInventory?.setItem(
             event.slot,
             null,
         )
@@ -104,23 +102,16 @@ class TradeListener(
 
     @EventHandler
     fun onInventoryDrag(event: InventoryDragEvent) {
-        val player =
-            event.whoClicked as? Player
-                ?: return
+        val player = event.whoClicked.toPlayer() ?: return
 
-        if (
-            tradeManager.getSession(player.uniqueId)
-            != null
-        ) {
+        if (tradeManager.getSession(player.uniqueId) != null) {
             event.isCancelled = true
         }
     }
 
     @EventHandler
     fun onInventoryClose(event: InventoryCloseEvent) {
-        val player =
-            event.player as? Player
-                ?: return
+        val player = event.player.toPlayer() ?: return
 
         val succeedSession = tradeManager.getSucceedSession(player.uniqueId)
         if (succeedSession != null) {
@@ -141,10 +132,10 @@ class TradeListener(
         )
 
         val p1 =
-            session.player1.player.player() ?: return
+            session.player1.playerUUID.toPlayer() ?: return
 
         val p2 =
-            session.player2.player.player() ?: return
+            session.player2.playerUUID.toPlayer() ?: return
 
         p1.sendMessage(
             cancelled.get(

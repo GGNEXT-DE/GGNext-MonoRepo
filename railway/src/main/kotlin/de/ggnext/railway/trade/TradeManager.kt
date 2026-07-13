@@ -1,7 +1,6 @@
 package de.ggnext.railway.trade
 
-import de.ggnext.core.utils.player
-import de.ggnext.railway.profile.RailwayProfileManager
+import de.ggnext.core.utils.toPlayer
 import java.util.UUID
 
 class TradeManager {
@@ -50,8 +49,8 @@ class TradeManager {
     ): TradeSession {
         activeRequests.removeIf { it.sender == sender && it.target == target }
 
-        val tradePlayer1 = TradePlayer(sender, mutableListOf(), false)
-        val tradePlayer2 = TradePlayer(target, mutableListOf(), false)
+        val tradePlayer1 = TradePlayer(sender, mutableListOf())
+        val tradePlayer2 = TradePlayer(target, mutableListOf())
         val session = TradeSession(tradePlayer1, tradePlayer2)
 
         activeSessions[sender] = session
@@ -61,17 +60,17 @@ class TradeManager {
     }
 
     fun endSession(session: TradeSession) {
-        activeSessions.remove(session.player1.player)
-        activeSessions.remove(session.player2.player)
+        activeSessions.remove(session.player1.playerUUID)
+        activeSessions.remove(session.player2.playerUUID)
 
         session.player1.offer.forEach {
-            session.player1.player.player()?.inventory?.addItem(
+            session.player1.playerUUID.toPlayer()?.inventory?.addItem(
                 it.clone(),
             )
         }
 
         session.player2.offer.forEach {
-            session.player2.player.player()?.inventory?.addItem(
+            session.player2.playerUUID.toPlayer()?.inventory?.addItem(
                 it.clone(),
             )
         }
@@ -79,13 +78,13 @@ class TradeManager {
         session.player1.offer.clear()
         session.player2.offer.clear()
 
-        succeedSession[session.player1.player] = session
-        succeedSession[session.player2.player] = session
+        succeedSession[session.player1.playerUUID] = session
+        succeedSession[session.player2.playerUUID] = session
     }
 
     fun removeSucceedSession(session: TradeSession) {
-        succeedSession.remove(session.player1.player)
-        succeedSession.remove(session.player2.player)
+        succeedSession.remove(session.player1.playerUUID)
+        succeedSession.remove(session.player2.playerUUID)
     }
 
     fun getSession(player: UUID): TradeSession? = activeSessions[player]
