@@ -28,7 +28,7 @@ class Railway : SuspendingJavaPlugin() {
         val zoneConfigs = ZoneConfigLoader(this).load()
         railwayProfileManager = RailwayProfileManager(GGNextAPI.mongoManager)
         zoneManager = ZoneManager(this, zoneConfigs, railwayProfileManager)
-        tradeManager = TradeManager(railwayProfileManager)
+        tradeManager = TradeManager()
         tradeGui = TradeGui(this, tradeManager)
         registerCommands()
         registerListeners()
