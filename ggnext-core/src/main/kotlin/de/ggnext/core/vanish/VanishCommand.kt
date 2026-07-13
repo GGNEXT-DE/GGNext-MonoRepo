@@ -5,7 +5,7 @@ import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.entity.Player
 
 class VanishCommand(
-    private val Manager: VanishManager,
+    private val manager: VanishManager,
 ) {
     val command =
         Commands
@@ -13,7 +13,7 @@ class VanishCommand(
             .requires { it.sender is Player && it.sender.hasPermission("ggnext.paper.vanish") }
             .executes { ctx ->
                 val player = ctx.source.sender as Player
-                Manager.toggle(player)
+                manager.toggle(player)
                 Command.SINGLE_SUCCESS
             }.build()
 }
