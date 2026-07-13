@@ -1,7 +1,7 @@
 package de.ggnext.railway.trade
 
+import de.ggnext.core.utils.player
 import de.ggnext.railway.profile.RailwayProfileManager
-import org.bukkit.entity.Player
 import java.util.UUID
 
 class TradeManager(
@@ -12,8 +12,8 @@ class TradeManager(
     private val succeedSession = mutableMapOf<UUID, TradeSession>()
 
     fun createRequest(
-        sender: Player,
-        target: Player,
+        sender: UUID,
+        target: UUID,
     ) {
         removeRequest(sender, target)
 
@@ -22,20 +22,20 @@ class TradeManager(
     }
 
     fun removeRequest(
-        sender: Player,
-        target: Player,
+        sender: UUID,
+        target: UUID,
     ) {
         activeRequests.removeIf { it.sender == sender && it.target == target }
     }
 
-    fun getFirstValidRequestForTarget(target: Player): TradeRequest? {
+    fun getFirstValidRequestForTarget(target: UUID): TradeRequest? {
         cleanupRequests()
         return activeRequests.find { it.target == target }
     }
 
     fun getValidRequestFromSender(
-        sender: Player,
-        target: Player,
+        sender: UUID,
+        target: UUID,
     ): TradeRequest? {
         cleanupRequests()
         return activeRequests.find { it.sender == sender && it.target == target }
@@ -47,38 +47,55 @@ class TradeManager(
     }
 
     fun startSession(
-        sender: Player,
-        target: Player,
+        sender: UUID,
+        target: UUID,
     ): TradeSession {
         activeRequests.removeIf { it.sender == sender && it.target == target }
 
-        val senderProfile = profileManager.getActiveProfile(sender) ?: throw IllegalStateException("Sender hat kein aktives Profil!")
-        val targetProfile = profileManager.getActiveProfile(target) ?: throw IllegalStateException("Target hat kein aktives Profil!")
+        val senderProfile =
+            sender.player()?.let { profileManager.getActiveProfile(it) } ?: throw IllegalStateException("Sender hat kein aktives Profil!")
+        val targetProfile =
+            target.player()?.let { profileManager.getActiveProfile(it) } ?: throw IllegalStateException("Target hat kein aktives Profil!")
 
         val tradePlayer1 = TradePlayer(sender, mutableListOf(), false, senderProfile)
         val tradePlayer2 = TradePlayer(target, mutableListOf(), false, targetProfile)
         val session = TradeSession(tradePlayer1, tradePlayer2)
 
-        activeSessions[sender.uniqueId] = session
-        activeSessions[target.uniqueId] = session
+        activeSessions[sender] = session
+        activeSessions[target] = session
 
         return session
     }
 
     fun endSession(session: TradeSession) {
-        activeSessions.remove(session.player1.player.uniqueId)
-        activeSessions.remove(session.player2.player.uniqueId)
+        activeSessions.remove(session.player1.player)
+        activeSessions.remove(session.player2.player)
 
-        succeedSession[session.player1.player.uniqueId] = session
-        succeedSession[session.player2.player.uniqueId] = session
+        session.player1.offer.forEach {
+            session.player1.player.player()?.inventory?.addItem(
+                it.clone(),
+            )
+        }
+
+        session.player2.offer.forEach {
+            session.player2.player.player()?.inventory?.addItem(
+                it.clone(),
+            )
+        }
+
+        session.player1.offer.clear()
+        session.player2.offer.clear()
+
+        succeedSession[session.player1.player] = session
+        succeedSession[session.player2.player] = session
     }
 
     fun removeSucceedSession(session: TradeSession) {
-        succeedSession.remove(session.player1.player.uniqueId)
-        succeedSession.remove(session.player2.player.uniqueId)
+        succeedSession.remove(session.player1.player)
+        succeedSession.remove(session.player2.player)
     }
 
-    fun getSession(player: Player): TradeSession? = activeSessions[player.uniqueId]
+    fun getSession(player: UUID): TradeSession? = activeSessions[player]
 
-    fun getSucceedSession(player: Player): TradeSession? = succeedSession[player.uniqueId]
+    fun getSucceedSession(player: UUID): TradeSession? = succeedSession[player]
 }

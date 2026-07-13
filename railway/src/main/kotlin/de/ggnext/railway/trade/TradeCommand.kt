@@ -1,15 +1,14 @@
 package de.ggnext.railway.trade
 
-import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.suggestion.Suggestions
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
+import de.ggnext.core.utils.player
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.CompletableFuture
 
 class TradeCommand(
@@ -25,7 +24,7 @@ class TradeCommand(
                     .literal("accept")
                     .executes { ctx ->
                         val player = ctx.source.sender as Player
-                        val request = tradeManager.getFirstValidRequestForTarget(player)
+                        val request = tradeManager.getFirstValidRequestForTarget(player.uniqueId)
                         handleAccept(player, request)
                         Command.SINGLE_SUCCESS
                     }.then(
@@ -42,7 +41,7 @@ class TradeCommand(
                                     player.sendMessage(msg.get(player.language()))
                                     return@executes 1
                                 }
-                                val request = tradeManager.getValidRequestFromSender(sender, player)
+                                val request = tradeManager.getValidRequestFromSender(sender.uniqueId, player.uniqueId)
                                 handleAccept(player, request)
                                 Command.SINGLE_SUCCESS
                             },
@@ -52,7 +51,7 @@ class TradeCommand(
                     .literal("deny")
                     .executes { ctx ->
                         val player = ctx.source.sender as Player
-                        val request = tradeManager.getFirstValidRequestForTarget(player)
+                        val request = tradeManager.getFirstValidRequestForTarget(player.uniqueId)
                         handleDeny(player, request)
                         Command.SINGLE_SUCCESS
                     }.then(
@@ -69,7 +68,7 @@ class TradeCommand(
                                     player.sendMessage(msg.get(player.language()))
                                     return@executes 1
                                 }
-                                val request = tradeManager.getValidRequestFromSender(sender, player)
+                                val request = tradeManager.getValidRequestFromSender(sender.uniqueId, player.uniqueId)
                                 handleDeny(player, request)
                                 Command.SINGLE_SUCCESS
                             },
@@ -95,13 +94,13 @@ class TradeCommand(
                             return@executes 1
                         }
 
-                        if (tradeManager.getValidRequestFromSender(player, target) != null) {
+                        if (tradeManager.getValidRequestFromSender(player.uniqueId, target.uniqueId) != null) {
                             val msg by TranslationStore("translations.railway.trade.exist_request")
                             player.sendMessage(msg.get(player.language(), listOf(player.name)))
                             return@executes 1
                         }
 
-                        tradeManager.createRequest(player, target)
+                        tradeManager.createRequest(player.uniqueId, target.uniqueId)
 
                         val msgSent by TranslationStore("translations.railway.trade.request_sent")
                         player.sendMessage(msgSent.get(player.language(), listOf(target.name)))
@@ -125,15 +124,15 @@ class TradeCommand(
             return
         }
 
-        val sender = request.sender
+        val sender = request.sender.player() ?: return
         if (!sender.isOnline) {
             val msg by TranslationStore("translations.railway.trade.sender_offline")
             player.sendMessage(msg.get(player.language()))
-            tradeManager.removeRequest(sender, player)
+            tradeManager.removeRequest(sender.uniqueId, player.uniqueId)
             return
         }
 
-        val session = tradeManager.startSession(sender, player)
+        val session = tradeManager.startSession(sender.uniqueId, player.uniqueId)
 
         val msgTarget by TranslationStore("translations.railway.trade.started_target")
         player.sendMessage(msgTarget.get(player.language(), listOf(sender.name)))
@@ -154,8 +153,8 @@ class TradeCommand(
             return
         }
 
-        val sender = request.sender
-        tradeManager.removeRequest(sender, player)
+        val sender = request.sender.player() ?: return
+        tradeManager.removeRequest(sender.uniqueId, player.uniqueId)
 
         val msgTarget by TranslationStore("translations.railway.trade.denied_target")
         player.sendMessage(msgTarget.get(player.language(), listOf(sender.name)))

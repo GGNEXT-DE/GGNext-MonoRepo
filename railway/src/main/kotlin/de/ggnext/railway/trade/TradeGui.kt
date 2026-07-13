@@ -9,13 +9,13 @@ import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.createFiller
 import de.ggnext.core.utils.language
 import de.ggnext.core.utils.name
-import de.ggnext.railway.profile.RailwayProfileManager
+import de.ggnext.core.utils.player
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.UUID
 
 class TradeGui(
     private val plugin: JavaPlugin,
@@ -40,11 +40,13 @@ class TradeGui(
     }
 
     private suspend fun openSinglePlayerGui(
-        viewer: Player,
+        viewer: UUID,
         self: TradePlayer,
         other: TradePlayer,
         session: TradeSession,
     ) {
+        val viewer = viewer.player() ?: return
+
         val title by TranslationStore(
             "translations.railway.trade.gui.title",
         )
@@ -65,16 +67,16 @@ class TradeGui(
                     title.get(
                         viewer.language(),
                         listOf(
-                            other.player.name,
+                            other.player.player()?.name ?: "",
                         ),
                     )
                 }
 
                 withTransform(
-                    session.accepted1Property,
-                    session.accepted2Property,
+                    session.accepted1,
+                    session.accepted2,
                     session.offerChangedProperty,
-                ) { pane, view ->
+                ) { pane, _ ->
 
                     self.offer.forEachIndexed { index, item ->
 
@@ -139,10 +141,10 @@ class TradeGui(
                                 !self.accept
 
                             if (session.player1 == self) {
-                                session.accepted1 =
+                                session.accepted1.value =
                                     self.accept
                             } else {
-                                session.accepted2 =
+                                session.accepted2.value =
                                     self.accept
                             }
 
@@ -154,7 +156,7 @@ class TradeGui(
                     val partnerStatus =
                         Component
                             .text(
-                                "${other.player.name}: ",
+                                "${other.player.player()?.name}: ",
                             ).color(
                                 NamedTextColor.GREEN,
                             ).append(
@@ -201,50 +203,98 @@ class TradeGui(
 
     private fun checkTradeCompletion(session: TradeSession) {
         if (
-            !session.accepted1 ||
-            !session.accepted2
+            !session.accepted1.value ||
+            !session.accepted2.value
         ) {
             return
         }
 
-        plugin.launch {
-            session.player1.offer.forEach {
-                session.player2.player.inventory.addItem(
-                    it.clone(),
-                )
-            }
+        val p1 = session.player1.player.player() ?: return
+        val p2 = session.player2.player.player() ?: return
 
-            session.player2.offer.forEach {
-                session.player1.player.inventory.addItem(
-                    it.clone(),
-                )
-            }
+        val p1SimulatedInv =
+            p1.inventory.storageContents
+                .map { it?.clone() }
+                .toTypedArray()
+        val p2SimulatedInv =
+            p2.inventory.storageContents
+                .map { it?.clone() }
+                .toTypedArray()
 
-            val success by TranslationStore(
-                "translations.railway.trade.success",
+        val p1Temp =
+            org.bukkit.Bukkit
+                .createInventory(null, 36)
+                .apply { storageContents = p1SimulatedInv }
+        val p2Temp =
+            org.bukkit.Bukkit
+                .createInventory(null, 36)
+                .apply { storageContents = p2SimulatedInv }
+
+        val p1Overflow =
+            p1Temp.addItem(
+                *session.player2.offer
+                    .map { it.clone() }
+                    .toTypedArray(),
+            )
+        val p2Overflow =
+            p2Temp.addItem(
+                *session.player1.offer
+                    .map { it.clone() }
+                    .toTypedArray(),
             )
 
-            session.player1.player.sendMessage(
-                success.get(
-                    session.player1.player.language(),
-                ),
-            )
-
-            session.player2.player.sendMessage(
-                success.get(
-                    session.player2.player.language(),
-                ),
-            )
-
-            session.player1.offer.clear()
-            session.player2.offer.clear()
-
+        if (p1Overflow.isNotEmpty() || p2Overflow.isNotEmpty()) {
+            val msg by TranslationStore("translations.railway.overflow")
+            p1.sendMessage(msg.get(p1.language()))
+            p2.sendMessage(msg.get(p2.language()))
             tradeManager.endSession(
                 session,
             )
 
-            session.player1.player.closeInventory()
-            session.player2.player.closeInventory()
+            session.player1.player
+                .player()
+                ?.closeInventory()
+            session.player2.player
+                .player()
+                ?.closeInventory()
+            return
         }
+
+        session.player2.offer.forEach { p1.inventory.addItem(it.clone()) }
+        session.player1.offer.forEach { p2.inventory.addItem(it.clone()) }
+
+        val success by TranslationStore(
+            "translations.railway.trade.success",
+        )
+
+        session.player1.player.player()?.sendMessage(
+            success.get(
+                session.player1.player
+                    .player()
+                    ?.language() ?: return,
+            ),
+        )
+
+        session.player2.player.player()?.sendMessage(
+            success.get(
+                session.player2.player
+                    .player()
+                    ?.language() ?: return,
+            ),
+        )
+
+        session.player1.offer.clear()
+        session.player2.offer.clear()
+
+        tradeManager.endSession(
+            session,
+        )
+
+        session.player1.player
+            .player()
+            ?.closeInventory()
+        session.player2.player
+            .player()
+            ?.closeInventory()
     }
 }

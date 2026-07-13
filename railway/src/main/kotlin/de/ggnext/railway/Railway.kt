@@ -16,6 +16,7 @@ import de.ggnext.railway.zone.command.ZoneSCommand
 import de.ggnext.railway.zone.config.ZoneConfigLoader
 import de.ggnext.railway.zone.listener.ZoneListener
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import org.bukkit.Bukkit
 
 class Railway : SuspendingJavaPlugin() {
     lateinit var zoneManager: ZoneManager
@@ -34,6 +35,15 @@ class Railway : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
+        for (player in Bukkit.getOnlinePlayers()) {
+            val session =
+                tradeManager.getSession(player.uniqueId)
+                    ?: continue
+
+            tradeManager.endSession(
+                session,
+            )
+        }
         // Plugin shutdown logic
     }
 
@@ -52,7 +62,7 @@ class Railway : SuspendingJavaPlugin() {
         server.pluginManager.apply {
             registerSuspendingEvents(ZoneListener(zoneManager), this@Railway)
             registerSuspendingEvents(ProfileListener(railwayProfileManager), this@Railway)
-            registerSuspendingEvents(TradeListener(this@Railway, tradeManager), this@Railway)
+            registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
         }
     }
 }

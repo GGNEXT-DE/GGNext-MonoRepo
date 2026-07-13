@@ -1,22 +1,21 @@
 package de.ggnext.railway.trade
 
-import com.github.shynixn.mccoroutine.bukkit.launch
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
+import de.ggnext.core.utils.player
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.plugin.java.JavaPlugin
 
 class TradeListener(
-    private val plugin: JavaPlugin,
     private val tradeManager: TradeManager,
 ) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -42,7 +41,7 @@ class TradeListener(
                 ?: return
 
         val session =
-            tradeManager.getSession(player)
+            tradeManager.getSession(player.uniqueId)
                 ?: return
 
         if (event.clickedInventory == null) {
@@ -70,12 +69,15 @@ class TradeListener(
             item.type == Material.BLACK_STAINED_GLASS_PANE ||
             item.type == Material.GRAY_STAINED_GLASS_PANE
         ) {
-            event.isCancelled = true
-            return
+            if (event.clickedInventory == event.view.topInventory) {
+                player.sendMessage(event.clickedInventory.toString())
+                event.isCancelled = true
+                return
+            }
         }
 
         val tradePlayer =
-            if (session.player1.player == player) {
+            if (session.player1.player.player() == player) {
                 session.player1
             } else {
                 session.player2
@@ -107,7 +109,7 @@ class TradeListener(
                 ?: return
 
         if (
-            tradeManager.getSession(player)
+            tradeManager.getSession(player.uniqueId)
             != null
         ) {
             event.isCancelled = true
@@ -120,44 +122,29 @@ class TradeListener(
             event.player as? Player
                 ?: return
 
-        val succeedSession = tradeManager.getSucceedSession(player)
+        val succeedSession = tradeManager.getSucceedSession(player.uniqueId)
         if (succeedSession != null) {
             tradeManager.removeSucceedSession(succeedSession)
             return
         }
 
         val session =
-            tradeManager.getSession(player)
+            tradeManager.getSession(player.uniqueId)
                 ?: return
 
         tradeManager.endSession(
             session,
         )
 
-        session.player1.offer.forEach {
-            session.player1.player.inventory.addItem(
-                it.clone(),
-            )
-        }
-
-        session.player2.offer.forEach {
-            session.player2.player.inventory.addItem(
-                it.clone(),
-            )
-        }
-
-        session.player1.offer.clear()
-        session.player2.offer.clear()
-
         val cancelled by TranslationStore(
             "translations.railway.trade.cancelled",
         )
 
         val p1 =
-            session.player1.player
+            session.player1.player.player() ?: return
 
         val p2 =
-            session.player2.player
+            session.player2.player.player() ?: return
 
         p1.sendMessage(
             cancelled.get(
@@ -175,6 +162,15 @@ class TradeListener(
             p2.closeInventory()
         } else {
             p1.closeInventory()
+        }
+    }
+
+    @EventHandler
+    fun onPlayerPickupItem(event: EntityPickupItemEvent) {
+        val player = event.entity as? Player ?: return
+
+        if (tradeManager.getSession(player.uniqueId) != null) {
+            event.isCancelled = true
         }
     }
 }
