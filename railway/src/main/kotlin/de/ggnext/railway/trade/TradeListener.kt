@@ -24,6 +24,12 @@ class TradeListener(
             return
         }
 
+        val player = event.whoClicked.toPlayer() ?: return
+
+        val session =
+            tradeManager.getSession(player.uniqueId)
+                ?: return
+
         if (event.clickedInventory?.type != InventoryType.PLAYER) {
             event.isCancelled = true
             return
@@ -44,12 +50,6 @@ class TradeListener(
 
             else -> {}
         }
-
-        val player = event.whoClicked.toPlayer() ?: return
-
-        val session =
-            tradeManager.getSession(player.uniqueId)
-                ?: return
 
         val item =
             event.currentItem
@@ -81,7 +81,7 @@ class TradeListener(
                 session.player2
             }
 
-        if (tradePlayer.offer.size >= 12) {
+        if (tradePlayer.offer.size >= 16) {
             event.isCancelled = true
             return
         }
@@ -112,12 +112,6 @@ class TradeListener(
     @EventHandler
     fun onInventoryClose(event: InventoryCloseEvent) {
         val player = event.player.toPlayer() ?: return
-
-        val succeedSession = tradeManager.getSucceedSession(player.uniqueId)
-        if (succeedSession != null) {
-            tradeManager.removeSucceedSession(succeedSession)
-            return
-        }
 
         val session =
             tradeManager.getSession(player.uniqueId)

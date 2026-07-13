@@ -108,7 +108,7 @@ class TradeGui(
 
                     forEachInGrid(6, 9) { row, column ->
 
-                        if (column == 4 || row == 3) {
+                        if (column == 4 || row == 4) {
                             pane[row, column] =
                                 StaticElement(
                                     drawable(

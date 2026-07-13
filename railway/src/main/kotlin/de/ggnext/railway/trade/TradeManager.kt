@@ -7,7 +7,6 @@ import java.util.UUID
 class TradeManager {
     private val activeSessions = mutableMapOf<UUID, TradeSession>()
     private val activeRequests = mutableListOf<TradeRequest>()
-    private val succeedSession = mutableMapOf<UUID, TradeSession>()
 
     fun createRequest(
         sender: UUID,
@@ -78,17 +77,7 @@ class TradeManager {
 
         session.player1.offer.clear()
         session.player2.offer.clear()
-
-        succeedSession[session.player1.playerUUID] = session
-        succeedSession[session.player2.playerUUID] = session
-    }
-
-    fun removeSucceedSession(session: TradeSession) {
-        succeedSession.remove(session.player1.playerUUID)
-        succeedSession.remove(session.player2.playerUUID)
     }
 
     fun getSession(player: UUID): TradeSession? = activeSessions[player]
-
-    fun getSucceedSession(player: UUID): TradeSession? = succeedSession[player]
 }
