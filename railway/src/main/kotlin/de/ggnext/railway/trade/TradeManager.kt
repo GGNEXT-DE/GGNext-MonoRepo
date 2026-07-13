@@ -1,5 +1,6 @@
 package de.ggnext.railway.trade
 
+import com.noxcrew.interfaces.properties.InterfaceProperty
 import de.ggnext.core.utils.toPlayer
 import java.util.UUID
 
@@ -49,8 +50,8 @@ class TradeManager {
     ): TradeSession {
         activeRequests.removeIf { it.sender == sender && it.target == target }
 
-        val tradePlayer1 = TradePlayer(sender, mutableListOf())
-        val tradePlayer2 = TradePlayer(target, mutableListOf())
+        val tradePlayer1 = TradePlayer(sender, mutableListOf(), InterfaceProperty(false))
+        val tradePlayer2 = TradePlayer(target, mutableListOf(), InterfaceProperty(false))
         val session = TradeSession(tradePlayer1, tradePlayer2)
 
         activeSessions[sender] = session

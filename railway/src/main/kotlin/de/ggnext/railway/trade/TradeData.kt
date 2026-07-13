@@ -1,5 +1,6 @@
 package de.ggnext.railway.trade
 
+import com.noxcrew.interfaces.properties.InterfaceProperty
 import com.noxcrew.interfaces.properties.interfaceProperty
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -9,19 +10,13 @@ data class TradeSession(
     val player2: TradePlayer,
     var lastChanged: Long = System.currentTimeMillis(),
 ) {
-    var accepted1 =
-        interfaceProperty(false)
-
-    var accepted2 =
-        interfaceProperty(false)
-
     val offerChangedProperty =
         interfaceProperty(0)
 
     fun triggerOfferUpdate() {
-        accepted1.value = false
+        player1.accepted.value = false
 
-        accepted2.value = false
+        player2.accepted.value = false
 
         lastChanged =
             System.currentTimeMillis()
@@ -33,6 +28,7 @@ data class TradeSession(
 data class TradePlayer(
     val playerUUID: UUID,
     val offer: MutableList<ItemStack>,
+    var accepted: InterfaceProperty<Boolean>,
 )
 
 data class TradeRequest(

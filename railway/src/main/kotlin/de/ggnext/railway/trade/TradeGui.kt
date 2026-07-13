@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.noxcrew.interfaces.drawable.Drawable.Companion.drawable
 import com.noxcrew.interfaces.element.StaticElement
 import com.noxcrew.interfaces.interfaces.buildChestInterface
+import com.noxcrew.interfaces.properties.InterfaceProperty
 import com.noxcrew.interfaces.utilities.forEachInGrid
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.createFiller
@@ -70,8 +71,8 @@ class TradeGui(
                 }
 
                 withTransform(
-                    session.accepted1,
-                    session.accepted2,
+                    session.player1.accepted,
+                    session.player2.accepted,
                     session.offerChangedProperty,
                 ) { pane, _ ->
 
@@ -118,7 +119,7 @@ class TradeGui(
                     }
 
                     val ownStatus =
-                        if (self.accept) {
+                        if (self.accepted.value) {
                             ready.get(
                                 viewer.language(),
                             )
@@ -131,18 +132,18 @@ class TradeGui(
                     pane[5, 2] =
                         StaticElement(
                             drawable(
-                                ItemStack(if (self.accept) Material.GREEN_WOOL else Material.RED_WOOL).name(ownStatus),
+                                ItemStack(if (self.accepted.value) Material.GREEN_WOOL else Material.RED_WOOL).name(ownStatus),
                             ),
                         ) {
-                            self.accept =
-                                !self.accept
+                            self.accepted.value =
+                                !self.accepted.value
 
                             if (session.player1 == self) {
-                                session.accepted1.value =
-                                    self.accept
+                                session.player1.accepted =
+                                    self.accepted
                             } else {
-                                session.accepted2.value =
-                                    self.accept
+                                session.player2.accepted =
+                                    self.accepted
                             }
 
                             checkTradeCompletion(
@@ -157,7 +158,7 @@ class TradeGui(
                             ).color(
                                 NamedTextColor.GREEN,
                             ).append(
-                                if (other.accept) {
+                                if (other.accepted.value) {
                                     ready.get(
                                         viewer.language(),
                                     )
@@ -172,7 +173,7 @@ class TradeGui(
                         StaticElement(
                             drawable(
                                 ItemStack(
-                                    if (other.accept) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE,
+                                    if (other.accepted.value) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE,
                                 ).name(partnerStatus),
                             ),
                         )
@@ -200,8 +201,8 @@ class TradeGui(
 
     private fun checkTradeCompletion(session: TradeSession) {
         if (
-            !session.accepted1.value ||
-            !session.accepted2.value
+            !session.player1.accepted.value ||
+            !session.player2.accepted.value
         ) {
             return
         }
