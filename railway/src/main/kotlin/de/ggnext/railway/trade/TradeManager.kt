@@ -4,9 +4,7 @@ import de.ggnext.core.utils.player
 import de.ggnext.railway.profile.RailwayProfileManager
 import java.util.UUID
 
-class TradeManager(
-    private val profileManager: RailwayProfileManager,
-) {
+class TradeManager {
     private val activeSessions = mutableMapOf<UUID, TradeSession>()
     private val activeRequests = mutableListOf<TradeRequest>()
     private val succeedSession = mutableMapOf<UUID, TradeSession>()
@@ -52,13 +50,8 @@ class TradeManager(
     ): TradeSession {
         activeRequests.removeIf { it.sender == sender && it.target == target }
 
-        val senderProfile =
-            sender.player()?.let { profileManager.getActiveProfile(it) } ?: throw IllegalStateException("Sender hat kein aktives Profil!")
-        val targetProfile =
-            target.player()?.let { profileManager.getActiveProfile(it) } ?: throw IllegalStateException("Target hat kein aktives Profil!")
-
-        val tradePlayer1 = TradePlayer(sender, mutableListOf(), false, senderProfile)
-        val tradePlayer2 = TradePlayer(target, mutableListOf(), false, targetProfile)
+        val tradePlayer1 = TradePlayer(sender, mutableListOf(), false)
+        val tradePlayer2 = TradePlayer(target, mutableListOf(), false)
         val session = TradeSession(tradePlayer1, tradePlayer2)
 
         activeSessions[sender] = session

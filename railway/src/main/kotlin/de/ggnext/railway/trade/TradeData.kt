@@ -41,7 +41,6 @@ data class TradePlayer(
     val player: UUID,
     val offer: MutableList<ItemStack>,
     var accept: Boolean,
-    val profile: RailwayProfile,
 )
 
 data class TradeRequest(
