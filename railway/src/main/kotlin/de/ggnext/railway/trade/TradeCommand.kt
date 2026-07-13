@@ -3,6 +3,7 @@ package de.ggnext.railway.trade
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
 import de.ggnext.core.utils.toPlayer
@@ -37,7 +38,7 @@ class TradeCommand(
                                 val sender = Bukkit.getPlayer(senderName)
 
                                 if (sender == null) {
-                                    val msg by TranslationStore("translations.railway.trade.player_not_found")
+                                    val msg by TranslationStore("translations.player_not_found")
                                     player.sendMessage(msg.get(player.language()))
                                     return@executes 1
                                 }
@@ -64,7 +65,7 @@ class TradeCommand(
                                 val sender = Bukkit.getPlayer(senderName)
 
                                 if (sender == null) {
-                                    val msg by TranslationStore("translations.railway.trade.player_not_found")
+                                    val msg by TranslationStore("translations.player_not_found")
                                     player.sendMessage(msg.get(player.language()))
                                     return@executes 1
                                 }
@@ -83,7 +84,7 @@ class TradeCommand(
                         val target = Bukkit.getPlayer(targetName)
 
                         if (target == null) {
-                            val msg by TranslationStore("translations.railway.trade.player_not_found")
+                            val msg by TranslationStore("translations.player_not_found")
                             player.sendMessage(msg.get(player.language()))
                             return@executes 1
                         }
@@ -126,7 +127,7 @@ class TradeCommand(
 
         val sender = request.sender.toPlayer() ?: return
         if (!sender.isOnline) {
-            val msg by TranslationStore("translations.railway.trade.sender_offline")
+            val msg by TranslationStore("translations.player_offline")
             player.sendMessage(msg.get(player.language()))
             tradeManager.removeRequest(sender.uniqueId, player.uniqueId)
             return
@@ -165,9 +166,7 @@ class TradeCommand(
         }
     }
 
-    private fun provideOnlinePlayerSuggestions(
-        builder: com.mojang.brigadier.suggestion.SuggestionsBuilder,
-    ): CompletableFuture<Suggestions> {
+    private fun provideOnlinePlayerSuggestions(builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         val current = builder.remaining.lowercase()
         Bukkit.getOnlinePlayers().forEach { onlinePlayer ->
             if (onlinePlayer.name.lowercase().startsWith(current)) {

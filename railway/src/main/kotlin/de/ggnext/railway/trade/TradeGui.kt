@@ -135,15 +135,12 @@ class TradeGui(
                                 ItemStack(if (self.accepted.value) Material.GREEN_WOOL else Material.RED_WOOL).name(ownStatus),
                             ),
                         ) {
-                            self.accepted.value =
-                                !self.accepted.value
+                            self.accepted.value = !self.accepted.value
 
                             if (session.player1 == self) {
-                                session.player1.accepted =
-                                    self.accepted
+                                session.player1.accepted = self.accepted
                             } else {
-                                session.player2.accepted =
-                                    self.accepted
+                                session.player2.accepted = self.accepted
                             }
 
                             checkTradeCompletion(
@@ -159,13 +156,9 @@ class TradeGui(
                                 NamedTextColor.GREEN,
                             ).append(
                                 if (other.accepted.value) {
-                                    ready.get(
-                                        viewer.language(),
-                                    )
+                                    ready.get(viewer.language())
                                 } else {
-                                    notReady.get(
-                                        viewer.language(),
-                                    )
+                                    notReady.get(viewer.language())
                                 },
                             )
 
@@ -200,10 +193,7 @@ class TradeGui(
     }
 
     private fun checkTradeCompletion(session: TradeSession) {
-        if (
-            !session.player1.accepted.value ||
-            !session.player2.accepted.value
-        ) {
+        if (!session.player1.accepted.value || !session.player2.accepted.value) {
             return
         }
 

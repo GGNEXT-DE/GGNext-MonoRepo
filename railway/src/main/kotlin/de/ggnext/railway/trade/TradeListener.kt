@@ -26,9 +26,7 @@ class TradeListener(
 
         val player = event.whoClicked.toPlayer() ?: return
 
-        val session =
-            tradeManager.getSession(player.uniqueId)
-                ?: return
+        val session = tradeManager.getSession(player.uniqueId) ?: return
 
         if (event.clickedInventory?.type != InventoryType.PLAYER) {
             event.isCancelled = true
@@ -51,9 +49,7 @@ class TradeListener(
             else -> {}
         }
 
-        val item =
-            event.currentItem
-                ?: return
+        val item = event.currentItem ?: return
 
         if (item.type.isAir) {
             return

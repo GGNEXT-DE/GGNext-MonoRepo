@@ -1,6 +1,7 @@
 package de.ggnext.railway.trade
 
 import com.noxcrew.interfaces.properties.InterfaceProperty
+import de.ggnext.contentsystem.value.store.NumberStore
 import de.ggnext.core.utils.toPlayer
 import java.util.UUID
 
@@ -14,7 +15,9 @@ class TradeManager {
     ) {
         removeRequest(sender, target)
 
-        val expirationTime = System.currentTimeMillis() + (5 * 60 * 1000L)
+        val expireTime by NumberStore("numbers.railways.trade.expire")
+
+        val expirationTime = System.currentTimeMillis() + (expireTime.toInt() * 60 * 1000L)
         activeRequests.add(TradeRequest(sender, target, expirationTime))
     }
 
@@ -60,9 +63,6 @@ class TradeManager {
     }
 
     fun endSession(session: TradeSession) {
-        activeSessions.remove(session.player1.playerUUID)
-        activeSessions.remove(session.player2.playerUUID)
-
         session.player1.offer.forEach {
             session.player1.playerUUID.toPlayer()?.inventory?.addItem(
                 it.clone(),
@@ -75,8 +75,8 @@ class TradeManager {
             )
         }
 
-        session.player1.offer.clear()
-        session.player2.offer.clear()
+        activeSessions.remove(session.player1.playerUUID)
+        activeSessions.remove(session.player2.playerUUID)
     }
 
     fun getSession(player: UUID): TradeSession? = activeSessions[player]
