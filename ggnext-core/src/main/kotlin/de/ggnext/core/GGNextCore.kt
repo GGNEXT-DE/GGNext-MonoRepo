@@ -9,6 +9,8 @@ import de.ggnext.core.db.MongoManager
 import de.ggnext.core.economy.EconomyService
 import de.ggnext.core.scoreboard.ScoreBoardListener
 import de.ggnext.core.scoreboard.ScoreBoardManager
+import de.ggnext.core.tab.TabListener
+import de.ggnext.core.tab.TabManager
 import de.ggnext.core.vanish.VanishCommand
 import de.ggnext.core.vanish.VanishManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
@@ -21,6 +23,7 @@ class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var contentSystem: ContentSystem
     private lateinit var scoreboardLibrary: ScoreboardLibrary
     private lateinit var scoreBoardManager: ScoreBoardManager
+    private lateinit var tabManager: TabManager
 
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
@@ -48,6 +51,8 @@ class GGNextCore : SuspendingJavaPlugin() {
         GGNextAPI.scoreBoardManager = scoreBoardManager
 
         server.pluginManager.registerEvents(ScoreBoardListener(scoreBoardManager), this)
+        tabManager = TabManager()
+        server.pluginManager.registerEvents(TabListener(tabManager), this)
 
         logger.info("GGNext Core enabled!")
     }
