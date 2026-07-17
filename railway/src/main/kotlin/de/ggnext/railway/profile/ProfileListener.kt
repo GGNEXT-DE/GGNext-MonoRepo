@@ -14,7 +14,7 @@ class ProfileListener(
         val player = event.player
         val profiles = railwayProfileManager.getProfiles(player)
         if (profiles.isEmpty()) {
-            railwayProfileManager.createProfile(player, profileGui.profileNames.random())
+            railwayProfileManager.createProfile(player, railwayProfileNames.random())
         }
         profileGui.openProfileGui(player)
     }
