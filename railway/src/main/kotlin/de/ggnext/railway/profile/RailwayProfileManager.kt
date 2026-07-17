@@ -88,17 +88,14 @@ class RailwayProfileManager(
         player: Player,
         profileId: UUID,
     ) {
+        if (getActiveProfile(player)?.id == profileId) {
+            return
+        }
         profileCollection.deleteOne(Filters.eq("_id", profileId))
         profileIndexCollection.updateOne(
             Filters.eq("_id", player.uniqueId),
             Updates.pull("profileIds", profileId),
         )
-
-        if (activeProfiles[player.uniqueId]?.id == profileId) {
-            activeProfiles.remove(player.uniqueId)
-            activeProfiles[player.uniqueId] = getProfiles(player).firstOrNull() ?: return
-            // wenn du eine bessere idee hast kannst du sie gerne kommentieren
-        }
     }
 
     fun setActiveProfile(

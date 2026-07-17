@@ -22,7 +22,7 @@ class ProfileGui(
     private val plugin: JavaPlugin,
     private val profileManager: RailwayProfileManager,
 ) {
-    private val profileNames =
+    val profileNames =
         listOf(
             "Alpha",
             "Beta",
