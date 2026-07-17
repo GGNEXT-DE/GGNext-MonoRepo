@@ -6,8 +6,6 @@ import java.util.UUID
 data class RailwayProfile(
     @BsonId val id: UUID,
     val name: String,
-    val createdAt: Long,
-    val lastPlayed: Long,
     val railwayDollars: Double,
 )
 

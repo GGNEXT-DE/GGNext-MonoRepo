@@ -7,12 +7,12 @@ import org.bukkit.event.player.PlayerQuitEvent
 
 class ProfileListener(
     private val railwayProfileManager: RailwayProfileManager,
+    private val profileGui: ProfileGui,
 ) : Listener {
     @EventHandler
     suspend fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         val player = event.player
-        val profile = railwayProfileManager.getProfiles(player).firstOrNull() ?: return
-        railwayProfileManager.setActiveProfile(player, profile)
+        profileGui.openProfileGui(player)
     }
 
     @EventHandler

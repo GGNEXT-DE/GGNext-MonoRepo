@@ -14,13 +14,20 @@ import java.util.concurrent.CompletableFuture
 
 class ProfileCommand(
     private val railwayProfileManager: RailwayProfileManager,
+    private val profileGui: ProfileGui,
     private val plugin: JavaPlugin,
 ) {
     val command =
         Commands
             .literal("profile")
             .requires { it.sender is Player }
-            .then(
+            .executes { ctx ->
+                val player = ctx.source.sender as Player
+                plugin.launch {
+                    profileGui.openProfileGui(player)
+                }
+                Command.SINGLE_SUCCESS
+            }.then(
                 Commands
                     .literal("create")
                     .then(
