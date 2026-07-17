@@ -9,10 +9,10 @@ import de.ggnext.core.db.MongoManager
 import de.ggnext.core.economy.EconomyService
 import de.ggnext.core.scoreboard.ScoreBoardListener
 import de.ggnext.core.scoreboard.ScoreBoardManager
-import de.ggnext.core.vanish.VanishCommand
-import de.ggnext.core.vanish.VanishManager
 import de.ggnext.core.tab.TabListener
 import de.ggnext.core.tab.TabManager
+import de.ggnext.core.vanish.VanishCommand
+import de.ggnext.core.vanish.VanishManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary

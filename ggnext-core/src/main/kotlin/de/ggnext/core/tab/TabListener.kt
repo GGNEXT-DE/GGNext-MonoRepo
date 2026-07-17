@@ -7,7 +7,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 class TabListener(
     private val tabManager: TabManager,
 ) : Listener {
-
     @EventHandler
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         tabManager.setTab(event.player)
