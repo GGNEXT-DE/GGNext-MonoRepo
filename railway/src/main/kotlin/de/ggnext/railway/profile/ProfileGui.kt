@@ -22,34 +22,6 @@ class ProfileGui(
     private val plugin: JavaPlugin,
     private val profileManager: RailwayProfileManager,
 ) {
-    val profileNames =
-        listOf(
-            "Alpha",
-            "Beta",
-            "Gamma",
-            "Delta",
-            "Omega",
-            "PlayerOne",
-            "Shadow",
-            "Phoenix",
-            "Nexus",
-            "Matrix",
-            "Hunter",
-            "Ranger",
-            "Rogue",
-            "Knight",
-            "Mage",
-            "Nova",
-            "Cosmo",
-            "Vortex",
-            "Titan",
-            "Echo",
-            "User1",
-            "User2",
-            "User3",
-            "Guest",
-            "Admin",
-        )
     private val previousGuiItemName by TranslationStore("translations.previous.gui")
 
     suspend fun openProfileGui(player: Player) {
@@ -118,7 +90,7 @@ class ProfileGui(
                     pane[2, 4] =
                         StaticElement(drawable(ItemStack(Material.NAME_TAG).name(createItemName.get(player.language())))) {
                             plugin.launch {
-                                val profile = profileManager.createProfile(player, profileNames.random())
+                                val profile = profileManager.createProfile(player, railwayProfileNames.random())
                                 if (profileManager.getActiveProfile(player) == null && profile != null) {
                                     profileManager.setActiveProfile(player, profile)
                                 }
