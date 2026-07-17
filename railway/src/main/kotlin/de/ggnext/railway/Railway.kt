@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.railway.profile.ProfileCommand
+import de.ggnext.railway.profile.ProfileGui
 import de.ggnext.railway.profile.ProfileListener
 import de.ggnext.railway.profile.RailwayProfileManager
 import de.ggnext.railway.trade.TradeCommand
@@ -21,12 +22,14 @@ import org.bukkit.Bukkit
 class Railway : SuspendingJavaPlugin() {
     lateinit var zoneManager: ZoneManager
     lateinit var railwayProfileManager: RailwayProfileManager
+    lateinit var profileGui: ProfileGui
     lateinit var tradeManager: TradeManager
     lateinit var tradeGui: TradeGui
 
     override suspend fun onEnableAsync() {
         val zoneConfigs = ZoneConfigLoader(this).load()
         railwayProfileManager = RailwayProfileManager(GGNextAPI.mongoManager)
+        profileGui = ProfileGui(this, railwayProfileManager)
         zoneManager = ZoneManager(this, zoneConfigs, railwayProfileManager)
         tradeManager = TradeManager()
         tradeGui = TradeGui(this, tradeManager)
@@ -53,7 +56,7 @@ class Railway : SuspendingJavaPlugin() {
 
             commands.register(ZoneSCommand(this, zoneManager).command)
             commands.register(ZoneCCommand(this, zoneManager).command)
-            commands.register(ProfileCommand(railwayProfileManager, this).command)
+            commands.register(ProfileCommand(railwayProfileManager, profileGui, this).command)
             commands.register(TradeCommand(tradeManager, tradeGui).command)
         }
     }
@@ -61,7 +64,7 @@ class Railway : SuspendingJavaPlugin() {
     private fun registerListeners() {
         server.pluginManager.apply {
             registerSuspendingEvents(ZoneListener(zoneManager), this@Railway)
-            registerSuspendingEvents(ProfileListener(railwayProfileManager), this@Railway)
+            registerSuspendingEvents(ProfileListener(railwayProfileManager, profileGui), this@Railway)
             registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
         }
     }

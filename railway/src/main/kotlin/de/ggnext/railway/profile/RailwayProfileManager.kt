@@ -41,8 +41,6 @@ class RailwayProfileManager(
         val railwayProfile =
             RailwayProfile(
                 profileId,
-                createdAt = System.currentTimeMillis(),
-                lastPlayed = System.currentTimeMillis(),
                 railwayDollars = defaultRailwayDollars,
                 name = name,
             )
@@ -90,13 +88,14 @@ class RailwayProfileManager(
         player: Player,
         profileId: UUID,
     ) {
+        if (getActiveProfile(player)?.id == profileId) {
+            return
+        }
         profileCollection.deleteOne(Filters.eq("_id", profileId))
         profileIndexCollection.updateOne(
             Filters.eq("_id", player.uniqueId),
             Updates.pull("profileIds", profileId),
         )
-
-        if (activeProfiles[player.uniqueId]?.id == profileId) activeProfiles.remove(player.uniqueId)
     }
 
     fun setActiveProfile(
