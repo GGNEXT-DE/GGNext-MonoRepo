@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.suggestion.Suggestions
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
+import de.ggnext.core.utils.stringArgument
 import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -31,8 +32,7 @@ class ProfileCommand(
                 Commands
                     .literal("create")
                     .then(
-                        Commands
-                            .argument("name", StringArgumentType.word())
+                        stringArgument("name")
                             .executes { ctx ->
                                 val player = ctx.source.sender as Player
                                 val name = ctx.getArgument("name", String::class.java)
@@ -54,8 +54,7 @@ class ProfileCommand(
                 Commands
                     .literal("delete")
                     .then(
-                        Commands
-                            .argument("name", StringArgumentType.word())
+                        stringArgument("name")
                             .suggests { ctx, builder ->
                                 val future = CompletableFuture<Suggestions>()
                                 plugin.launch {
@@ -86,8 +85,7 @@ class ProfileCommand(
                 Commands
                     .literal("select")
                     .then(
-                        Commands
-                            .argument("name", StringArgumentType.word())
+                        stringArgument("name")
                             .suggests { ctx, builder ->
                                 val future = CompletableFuture<Suggestions>()
                                 plugin.launch {

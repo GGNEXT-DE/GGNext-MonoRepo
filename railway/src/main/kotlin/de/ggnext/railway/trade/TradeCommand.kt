@@ -2,15 +2,13 @@ package de.ggnext.railway.trade
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
+import de.ggnext.core.utils.playerArgument
 import de.ggnext.core.utils.toPlayer
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.concurrent.CompletableFuture
 
 class TradeCommand(
     private val tradeManager: TradeManager,
@@ -29,9 +27,7 @@ class TradeCommand(
                         handleAccept(player, request)
                         Command.SINGLE_SUCCESS
                     }.then(
-                        Commands
-                            .argument("sender", StringArgumentType.word())
-                            .suggests { _, builder -> provideOnlinePlayerSuggestions(builder) }
+                        playerArgument("sender")
                             .executes { ctx ->
                                 val player = ctx.source.sender as Player
                                 val senderName = StringArgumentType.getString(ctx, "sender")
@@ -56,9 +52,7 @@ class TradeCommand(
                         handleDeny(player, request)
                         Command.SINGLE_SUCCESS
                     }.then(
-                        Commands
-                            .argument("sender", StringArgumentType.word())
-                            .suggests { _, builder -> provideOnlinePlayerSuggestions(builder) }
+                        playerArgument("sender")
                             .executes { ctx ->
                                 val player = ctx.source.sender as Player
                                 val senderName = StringArgumentType.getString(ctx, "sender")
@@ -75,9 +69,7 @@ class TradeCommand(
                             },
                     ),
             ).then(
-                Commands
-                    .argument("target", StringArgumentType.word())
-                    .suggests { _, builder -> provideOnlinePlayerSuggestions(builder) }
+                playerArgument("target")
                     .executes { ctx ->
                         val player = ctx.source.sender as Player
                         val targetName = StringArgumentType.getString(ctx, "target")
@@ -164,17 +156,5 @@ class TradeCommand(
             val msgSender by TranslationStore("translations.railway.trade.denied_sender")
             sender.sendMessage(msgSender.get(sender.language(), listOf(player.name)))
         }
-    }
-
-    private fun provideOnlinePlayerSuggestions(builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
-        val current = builder.remaining.lowercase()
-        Bukkit.getOnlinePlayers().forEach { onlinePlayer ->
-            if (onlinePlayer.name.lowercase().startsWith(current)) {
-                builder.suggest(onlinePlayer.name)
-            }
-        }
-        val future = CompletableFuture<Suggestions>()
-        future.complete(builder.build())
-        return future
     }
 }
