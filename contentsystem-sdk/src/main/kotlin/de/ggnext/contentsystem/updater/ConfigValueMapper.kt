@@ -20,7 +20,7 @@ internal object ConfigValueMapper {
             "NUMBER" -> {
                 NumberValue(
                     key = key,
-                    value = doc.getDouble("value"),
+                    value = doc.getInteger("value"),
                 )
             }
 

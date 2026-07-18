@@ -17,7 +17,7 @@ class NumberStore(
     operator fun getValue(
         thisRef: Any?,
         property: KProperty<*>,
-    ): Double =
+    ): Int =
         runCatching {
             ValueCache.getTyped<NumberValue>(key).value
         }.getOrElse {
@@ -25,13 +25,13 @@ class NumberStore(
                 Document()
                     .append("_id", key)
                     .append("type", "NUMBER")
-                    .append("value", 1.0)
+                    .append("value", 1)
 
             ContentSystem.instance.scope.launch {
                 ContentSystem.instance.mongoManager.collection
                     .insertOne(doc)
             }
 
-            1.0
+            1
         }
 }

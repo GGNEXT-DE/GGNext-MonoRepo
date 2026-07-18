@@ -41,7 +41,7 @@ class RailwayProfileManager(
         val railwayProfile =
             RailwayProfile(
                 profileId,
-                railwayDollars = defaultRailwayDollars,
+                railwayDollars = defaultRailwayDollars.toDouble(),
                 name = name,
             )
 
