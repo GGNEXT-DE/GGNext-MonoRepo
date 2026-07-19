@@ -8,6 +8,7 @@ dependencies {
 
     implementation(libs.bundles.ggnext.velocity)
     implementation(project(":contentsystem-sdk"))
+    implementation(project(":ggnext-common"))
 }
 
 tasks {
