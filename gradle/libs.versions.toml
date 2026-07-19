@@ -4,7 +4,7 @@ mongodb = "5.9.0"
 mccoroutine = "2.22.0"
 interfaces = "2.1.0-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
-scoreboard = "2.8.0"
+scoreboard = "2.8.1"
 
 [libraries]
 # Fawe
