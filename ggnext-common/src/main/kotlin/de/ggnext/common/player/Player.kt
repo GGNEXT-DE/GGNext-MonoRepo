@@ -1,4 +1,4 @@
-package de.ggnext.velocityCore.features.players
+package de.ggnext.common.player
 
 import org.bson.codecs.pojo.annotations.BsonId
 import java.util.UUID
