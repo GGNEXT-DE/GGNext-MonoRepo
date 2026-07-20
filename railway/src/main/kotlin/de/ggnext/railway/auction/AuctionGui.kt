@@ -65,7 +65,7 @@ class AuctionGui(
         get() = defaultPrice.toLong().coerceAtLeast(configuredMinimumPrice)
 
     private val auctionsPerPage: Int
-        get() = maximumAuctions.toInt().coerceIn(1, MAX_AUCTIONS_PER_PAGE)
+        get() = maximumAuctions.coerceIn(1, MAX_AUCTIONS_PER_PAGE)
 
     suspend fun openAuctionGui(
         player: Player,
