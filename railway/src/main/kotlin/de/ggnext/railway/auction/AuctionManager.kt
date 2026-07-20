@@ -3,6 +3,7 @@ package de.ggnext.railway.auction
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.mongodb.client.model.Updates
+import de.ggnext.contentsystem.value.store.NumberStore
 import de.ggnext.core.db.MongoManager
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
@@ -14,6 +15,8 @@ class AuctionManager(
 ) {
     private val auctionCollection =
         mongoManager.database.getCollection<AuctionItem>("auction_items")
+
+    private val auctionExpirationDays by NumberStore("railway.auction.expiration_days")
 
     suspend fun createAuction(
         sellerId: UUID,
@@ -62,7 +65,10 @@ class AuctionManager(
             .updateMany(
                 Filters.and(
                     Filters.eq("status", AuctionStatus.ACTIVE),
-                    Filters.lte("createdAt", currentTime - EXPIRATION_TIME),
+                    Filters.lte(
+                        "createdAt",
+                        currentTime - auctionExpirationDays.toLong() * MILLIS_PER_DAY,
+                    ),
                 ),
                 Updates.set("status", AuctionStatus.EXPIRED),
             ).modifiedCount
@@ -104,6 +110,6 @@ class AuctionManager(
             ).modifiedCount == 1L
 
     companion object {
-        private const val EXPIRATION_TIME = 14 * 24 * 60 * 60 * 1000L
+        private const val MILLIS_PER_DAY = 24 * 60 * 60 * 1000L
     }
 }

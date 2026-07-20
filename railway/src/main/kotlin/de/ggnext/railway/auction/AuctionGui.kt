@@ -6,6 +6,7 @@ import com.noxcrew.interfaces.element.StaticElement
 import com.noxcrew.interfaces.interfaces.buildChestInterface
 import com.noxcrew.interfaces.properties.InterfaceProperty
 import com.noxcrew.interfaces.utilities.forEachInGrid
+import de.ggnext.contentsystem.value.store.NumberStore
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.createFiller
 import de.ggnext.core.utils.language
@@ -24,6 +25,10 @@ class AuctionGui(
     private val auctionManager: AuctionManager,
     private val profileManager: RailwayProfileManager,
 ) {
+    private val defaultPrice by NumberStore("railway.auction.default_price")
+    private val minimumPrice by NumberStore("railway.auction.minimum_price")
+    private val maximumAuctions by NumberStore("railway.auction.maximum_auctions")
+
     private val auctionHouseTitle by TranslationStore("translations.railway.auction.gui.title")
     private val noActiveAuctions by TranslationStore("translations.railway.auction.gui.empty")
     private val auctionPrice by TranslationStore("translations.railway.auction.item.price")
@@ -37,6 +42,8 @@ class AuctionGui(
     private val expiredStatus by TranslationStore("translations.railway.auction.claim.expired")
     private val claimAction by TranslationStore("translations.railway.auction.claim.collect")
     private val backAction by TranslationStore("translations.railway.auction.back")
+    private val previousPageAction by TranslationStore("translations.railway.auction.pagination.previous")
+    private val nextPageAction by TranslationStore("translations.railway.auction.pagination.next")
     private val noActiveProfile by TranslationStore("translations.railway.auction.message.no_active_profile")
     private val holdItem by TranslationStore("translations.railway.auction.message.hold_item")
     private val auctionCreated by TranslationStore("translations.railway.auction.message.created")
@@ -51,8 +58,21 @@ class AuctionGui(
     private val itemAlreadyClaimed by TranslationStore("translations.railway.auction.message.already_claimed")
     private val itemClaimed by TranslationStore("translations.railway.auction.message.claimed")
 
-    suspend fun openAuctionGui(player: Player) {
-        val auctions = auctionManager.getActiveAuctions().take(MAX_AUCTIONS)
+    private val configuredMinimumPrice: Long
+        get() = minimumPrice.toLong().coerceAtLeast(1L)
+
+    private val configuredDefaultPrice: Long
+        get() = defaultPrice.toLong().coerceAtLeast(configuredMinimumPrice)
+
+    private val auctionsPerPage: Int
+        get() = maximumAuctions.toInt().coerceIn(1, MAX_AUCTIONS_PER_PAGE)
+
+    suspend fun openAuctionGui(
+        player: Player,
+        page: Int = 0,
+    ) {
+        val auctionPage = paginate(auctionManager.getActiveAuctions(), page)
+        val auctions = auctionPage.entries
 
         val auctionGui =
             buildChestInterface {
@@ -122,6 +142,21 @@ class AuctionGui(
                             }
                     }
 
+                    if (auctionPage.currentPage > 0) {
+                        pane[5, 0] =
+                            StaticElement(
+                                drawable(
+                                    ItemStack(Material.ARROW)
+                                        .name(previousPageAction.get(player.language())),
+                                ),
+                            ) {
+                                plugin.launch {
+                                    player.inventory.close()
+                                    openAuctionGui(player, auctionPage.currentPage - 1)
+                                }
+                            }
+                    }
+
                     pane[5, 3] =
                         StaticElement(
                             drawable(
@@ -147,6 +182,21 @@ class AuctionGui(
                                 openClaimGui(player)
                             }
                         }
+
+                    if (auctionPage.currentPage < auctionPage.pageCount - 1) {
+                        pane[5, 8] =
+                            StaticElement(
+                                drawable(
+                                    ItemStack(Material.SPECTRAL_ARROW)
+                                        .name(nextPageAction.get(player.language())),
+                                ),
+                            ) {
+                                plugin.launch {
+                                    player.inventory.close()
+                                    openAuctionGui(player, auctionPage.currentPage + 1)
+                                }
+                            }
+                    }
                 }
             }
 
@@ -159,7 +209,7 @@ class AuctionGui(
             return
         }
 
-        val price = InterfaceProperty(DEFAULT_PRICE)
+        val price = InterfaceProperty(configuredDefaultPrice)
 
         val createGui =
             buildChestInterface {
@@ -186,14 +236,14 @@ class AuctionGui(
                         StaticElement(
                             drawable(ItemStack(Material.REDSTONE).name(Component.text("-100", NamedTextColor.RED))),
                         ) {
-                            price.value = maxOf(MIN_PRICE, price.value - 100L)
+                            price.value = maxOf(configuredMinimumPrice, price.value - 100L)
                         }
 
                     pane[3, 3] =
                         StaticElement(
                             drawable(ItemStack(Material.REDSTONE).name(Component.text("-10", NamedTextColor.RED))),
                         ) {
-                            price.value = maxOf(MIN_PRICE, price.value - 10L)
+                            price.value = maxOf(configuredMinimumPrice, price.value - 10L)
                         }
 
                     pane[3, 4] =
@@ -331,7 +381,10 @@ class AuctionGui(
         openAuctionGui(player)
     }
 
-    private suspend fun openClaimGui(player: Player) {
+    private suspend fun openClaimGui(
+        player: Player,
+        page: Int = 0,
+    ) {
         val activeProfile = profileManager.getActiveProfile(player)
 
         if (activeProfile == null) {
@@ -339,7 +392,12 @@ class AuctionGui(
             return
         }
 
-        val claims = auctionManager.getClaimableAuctions(activeProfile.id).take(MAX_AUCTIONS)
+        val claimPage =
+            paginate(
+                auctionManager.getClaimableAuctions(activeProfile.id),
+                page,
+            )
+        val claims = claimPage.entries
 
         val claimGui =
             buildChestInterface {
@@ -400,7 +458,26 @@ class AuctionGui(
                                 drawable(item),
                             ) {
                                 plugin.launch {
-                                    claimAuction(player, auction)
+                                    claimAuction(
+                                        player,
+                                        auction,
+                                        claimPage.currentPage,
+                                    )
+                                }
+                            }
+                    }
+
+                    if (claimPage.currentPage > 0) {
+                        pane[5, 0] =
+                            StaticElement(
+                                drawable(
+                                    ItemStack(Material.ARROW)
+                                        .name(previousPageAction.get(player.language())),
+                                ),
+                            ) {
+                                plugin.launch {
+                                    player.inventory.close()
+                                    openClaimGui(player, claimPage.currentPage - 1)
                                 }
                             }
                     }
@@ -417,6 +494,21 @@ class AuctionGui(
                                 openAuctionGui(player)
                             }
                         }
+
+                    if (claimPage.currentPage < claimPage.pageCount - 1) {
+                        pane[5, 8] =
+                            StaticElement(
+                                drawable(
+                                    ItemStack(Material.SPECTRAL_ARROW)
+                                        .name(nextPageAction.get(player.language())),
+                                ),
+                            ) {
+                                plugin.launch {
+                                    player.inventory.close()
+                                    openClaimGui(player, claimPage.currentPage + 1)
+                                }
+                            }
+                    }
                 }
             }
 
@@ -426,6 +518,7 @@ class AuctionGui(
     private suspend fun claimAuction(
         player: Player,
         auction: AuctionItem,
+        page: Int,
     ) {
         val activeProfile = profileManager.getActiveProfile(player)
 
@@ -455,7 +548,29 @@ class AuctionGui(
         player.inventory.addItem(item)
         player.sendMessage(itemClaimed.get(player.language()))
         player.inventory.close()
-        openClaimGui(player)
+        openClaimGui(player, page)
+    }
+
+    private fun <T> paginate(
+        entries: List<T>,
+        requestedPage: Int,
+    ): Page<T> {
+        val pageCount =
+            maxOf(
+                1,
+                (entries.size + auctionsPerPage - 1) / auctionsPerPage,
+            )
+        val currentPage = requestedPage.coerceIn(0, pageCount - 1)
+        val pageEntries =
+            entries
+                .drop(currentPage * auctionsPerPage)
+                .take(auctionsPerPage)
+
+        return Page(
+            entries = pageEntries,
+            currentPage = currentPage,
+            pageCount = pageCount,
+        )
     }
 
     private fun hasInventorySpace(
@@ -473,9 +588,13 @@ class AuctionGui(
         return simulatedInventory.addItem(item.clone()).isEmpty()
     }
 
+    private data class Page<T>(
+        val entries: List<T>,
+        val currentPage: Int,
+        val pageCount: Int,
+    )
+
     companion object {
-        private const val DEFAULT_PRICE = 100L
-        private const val MIN_PRICE = 10L
-        private const val MAX_AUCTIONS = 45
+        private const val MAX_AUCTIONS_PER_PAGE = 45
     }
 }
