@@ -4,7 +4,6 @@ package de.ggnext.common.job
  * A recurring task that can be scheduled and run by [JobManager].
  */
 interface Job {
-
     /** Unique identifier for this job. */
     val id: String
 
