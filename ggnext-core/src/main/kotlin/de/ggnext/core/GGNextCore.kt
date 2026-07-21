@@ -3,6 +3,7 @@ package de.ggnext.core
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.scope
 import com.noxcrew.interfaces.InterfacesListeners
+import de.ggnext.common.job.JobManager
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.core.command.CommandVisibilityFilter
@@ -25,6 +26,7 @@ class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var scoreboardLibrary: ScoreboardLibrary
     private lateinit var scoreBoardManager: ScoreBoardManager
     private lateinit var tabManager: TabManager
+    private lateinit var jobManager: JobManager
 
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
@@ -57,6 +59,9 @@ class GGNextCore : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(TabListener(tabManager), this)
 
         server.pluginManager.registerEvents(CommandVisibilityFilter(config.getBoolean("prod")), this)
+
+        jobManager = JobManager(scope, logger).also { it.startAll() }
+        GGNextAPI.jobManager = jobManager
 
         logger.info("GGNext Core enabled!")
     }
