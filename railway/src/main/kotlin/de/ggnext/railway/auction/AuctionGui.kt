@@ -25,9 +25,9 @@ class AuctionGui(
     private val auctionManager: AuctionManager,
     private val profileManager: RailwayProfileManager,
 ) {
-    private val defaultPrice by NumberStore("railway.auction.default_price")
-    private val minimumPrice by NumberStore("railway.auction.minimum_price")
-    private val maximumAuctions by NumberStore("railway.auction.maximum_auctions")
+    private val defaultPrice by NumberStore("numbers.railway.auction.default_price")
+    private val minimumPrice by NumberStore("numbers.railway.auction.minimum_price")
+    private val maximumAuctions by NumberStore("numbers.railway.auction.maximum_auctions")
 
     private val auctionHouseTitle by TranslationStore("translations.railway.auction.gui.title")
     private val noActiveAuctions by TranslationStore("translations.railway.auction.gui.empty")
@@ -49,6 +49,7 @@ class AuctionGui(
     private val auctionCreated by TranslationStore("translations.railway.auction.message.created")
     private val auctionCreateFailed by TranslationStore("translations.railway.auction.message.create_failed")
     private val ownAuction by TranslationStore("translations.railway.auction.message.own_auction")
+    // FIXME(key-consistency): near-duplicate of no_active_profile above; confirm both are intentional.
     private val profileNotFound by TranslationStore("translations.railway.auction.message.profile_not_found")
     private val notEnoughMoney by TranslationStore("translations.railway.auction.message.not_enough_money")
     private val auctionAlreadyBought by TranslationStore("translations.railway.auction.message.already_bought")

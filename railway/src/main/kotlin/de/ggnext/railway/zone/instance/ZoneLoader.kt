@@ -30,7 +30,7 @@ class ZoneLoader(
             ?: throw RuntimeException("Could not load void_world!")
     private val weWorld = BukkitAdapter.adapt(world)
 
-    private val xDifference by NumberStore("x_difference")
+    private val xDifference by NumberStore("numbers.railway.zone.x_difference")
 
     suspend fun spawnSlot(
         slot: Int,

@@ -39,7 +39,7 @@ class MuteCommands(
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                     if (punishmentManager.getActiveMute(targetUUID) != null) {
-                                        val msg by TranslationStore("translations.punishment.mute.alredyMuted")
+                                        val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
                                         player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                         return@launch
                                     }
@@ -79,7 +79,7 @@ class MuteCommands(
                                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                             if (punishmentManager.getActiveMute(targetUUID) != null) {
-                                                val msg by TranslationStore("translations.punishment.mute.alredyMuted")
+                                                val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
                                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                                 return@launch
                                             }
@@ -87,7 +87,7 @@ class MuteCommands(
                                             punishmentManager.tempMute(targetUUID, player.uniqueId, duration, reason)
                                             val msg by TranslationStore("translations.punishment.temp-mute.success")
                                             player.sendMessage(msg.get(player.language(), listOf(targetName, durationInput)))
-                                            val msg1 by TranslationStore("translations.punishment.temp-muted.muted")
+                                            val msg1 by TranslationStore("translations.punishment.temp-mute.muted")
                                             proxy
                                                 .getPlayer(targetName)
                                                 .getOrNull()
@@ -116,7 +116,7 @@ class MuteCommands(
                                 val msg by TranslationStore("translations.punishment.unmute.success")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             } else {
-                                val msg by TranslationStore("translations.punishment.unmuted.failed")
+                                val msg by TranslationStore("translations.punishment.unmute.failed")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             }
                         }

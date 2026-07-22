@@ -6,6 +6,7 @@ import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
+import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.velocityCore.features.players.PlayerManager
 import de.ggnext.velocityCore.features.punishment.DurationParser
 import net.kyori.adventure.text.Component
@@ -32,7 +33,8 @@ class CommandUtils(
             return storedPlayer.id
         }
 
-        player.sendMessage(Component.text("Player '$username' was not found in the network database."))
+        val msg by TranslationStore("translations.player_not_found")
+        player.sendMessage(msg.get(player.language(), listOf(username)))
         return null
     }
 

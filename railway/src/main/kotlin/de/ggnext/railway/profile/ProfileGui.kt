@@ -22,6 +22,7 @@ class ProfileGui(
     private val plugin: JavaPlugin,
     private val profileManager: RailwayProfileManager,
 ) {
+    // FIXME(key-consistency): "previous" is not a real project; make this global or railway-scoped.
     private val previousGuiItemName by TranslationStore("translations.previous.gui")
 
     suspend fun openProfileGui(player: Player) {
@@ -86,7 +87,7 @@ class ProfileGui(
                             }
                     }
 
-                    val createItemName by TranslationStore("railway.profile.gui.create.item.name")
+                    val createItemName by TranslationStore("translations.railway.profile.gui.create.item.name")
                     pane[2, 4] =
                         StaticElement(drawable(ItemStack(Material.NAME_TAG).name(createItemName.get(player.language())))) {
                             plugin.launch {
@@ -149,7 +150,7 @@ class ProfileGui(
                             }
                         }
 
-                    val deletionItemName by TranslationStore("translations.railway.profile.spec.deletion.item.name")
+                    val deletionItemName by TranslationStore("translations.railway.profile.gui.spec.deletion.item.name")
                     pane[2, 3] =
                         StaticElement(
                             drawable(ItemStack(Material.BARRIER).name(deletionItemName.get(player.language()))),
@@ -160,7 +161,7 @@ class ProfileGui(
                             }
                         }
 
-                    val activateItemName by TranslationStore("translations.railway.profile.spec.activation.item.name")
+                    val activateItemName by TranslationStore("translations.railway.profile.gui.spec.activation.item.name")
                     pane[2, 5] =
                         StaticElement(
                             drawable(ItemStack(Material.GREEN_WOOL).name(activateItemName.get(player.language()))),
@@ -207,7 +208,7 @@ class ProfileGui(
                             }
                         }
 
-                    val deletionItemName by TranslationStore("translations.railway.profile.confirm.deletion.item.name")
+                    val deletionItemName by TranslationStore("translations.railway.profile.gui.confirm.deletion.item.name")
                     pane[1, 4] =
                         StaticElement(
                             drawable(ItemStack(Material.BARRIER).name(deletionItemName.get(player.language()))),

@@ -17,7 +17,7 @@ class RailwayProfileManager(
     private val profileCollection = mongoManager.database.getCollection<RailwayProfile>("railway_profiles")
     private val profileIndexCollection = mongoManager.database.getCollection<RailwayProfileIndex>("railway_profile_index")
     private val maxRailwayAccounts by NumberStore("numbers.railway.profile.max_railway_accounts")
-    private val defaultRailwayDollars by NumberStore("number.srailway.profile.default_railway_dollars")
+    private val defaultRailwayDollars by NumberStore("numbers.railway.profile.default_railway_dollars")
     private val maxNameLength by NumberStore("numbers.railway.profile.max_name_length")
 
     private val activeProfiles = ConcurrentHashMap<UUID, RailwayProfile>()

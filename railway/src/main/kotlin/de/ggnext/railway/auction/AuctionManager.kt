@@ -16,7 +16,7 @@ class AuctionManager(
     private val auctionCollection =
         mongoManager.database.getCollection<AuctionItem>("auction_items")
 
-    private val auctionExpirationDays by NumberStore("railway.auction.expiration_days")
+    private val auctionExpirationDays by NumberStore("numbers.railway.auction.expiration_days")
 
     suspend fun createAuction(
         sellerId: UUID,
