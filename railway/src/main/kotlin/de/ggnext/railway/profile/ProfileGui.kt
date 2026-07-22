@@ -22,7 +22,6 @@ class ProfileGui(
     private val plugin: JavaPlugin,
     private val profileManager: RailwayProfileManager,
 ) {
-    // FIXME(key-consistency): "previous" is not a real project; make this global or railway-scoped.
     private val previousGuiItemName by TranslationStore("translations.previous.gui")
 
     suspend fun openProfileGui(player: Player) {
