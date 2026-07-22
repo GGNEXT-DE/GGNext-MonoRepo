@@ -232,7 +232,7 @@ class TradeGui(
             )
 
         if (p1Overflow.isNotEmpty() || p2Overflow.isNotEmpty()) {
-            val msg by TranslationStore("translations.railway.overflow")
+            val msg by TranslationStore("translations.railway.trade.overflow")
             p1.sendMessage(msg.get(p1.language()))
             p2.sendMessage(msg.get(p2.language()))
             tradeManager.endSession(

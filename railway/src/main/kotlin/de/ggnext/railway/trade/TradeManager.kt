@@ -15,7 +15,7 @@ class TradeManager {
     ) {
         removeRequest(sender, target)
 
-        val expireTime by NumberStore("numbers.railways.trade.expire")
+        val expireTime by NumberStore("numbers.railway.trade.expire")
 
         val expirationTime = System.currentTimeMillis() + (expireTime.toInt() * 60 * 1000L)
         activeRequests.add(TradeRequest(sender, target, expirationTime))

@@ -25,9 +25,9 @@ class AuctionGui(
     private val auctionManager: AuctionManager,
     private val profileManager: RailwayProfileManager,
 ) {
-    private val defaultPrice by NumberStore("railway.auction.default_price")
-    private val minimumPrice by NumberStore("railway.auction.minimum_price")
-    private val maximumAuctions by NumberStore("railway.auction.maximum_auctions")
+    private val defaultPrice by NumberStore("numbers.railway.auction.default_price")
+    private val minimumPrice by NumberStore("numbers.railway.auction.minimum_price")
+    private val maximumAuctions by NumberStore("numbers.railway.auction.maximum_auctions")
 
     private val auctionHouseTitle by TranslationStore("translations.railway.auction.gui.title")
     private val noActiveAuctions by TranslationStore("translations.railway.auction.gui.empty")
