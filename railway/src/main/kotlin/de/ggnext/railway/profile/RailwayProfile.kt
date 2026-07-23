@@ -20,6 +20,8 @@ data class RailwayLevel(
     val xp: Long,
     val skillPoints: Int,
 ) {
+    fun neededXpForLevel(level: Int): Long = (100 * level.toDouble().pow(2)).toLong()
+
     val currentLevel: Int
         get() {
             var level = 0
@@ -29,8 +31,6 @@ data class RailwayLevel(
             return level
         }
 }
-
-fun neededXpForLevel(level: Int): Long = (100 * level.toDouble().pow(2)).toLong()
 
 val railwayProfileNames =
     listOf(

@@ -138,7 +138,7 @@ class RailwayProfileManager(
 
         val updates =
             mutableListOf(
-                Updates.inc("level.xp", amount), // Erhöht die XP im Unterobjekt
+                Updates.inc("level.xp", amount),
             )
 
         if (levelGain > 0) {
