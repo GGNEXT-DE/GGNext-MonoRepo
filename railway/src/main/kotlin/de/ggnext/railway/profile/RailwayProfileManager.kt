@@ -128,30 +128,24 @@ class RailwayProfileManager(
         profile: RailwayProfile,
         amount: Long,
     ) {
-        // 1. Altes Level aus dem Profil ablesen
         val oldLevel = profile.level.currentLevel
 
-        // 2. Neues Level mit den zusätzlichen XP berechnen
         val newXp = profile.level.xp + amount
         val newLevelObj = RailwayLevel(newXp, profile.level.skillPoints)
         val newLevel = newLevelObj.currentLevel
 
-        // 3. Level-Differenz berechnen
         val levelGain = newLevel - oldLevel
 
-        // 4. Updates für die verschachtelten Felder vorbereiten
         val updates =
             mutableListOf(
                 Updates.inc("level.xp", amount), // Erhöht die XP im Unterobjekt
             )
 
-        // Falls ein Level-Up stattfand, Skillpoints hinzufügen
         if (levelGain > 0) {
             val earnedSkillPoints = levelGain * 1
             updates.add(Updates.inc("level.skillPoints", earnedSkillPoints))
         }
 
-        // 5. Update in der MongoDB ausführen
         profileCollection.updateOne(
             Filters.eq("_id", profile.id),
             Updates.combine(updates),

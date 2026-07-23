@@ -23,7 +23,6 @@ data class RailwayLevel(
     val currentLevel: Int
         get() {
             var level = 0
-            // Schleife läuft so lange, wie die XP für das NÄCHSTE Level erreicht sind
             while (xp >= neededXpForLevel(level + 1)) {
                 level++
             }
