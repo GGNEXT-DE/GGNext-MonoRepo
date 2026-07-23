@@ -2,6 +2,10 @@ package de.ggnext.velocityCore.features.friends
 
 import de.ggnext.common.player.FriendRequest
 import de.ggnext.contentsystem.value.store.NumberStore
+import de.ggnext.velocityCore.features.friends.results.AcceptResult
+import de.ggnext.velocityCore.features.friends.results.DenyResult
+import de.ggnext.velocityCore.features.friends.results.FriendRequestResult
+import de.ggnext.velocityCore.features.friends.results.RemoveResult
 import de.ggnext.velocityCore.features.players.PlayerManager
 import java.util.UUID
 

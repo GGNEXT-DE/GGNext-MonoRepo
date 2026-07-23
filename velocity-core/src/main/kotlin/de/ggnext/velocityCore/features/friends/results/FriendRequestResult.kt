@@ -1,4 +1,4 @@
-package de.ggnext.velocityCore.features.friends
+package de.ggnext.velocityCore.features.friends.results
 
 enum class FriendRequestResult {
     SENT,
