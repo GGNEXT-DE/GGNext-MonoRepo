@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.connection.LoginEvent
 import de.ggnext.velocityCore.config.VelocityConfig
+import de.ggnext.velocityCore.features.party.PartySystemManager
 import de.ggnext.velocityCore.features.players.PlayerManager
 import de.ggnext.velocityCore.features.punishment.PunishmentManager
 import net.kyori.adventure.text.Component
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 class PlayerListener(
     private val playerManager: PlayerManager,
     private val punishmentManager: PunishmentManager,
+    private val partySystemManager: PartySystemManager,
     private val config: VelocityConfig,
 ) {
     @Subscribe
@@ -41,6 +43,7 @@ class PlayerListener(
     @Subscribe
     suspend fun onLeaveListener(event: DisconnectEvent) {
         val player = event.player
+        partySystemManager.leaveParty(player.uniqueId)
         playerManager.savePlaytime(player.uniqueId)
     }
 }

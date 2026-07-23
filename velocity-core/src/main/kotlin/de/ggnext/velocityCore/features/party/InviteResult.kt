@@ -1,0 +1,10 @@
+package de.ggnext.velocityCore.features.party
+
+enum class InviteResult {
+    SENT,
+    NOT_LEADER,
+    ALREADY_INVITED,
+    TARGET_IN_PARTY,
+    PARTY_FULL,
+    SELF,
+}
