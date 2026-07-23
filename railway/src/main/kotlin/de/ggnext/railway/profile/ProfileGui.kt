@@ -63,7 +63,16 @@ class ProfileGui(
                                     ItemStack(
                                         Material.GOLD_BLOCK,
                                     ).name(Component.text(profile.name, profileStatusTextColor))
-                                        .description(listOf(Component.text(profile.railwayDollars))),
+                                        .description(
+                                            listOf(
+                                                Component
+                                                    .text(
+                                                        profile.railwayDollars,
+                                                    ),
+                                                Component.text(profile.level.xp),
+                                                Component.text(profile.level.skillPoints),
+                                            ),
+                                        ),
                                 ),
                             ) { event ->
                                 val type = event.type
@@ -135,7 +144,16 @@ class ProfileGui(
                                 ItemStack(
                                     Material.GOLD_BLOCK,
                                 ).name(Component.text(profile.name))
-                                    .description(listOf(Component.text(profile.railwayDollars))),
+                                    .description(
+                                        listOf(
+                                            Component
+                                                .text(
+                                                    profile.railwayDollars,
+                                                ),
+                                            Component.text(profile.level.xp),
+                                            Component.text(profile.level.skillPoints),
+                                        ),
+                                    ),
                             ),
                         )
 

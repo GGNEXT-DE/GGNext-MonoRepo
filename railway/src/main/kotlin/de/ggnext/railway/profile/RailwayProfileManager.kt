@@ -43,6 +43,7 @@ class RailwayProfileManager(
                 profileId,
                 railwayDollars = defaultRailwayDollars.toDouble(),
                 name = name,
+                level = RailwayLevel(0L, 0),
             )
 
         profileCollection.insertOne(railwayProfile)
@@ -111,15 +112,58 @@ class RailwayProfileManager(
 
     suspend fun addDollars(
         profile: RailwayProfile,
-        amount: Double,
+        amount: Int,
     ) = profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", amount))
 
     suspend fun removeDollars(
         profile: RailwayProfile,
-        amount: Double,
+        amount: Int,
     ): Boolean {
         if (profile.railwayDollars < amount) return false
         profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", -amount))
+        return true
+    }
+
+    suspend fun addXp(
+        profile: RailwayProfile,
+        amount: Long,
+    ) {
+        // 1. Altes Level aus dem Profil ablesen
+        val oldLevel = profile.level.currentLevel
+
+        // 2. Neues Level mit den zusätzlichen XP berechnen
+        val newXp = profile.level.xp + amount
+        val newLevelObj = RailwayLevel(newXp, profile.level.skillPoints)
+        val newLevel = newLevelObj.currentLevel
+
+        // 3. Level-Differenz berechnen
+        val levelGain = newLevel - oldLevel
+
+        // 4. Updates für die verschachtelten Felder vorbereiten
+        val updates =
+            mutableListOf(
+                Updates.inc("level.xp", amount), // Erhöht die XP im Unterobjekt
+            )
+
+        // Falls ein Level-Up stattfand, Skillpoints hinzufügen
+        if (levelGain > 0) {
+            val earnedSkillPoints = levelGain * 1
+            updates.add(Updates.inc("level.skillPoints", earnedSkillPoints))
+        }
+
+        // 5. Update in der MongoDB ausführen
+        profileCollection.updateOne(
+            Filters.eq("_id", profile.id),
+            Updates.combine(updates),
+        )
+    }
+
+    suspend fun removeSkillPoints(
+        profile: RailwayProfile,
+        amount: Int,
+    ): Boolean {
+        if (profile.level.skillPoints < amount) return false
+        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("level.skillPoints", -amount))
         return true
     }
 }
