@@ -14,6 +14,7 @@ GGNext-MonoRepo is the core structure for all Kotlin projects from GGNext.
 ## Requirements
 - **Java**: Java 25
 - **Docker**
+- **Lefthook**: Fast Git hooks manager (see installation steps below)
 
 
 ## Building the Project
@@ -42,4 +43,38 @@ rs.initiate({
 Finally:
 ```bash
 exit
+```
+---
+
+## Installing Lefthook
+
+We use [Lefthook](https://github.com/evilmartians/lefthook) to manage Git hooks (such as linters and code formatting) across our Monorepo. Please install the CLI globally on your machine once:
+
+### Windows
+
+Via **Winget** (pre-installed on Windows 10/11) in PowerShell:
+
+```powershell
+winget install evilmartians.lefthook
+
+```
+
+*(Alternatively via Scoop: `scoop install lefthook`)*
+
+### Arch Linux
+
+Available directly in the official extra repository:
+
+```bash
+sudo pacman -S lefthook
+
+```
+
+### Activating Hooks
+
+Once the CLI is installed, activate the hooks for this repository by running the following command in the project root:
+
+```bash
+lefthook install
+
 ```
