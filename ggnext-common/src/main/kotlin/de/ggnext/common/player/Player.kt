@@ -13,7 +13,7 @@ data class Player(
     val friendIds: List<UUID> = emptyList(),
     val pendingFriendRequests: List<FriendRequest> = emptyList(),
     val settings: PlayerSettings = PlayerSettings(),
-    val discordId: Int? = null,
+    val discordId: Long? = null,
 )
 
 data class NetworkLevel(

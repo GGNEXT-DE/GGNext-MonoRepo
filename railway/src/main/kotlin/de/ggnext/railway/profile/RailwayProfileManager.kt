@@ -43,6 +43,7 @@ class RailwayProfileManager(
                 profileId,
                 railwayDollars = defaultRailwayDollars.toDouble(),
                 name = name,
+                level = RailwayLevel(0L, 0),
             )
 
         profileCollection.insertOne(railwayProfile)
@@ -120,6 +121,43 @@ class RailwayProfileManager(
     ): Boolean {
         if (profile.railwayDollars < amount) return false
         profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", -amount))
+        return true
+    }
+
+    suspend fun addXp(
+        profile: RailwayProfile,
+        amount: Long,
+    ) {
+        val oldLevel = profile.level.currentLevel
+
+        val newXp = profile.level.xp + amount
+        val newLevelObj = RailwayLevel(newXp, profile.level.skillPoints)
+        val newLevel = newLevelObj.currentLevel
+
+        val levelGain = newLevel - oldLevel
+
+        val updates =
+            mutableListOf(
+                Updates.inc("level.xp", amount),
+            )
+
+        if (levelGain > 0) {
+            val earnedSkillPoints = levelGain * 1
+            updates.add(Updates.inc("level.skillPoints", earnedSkillPoints))
+        }
+
+        profileCollection.updateOne(
+            Filters.eq("_id", profile.id),
+            Updates.combine(updates),
+        )
+    }
+
+    suspend fun removeSkillPoints(
+        profile: RailwayProfile,
+        amount: Int,
+    ): Boolean {
+        if (profile.level.skillPoints < amount) return false
+        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("level.skillPoints", -amount))
         return true
     }
 }
