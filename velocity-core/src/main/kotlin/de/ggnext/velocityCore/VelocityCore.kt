@@ -18,6 +18,8 @@ import de.ggnext.velocityCore.features.hub.HubCommand
 import de.ggnext.velocityCore.features.maintenance.commands.EditMtCommand
 import de.ggnext.velocityCore.features.maintenance.commands.ToggleMtCommand
 import de.ggnext.velocityCore.features.maintenance.listener.MaintenanceListener
+import de.ggnext.velocityCore.features.party.PartySystemManager
+import de.ggnext.velocityCore.features.party.commands.PartyCommand
 import de.ggnext.velocityCore.features.players.PlayerManager
 import de.ggnext.velocityCore.features.players.listener.PlayerListener
 import de.ggnext.velocityCore.features.punishment.PunishmentChatListener
@@ -57,6 +59,7 @@ class VelocityCore
         private lateinit var punishmentManager: PunishmentManager
         private lateinit var commandUtils: CommandUtils
         private lateinit var verifyManager: VerifyManager
+        private lateinit var partySystemManager: PartySystemManager
         private lateinit var friendSystemManager: FriendSystemManager
 
         @Subscribe
@@ -69,12 +72,16 @@ class VelocityCore
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)
             verifyManager = VerifyManager(mongoManager.database)
+            partySystemManager = PartySystemManager(playerManager)
             friendSystemManager = FriendSystemManager(playerManager)
 
             registerCommands()
 
             server.eventManager.register(this, TeamChatListener(server))
-            server.eventManager.registerSuspend(this, PlayerListener(playerManager, punishmentManager, configManager.config))
+            server.eventManager.registerSuspend(
+                this,
+                PlayerListener(playerManager, punishmentManager, partySystemManager, configManager.config),
+            )
             server.eventManager.registerSuspend(this, PunishmentChatListener(punishmentManager))
             server.eventManager.register(this, MaintenanceListener(configManager.config))
 
@@ -103,6 +110,8 @@ class VelocityCore
             commandRegistry.registerCommand(WarnCommand(server, commandUtils, punishmentManager, scope).warn)
 
             commandRegistry.registerCommand(VerifyCommand(verifyManager, playerManager, scope).command)
+
+            commandRegistry.registerCommand(PartyCommand(partySystemManager, commandUtils, server, scope).command)
 
             commandRegistry.registerCommand(FriendCommand(friendSystemManager, commandUtils, server, scope).command)
         }
