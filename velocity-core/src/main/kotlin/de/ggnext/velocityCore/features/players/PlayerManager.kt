@@ -20,6 +20,10 @@ class PlayerManager(
             .find(Filters.regex("username", "^${Pattern.quote(username)}$", "i"))
             .firstOrNull()
 
+    suspend fun savePlayer(player: Player) {
+        collection.replaceOne(Filters.eq("_id", player.id), player)
+    }
+
     suspend fun createPlayer(
         uuid: UUID,
         username: String,

@@ -12,6 +12,8 @@ import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.db.MongoManager
+import de.ggnext.velocityCore.features.friends.FriendSystemManager
+import de.ggnext.velocityCore.features.friends.commands.FriendCommand
 import de.ggnext.velocityCore.features.hub.HubCommand
 import de.ggnext.velocityCore.features.maintenance.commands.EditMtCommand
 import de.ggnext.velocityCore.features.maintenance.commands.ToggleMtCommand
@@ -55,6 +57,7 @@ class VelocityCore
         private lateinit var punishmentManager: PunishmentManager
         private lateinit var commandUtils: CommandUtils
         private lateinit var verifyManager: VerifyManager
+        private lateinit var friendSystemManager: FriendSystemManager
 
         @Subscribe
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
@@ -66,6 +69,7 @@ class VelocityCore
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)
             verifyManager = VerifyManager(mongoManager.database)
+            friendSystemManager = FriendSystemManager(playerManager)
 
             registerCommands()
 
@@ -99,5 +103,7 @@ class VelocityCore
             commandRegistry.registerCommand(WarnCommand(server, commandUtils, punishmentManager, scope).warn)
 
             commandRegistry.registerCommand(VerifyCommand(verifyManager, playerManager, scope).command)
+
+            commandRegistry.registerCommand(FriendCommand(friendSystemManager, commandUtils, server, scope).command)
         }
     }
