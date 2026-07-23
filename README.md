@@ -63,10 +63,10 @@ winget install evilmartians.lefthook
 
 ### Arch Linux
 
-Available directly in the official extra repository:
+Available in the AUR:
 
 ```bash
-sudo pacman -S lefthook
+yay -S lefthook
 
 ```
 
