@@ -1,4 +1,4 @@
-package de.ggnext.velocityCore.features.party
+package de.ggnext.velocityCore.features.party.results
 
 enum class AcceptResult {
     SUCCESS,
