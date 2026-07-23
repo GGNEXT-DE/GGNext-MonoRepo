@@ -5,10 +5,10 @@ import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
+import de.ggnext.velocityCore.features.friends.FriendSystemManager
 import de.ggnext.velocityCore.features.friends.results.AcceptResult
 import de.ggnext.velocityCore.features.friends.results.DenyResult
 import de.ggnext.velocityCore.features.friends.results.FriendRequestResult
-import de.ggnext.velocityCore.features.friends.FriendSystemManager
 import de.ggnext.velocityCore.features.friends.results.RemoveResult
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
