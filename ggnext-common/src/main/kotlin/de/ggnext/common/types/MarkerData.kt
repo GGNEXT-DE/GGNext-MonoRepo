@@ -1,4 +1,4 @@
-package de.ggnext.builder.types
+package de.ggnext.common.types
 
 import kotlinx.serialization.Serializable
 
