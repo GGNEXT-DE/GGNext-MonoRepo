@@ -9,9 +9,9 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import de.ggnext.common.db.MongoManager
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
-import de.ggnext.velocityCore.db.MongoManager
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
 import de.ggnext.velocityCore.features.friends.commands.FriendCommand
 import de.ggnext.velocityCore.features.hub.HubCommand
@@ -67,7 +67,7 @@ class VelocityCore
             configManager.load()
             configManager.save()
 
-            mongoManager = MongoManager(configManager)
+            mongoManager = MongoManager(configManager.config.mongoConnection, configManager.config.database)
             playerManager = PlayerManager(mongoManager.database)
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)

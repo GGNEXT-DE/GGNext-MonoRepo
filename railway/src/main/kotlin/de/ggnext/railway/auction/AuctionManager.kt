@@ -3,8 +3,8 @@ package de.ggnext.railway.auction
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.mongodb.client.model.Updates
+import de.ggnext.common.db.MongoManager
 import de.ggnext.contentsystem.value.store.NumberStore
-import de.ggnext.core.db.MongoManager
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import org.bson.types.ObjectId

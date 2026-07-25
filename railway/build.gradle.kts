@@ -4,7 +4,6 @@ plugins {
 
 dependencies {
     compileOnly(project(":ggnext-core"))
-    compileOnly(project(":ggnext-common"))
 
     compileOnly(libs.fawe.core)
     compileOnly(libs.fawe.bukkit) { isTransitive = false }
