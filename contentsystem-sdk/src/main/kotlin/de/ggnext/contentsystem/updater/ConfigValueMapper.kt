@@ -3,6 +3,10 @@ package de.ggnext.contentsystem.updater
 import de.ggnext.contentsystem.value.types.ConfigValue
 import de.ggnext.contentsystem.value.types.MaterialValue
 import de.ggnext.contentsystem.value.types.NumberValue
+import de.ggnext.contentsystem.value.types.Quest
+import de.ggnext.contentsystem.value.types.QuestCategory
+import de.ggnext.contentsystem.value.types.QuestTrackingType
+import de.ggnext.contentsystem.value.types.QuestValue
 import de.ggnext.contentsystem.value.types.StringValue
 import de.ggnext.contentsystem.value.types.Translation
 import de.ggnext.contentsystem.value.types.TranslationValue
@@ -46,6 +50,34 @@ internal object ConfigValueMapper {
                         Translation(
                             de = valueDoc.getString("de"),
                             en = valueDoc.getString("en"),
+                        ),
+                )
+            }
+
+            "QUEST" -> {
+                val valueDoc = doc.get("value", Document::class.java)
+                val nameDoc = valueDoc.get("name", Document::class.java)
+                val descDoc = valueDoc.get("description", Document::class.java)
+                QuestValue(
+                    key = key,
+                    value =
+                        Quest(
+                            name =
+                                Translation(
+                                    de = nameDoc.getString("de"),
+                                    en = nameDoc.getString("en"),
+                                ),
+                            description =
+                                Translation(
+                                    de = descDoc.getString("de"),
+                                    en = descDoc.getString("en"),
+                                ),
+                            category = QuestCategory.valueOf(valueDoc.getString("category")),
+                            trackingType = QuestTrackingType.valueOf(valueDoc.getString("trackingType")),
+                            trackingTarget = valueDoc.getString("trackingTarget"),
+                            targetValue = valueDoc.getInteger("targetValue"),
+                            rewardXp = valueDoc.getInteger("rewardXp"),
+                            rewardMoney = valueDoc.getDouble("rewardMoney"),
                         ),
                 )
             }
