@@ -3,11 +3,11 @@ package de.ggnext.core
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.scope
 import com.noxcrew.interfaces.InterfacesListeners
+import de.ggnext.common.db.MongoManager
 import de.ggnext.common.job.JobManager
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.core.command.CommandVisibilityFilter
-import de.ggnext.core.db.MongoManager
 import de.ggnext.core.economy.EconomyService
 import de.ggnext.core.scoreboard.ScoreBoardListener
 import de.ggnext.core.scoreboard.ScoreBoardManager
@@ -33,7 +33,7 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         InterfacesListeners.install(this)
 
-        mongoManager = MongoManager(config)
+        mongoManager = MongoManager(config.getString("mongo.connectionString"), config.getString("mongo.database"))
         GGNextAPI.mongoManager = mongoManager
 
         registerCommands()

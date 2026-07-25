@@ -1,21 +1,21 @@
-package de.ggnext.velocityCore.db
+package de.ggnext.common.db
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import de.ggnext.velocityCore.config.ConfigManager
 import org.bson.UuidRepresentation
 
 class MongoManager(
-    private val configManager: ConfigManager,
+    private val connectionString: String?,
+    private val databaseName: String?,
 ) {
     private val mongoClient: MongoClient
-    var database: MongoDatabase
+    val database: MongoDatabase
 
     init {
-        val connectionString = configManager.config.mongoConnection
-        val databaseName = if (configManager.config.prod) "production" else "staging"
+        require(!connectionString.isNullOrBlank()) { "connectionString cannot be null or blank" }
+        require(!databaseName.isNullOrBlank()) { "databaseName cannot be null or blank" }
 
         val settings =
             MongoClientSettings
@@ -27,4 +27,6 @@ class MongoManager(
         mongoClient = MongoClient.create(settings)
         database = mongoClient.getDatabase(databaseName)
     }
+
+    fun close() = mongoClient.close()
 }
