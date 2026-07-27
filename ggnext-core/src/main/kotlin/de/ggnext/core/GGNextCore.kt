@@ -5,10 +5,10 @@ import com.github.shynixn.mccoroutine.bukkit.scope
 import com.noxcrew.interfaces.InterfacesListeners
 import de.ggnext.common.db.MongoManager
 import de.ggnext.common.job.JobManager
-import de.ggnext.common.sentry.SentryBuilder
-import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.common.logging.LogControl
 import de.ggnext.common.logging.LogLevel
+import de.ggnext.common.sentry.SentryBuilder
+import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.core.command.CommandVisibilityFilter
