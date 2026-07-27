@@ -9,6 +9,7 @@ data class VelocityConfig(
     var mongoConnection: String = "mongodb://localhost:27017",
     var database: String = "ggnext",
     var prod: Boolean = false,
+    var sentryDSN: String = "sentry",
 )
 
 class ConfigManager(
@@ -29,6 +30,7 @@ class ConfigManager(
                 mongoConnection = node.node("mongo", "connection").getString("mongodb://localhost:27017"),
                 database = node.node("mongo", "database").getString("ggnext"),
                 prod = node.node("prod", "prod").getBoolean(false),
+                sentryDSN = node.node("sentry-dsn").getString("sentry-dsn"),
             )
     }
 
@@ -39,6 +41,7 @@ class ConfigManager(
         node.node("mongo", "connection").set(config.mongoConnection)
         node.node("mongo", "database").set(config.database)
         node.node("prod", "prod").set(config.prod)
+        node.node("sentry-dsn").set(config.sentryDSN)
         loader.save(node)
     }
 }

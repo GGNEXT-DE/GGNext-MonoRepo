@@ -10,6 +10,8 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.common.db.MongoManager
+import de.ggnext.common.sentry.SentryBuilder
+import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
@@ -54,6 +56,7 @@ class VelocityCore
         private val scope by lazy { suspendingPluginContainer.pluginContainer.scope }
 
         val configManager = ConfigManager(dataFolder)
+        private val config = configManager.config
         private lateinit var mongoManager: MongoManager
         private lateinit var playerManager: PlayerManager
         private lateinit var punishmentManager: PunishmentManager
@@ -67,7 +70,14 @@ class VelocityCore
             configManager.load()
             configManager.save()
 
-            mongoManager = MongoManager(configManager.config.mongoConnection, configManager.config.database)
+            SentryBuilder.init(
+                SentryConfig(
+                    config.sentryDSN,
+                    config.prod,
+                ),
+            )
+
+            mongoManager = MongoManager(config.mongoConnection, config.database)
             playerManager = PlayerManager(mongoManager.database)
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)
@@ -80,7 +90,7 @@ class VelocityCore
             server.eventManager.register(this, TeamChatListener(server))
             server.eventManager.registerSuspend(
                 this,
-                PlayerListener(playerManager, punishmentManager, partySystemManager, configManager.config),
+                PlayerListener(playerManager, punishmentManager, partySystemManager, config),
             )
             server.eventManager.registerSuspend(this, PunishmentChatListener(punishmentManager))
             server.eventManager.register(this, MaintenanceListener(configManager.config))
