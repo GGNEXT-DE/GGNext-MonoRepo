@@ -7,6 +7,8 @@ import de.ggnext.common.db.MongoManager
 import de.ggnext.common.job.JobManager
 import de.ggnext.common.logging.LogControl
 import de.ggnext.common.logging.LogLevel
+import de.ggnext.common.logging.log
+import de.ggnext.common.logging.warn
 import de.ggnext.common.sentry.SentryBuilder
 import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.contentsystem.ContentSystem
@@ -59,7 +61,7 @@ class GGNextCore : SuspendingJavaPlugin() {
             scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this)
         }.onFailure {
             scoreboardLibrary = NoopScoreboardLibrary()
-            logger.warning("Could not load scoreboard library")
+            log.warn("Could not load scoreboard library")
         }
 
         scoreBoardManager = ScoreBoardManager(scoreboardLibrary)
@@ -75,7 +77,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         jobManager = JobManager(scope, logger).also { it.startAll() }
         GGNextAPI.jobManager = jobManager
 
-        logger.info("GGNext Core enabled!")
+        log.info("GGNext Core enabled!")
     }
 
     override suspend fun onDisableAsync() {
@@ -83,7 +85,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         mongoManager.close()
         scoreBoardManager.shutdown()
 
-        logger.info("GGNext Core disabled!")
+        log.info("GGNext Core disabled!")
     }
 
     private fun registerCommands() {
