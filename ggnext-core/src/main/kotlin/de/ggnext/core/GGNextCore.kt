@@ -7,6 +7,8 @@ import de.ggnext.common.db.MongoManager
 import de.ggnext.common.job.JobManager
 import de.ggnext.common.sentry.SentryBuilder
 import de.ggnext.common.sentry.SentryConfig
+import de.ggnext.common.logging.LogControl
+import de.ggnext.common.logging.LogLevel
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.core.command.CommandVisibilityFilter
@@ -32,6 +34,7 @@ class GGNextCore : SuspendingJavaPlugin() {
 
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
+        if (config.getBoolean("prod")) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
         SentryBuilder.init(
             SentryConfig(

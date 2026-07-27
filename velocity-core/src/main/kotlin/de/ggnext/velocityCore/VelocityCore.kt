@@ -12,6 +12,8 @@ import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.common.db.MongoManager
 import de.ggnext.common.sentry.SentryBuilder
 import de.ggnext.common.sentry.SentryConfig
+import de.ggnext.common.logging.LogControl
+import de.ggnext.common.logging.LogLevel
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
@@ -69,6 +71,7 @@ class VelocityCore
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
             configManager.load()
             configManager.save()
+            if (configManager.config.prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
             SentryBuilder.init(
                 SentryConfig(
