@@ -57,7 +57,6 @@ class Railway : SuspendingJavaPlugin() {
                 session,
             )
         }
-        // Plugin shutdown logic
     }
 
     private fun registerCommands() {

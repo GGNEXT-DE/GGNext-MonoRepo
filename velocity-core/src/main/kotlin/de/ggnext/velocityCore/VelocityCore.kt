@@ -10,6 +10,8 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.common.db.MongoManager
+import de.ggnext.common.logging.LogControl
+import de.ggnext.common.logging.LogLevel
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
@@ -66,6 +68,7 @@ class VelocityCore
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
             configManager.load()
             configManager.save()
+            if (configManager.config.prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
             mongoManager = MongoManager(configManager.config.mongoConnection, configManager.config.database)
             playerManager = PlayerManager(mongoManager.database)
