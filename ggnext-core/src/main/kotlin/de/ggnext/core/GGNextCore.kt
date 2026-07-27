@@ -5,6 +5,8 @@ import com.github.shynixn.mccoroutine.bukkit.scope
 import com.noxcrew.interfaces.InterfacesListeners
 import de.ggnext.common.db.MongoManager
 import de.ggnext.common.job.JobManager
+import de.ggnext.common.sentry.SentryBuilder
+import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.common.logging.LogControl
 import de.ggnext.common.logging.LogLevel
 import de.ggnext.contentsystem.ContentSystem
@@ -33,6 +35,13 @@ class GGNextCore : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
         if (config.getBoolean("prod")) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
+
+        SentryBuilder.init(
+            SentryConfig(
+                config.getString("sentry.dsn"),
+                config.getBoolean("prod"),
+            ),
+        )
 
         InterfacesListeners.install(this)
 

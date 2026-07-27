@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     id("com.diffplug.spotless")
     kotlin("plugin.serialization")
+    id("io.sentry.jvm.gradle")
 }
 
 kotlin {
