@@ -2,7 +2,6 @@ package de.ggnext.railway
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
-import de.ggnext.contentsystem.value.types.SkillPath
 import de.ggnext.core.api.GGNextAPI
 import de.ggnext.railway.auction.AuctionCommand
 import de.ggnext.railway.auction.AuctionGui
