@@ -29,7 +29,7 @@ class SkillTreeManager(
         pathId: String,
     ): Boolean {
         val tier = nextTier(profile, pathId) ?: return false
-        if (!canUnlock()) return false
+        if (!canUnlock(profile, pathId)) return false
 
         val currentCount = profile.level.unlockedTiers[pathId] ?: 0
         val updatedLevel =
