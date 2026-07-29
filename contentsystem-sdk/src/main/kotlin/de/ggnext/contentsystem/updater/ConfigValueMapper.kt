@@ -7,11 +7,15 @@ import de.ggnext.contentsystem.value.types.Quest
 import de.ggnext.contentsystem.value.types.QuestCategory
 import de.ggnext.contentsystem.value.types.QuestTrackingType
 import de.ggnext.contentsystem.value.types.QuestValue
+import de.ggnext.contentsystem.value.types.SkillPath
+import de.ggnext.contentsystem.value.types.SkillPathValue
+import de.ggnext.contentsystem.value.types.SkillTier
 import de.ggnext.contentsystem.value.types.StringValue
 import de.ggnext.contentsystem.value.types.Translation
 import de.ggnext.contentsystem.value.types.TranslationValue
 import org.bson.Document
 import org.bukkit.Material
+import kotlin.collections.emptyList
 
 /**
  * Maps a MongoDB [Document] to the corresponding [ConfigValue] subtype.
@@ -79,6 +83,22 @@ internal object ConfigValueMapper {
                             rewardXp = valueDoc.getInteger("rewardXp"),
                             rewardMoney = valueDoc.getDouble("rewardMoney"),
                         ),
+                )
+            }
+
+            "SKILL_PATH" -> {
+                val tierDocs = doc.getList("value", Document::class.java) ?: emptyList()
+                val tiers =
+                    tierDocs.map { tierDoc ->
+                        val effectsDoc = tierDoc.get("effects", Document::class.java) ?: Document()
+                        SkillTier(
+                            cost = tierDoc.getInteger("cost"),
+                            effects = effectsDoc.mapValues { (_, v) -> (v as Number).toDouble() },
+                        )
+                    }
+                SkillPathValue(
+                    key = key,
+                    value = SkillPath(key, tiers),
                 )
             }
 
