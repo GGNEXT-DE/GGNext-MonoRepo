@@ -16,6 +16,7 @@ import de.ggnext.common.sentry.SentryBuilder
 import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
+import de.ggnext.velocityCore.config.VelocityConfig
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
 import de.ggnext.velocityCore.features.friends.commands.FriendCommand
 import de.ggnext.velocityCore.features.hub.HubCommand
@@ -58,7 +59,7 @@ class VelocityCore
         private val scope by lazy { suspendingPluginContainer.pluginContainer.scope }
 
         val configManager = ConfigManager(dataFolder)
-        private val config = configManager.config
+        private lateinit var config: VelocityConfig
         private lateinit var mongoManager: MongoManager
         private lateinit var playerManager: PlayerManager
         private lateinit var punishmentManager: PunishmentManager
@@ -71,7 +72,8 @@ class VelocityCore
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
             configManager.load()
             configManager.save()
-            if (configManager.config.prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
+            config = configManager.config
+            if (config.prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
             SentryBuilder.init(
                 SentryConfig(
