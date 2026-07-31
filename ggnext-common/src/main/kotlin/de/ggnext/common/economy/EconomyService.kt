@@ -49,19 +49,4 @@ class EconomyService(
 
         return result.modifiedCount > 0
     }
-
-    suspend fun migrateLegacyNetworkEconomy() {
-        legacyNetworkEconomy.find().collect { legacyEconomy ->
-            val playerId = legacyEconomy.get("_id", UUID::class.java) ?: return@collect
-            val gems = legacyEconomy.getInteger("gems") ?: return@collect
-
-            players.updateOne(
-                Filters.and(
-                    Filters.eq("_id", playerId),
-                    Filters.exists("gems", false),
-                ),
-                Updates.set("gems", gems),
-            )
-        }
-    }
 }

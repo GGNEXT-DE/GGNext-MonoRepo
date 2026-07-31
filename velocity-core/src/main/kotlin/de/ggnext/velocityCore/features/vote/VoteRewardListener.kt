@@ -24,13 +24,12 @@ class VoteRewardListener(
         if (!vote.serviceName.contains("minecraft-server.eu", ignoreCase = true)) return
 
         val player = playerManager.getPlayer(vote.username) ?: return
-        val amount = rewardGems
 
-        if (!economyService.addGems(player.id, amount)) return
+        if (!economyService.addGems(player.id, rewardGems)) return
 
         server.getPlayer(player.id).getOrNull()?.let { onlinePlayer ->
             val message by TranslationStore("translations.velocity.vote.rewarded")
-            onlinePlayer.sendMessage(message.get(onlinePlayer.language(), listOf(amount.toString())))
+            onlinePlayer.sendMessage(message.get(onlinePlayer.language(), listOf(rewardGems.toString())))
         }
     }
 }

@@ -96,7 +96,6 @@ class VelocityCore
             partySystemManager = PartySystemManager(playerManager)
             friendSystemManager = FriendSystemManager(playerManager)
             economyService = EconomyService(mongoManager.database)
-            economyService.migrateLegacyNetworkEconomy()
 
             registerCommands()
 
