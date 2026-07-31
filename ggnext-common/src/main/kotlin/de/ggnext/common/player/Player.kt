@@ -9,6 +9,7 @@ data class Player(
     val firstJoin: Long,
     val lastLogin: Long,
     val playTimeSeconds: Long = 0,
+    val gems: Int = 0,
     val networkLevel: NetworkLevel = NetworkLevel(),
     val friendIds: List<UUID> = emptyList(),
     val pendingFriendRequests: List<FriendRequest> = emptyList(),

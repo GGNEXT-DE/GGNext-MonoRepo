@@ -1,41 +1,40 @@
 package de.ggnext.core.economy
 
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.UpdateOptions
-import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import kotlinx.coroutines.flow.firstOrNull
 import org.bukkit.entity.Player
+import java.util.UUID
+import de.ggnext.common.economy.EconomyService as CommonEconomyService
 
 class EconomyService(
-    private val database: MongoDatabase,
+    database: MongoDatabase,
 ) {
-    private val collection = database.getCollection<NetworkEconomy>("network_econemy")
-
-    suspend fun getNetworkEconomy(player: Player): NetworkEconomy? = collection.find(Filters.eq("_id", player.uniqueId)).firstOrNull()
+    private val delegate = CommonEconomyService(database)
 
     suspend fun addGems(
         player: Player,
         amount: Int,
     ) {
-        collection.updateOne(
-            Filters.eq("_id", player.uniqueId),
-            Updates.inc("gems", amount),
-            UpdateOptions().upsert(true),
-        )
+        delegate.addGems(player.uniqueId, amount)
     }
 
     suspend fun removeGems(
         player: Player,
         amount: Int,
-    ): Boolean {
-        val networkEconomy = getNetworkEconomy(player) ?: return false
-        if (networkEconomy.gems < amount) return false
+    ): Boolean = delegate.removeGems(player.uniqueId, amount)
 
-        collection.updateOne(
-            Filters.eq("_id", player.uniqueId),
-            Updates.inc("gems", -amount),
-        )
-        return true
-    }
+    suspend fun getGems(player: Player): Int = delegate.getGems(player.uniqueId)
+
+    suspend fun addGems(
+        playerId: UUID,
+        amount: Int,
+    ): Boolean = delegate.addGems(playerId, amount)
+
+    suspend fun removeGems(
+        playerId: UUID,
+        amount: Int,
+    ): Boolean = delegate.removeGems(playerId, amount)
+
+    suspend fun getGems(playerId: UUID): Int = delegate.getGems(playerId)
+
+    suspend fun migrateLegacyNetworkEconomy() = delegate.migrateLegacyNetworkEconomy()
 }

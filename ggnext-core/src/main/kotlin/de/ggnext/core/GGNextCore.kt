@@ -40,6 +40,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         contentSystem = ContentSystem(mongoManager.database, scope).also { it.init() }
 
         economyService = EconomyService(mongoManager.database)
+        economyService.migrateLegacyNetworkEconomy()
         GGNextAPI.economyService = economyService
 
         runCatching {

@@ -6,9 +6,11 @@ import com.github.shynixn.mccoroutine.velocity.scope
 import com.google.inject.Inject
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
+import com.velocitypowered.api.plugin.Dependency
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import de.ggnext.common.economy.EconomyService
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.db.MongoManager
@@ -31,6 +33,8 @@ import de.ggnext.velocityCore.features.punishment.commands.WarnCommand
 import de.ggnext.velocityCore.features.team.TeamChatListener
 import de.ggnext.velocityCore.features.verify.VerifyCommand
 import de.ggnext.velocityCore.features.verify.VerifyManager
+import de.ggnext.velocityCore.features.vote.VoteCommand
+import de.ggnext.velocityCore.features.vote.VoteRewardListener
 import de.ggnext.velocityCore.utils.CommandRegistry
 import de.ggnext.velocityCore.utils.CommandUtils
 import java.nio.file.Path
@@ -39,6 +43,7 @@ import java.nio.file.Path
     id = "velocity-core",
     name = "Velocity-Core",
     version = "1.0-SNAPSHOT",
+    dependencies = [Dependency(id = "nuvotifier")],
 )
 class VelocityCore
     @Inject
@@ -61,6 +66,7 @@ class VelocityCore
         private lateinit var verifyManager: VerifyManager
         private lateinit var partySystemManager: PartySystemManager
         private lateinit var friendSystemManager: FriendSystemManager
+        private lateinit var economyService: EconomyService
 
         @Subscribe
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
@@ -74,6 +80,8 @@ class VelocityCore
             verifyManager = VerifyManager(mongoManager.database)
             partySystemManager = PartySystemManager(playerManager)
             friendSystemManager = FriendSystemManager(playerManager)
+            economyService = EconomyService(mongoManager.database)
+            economyService.migrateLegacyNetworkEconomy()
 
             registerCommands()
 
@@ -86,6 +94,7 @@ class VelocityCore
             server.eventManager.register(this, MaintenanceListener(configManager.config))
 
             ContentSystem(mongoManager.database, scope).also { it.init() }
+            server.eventManager.registerSuspend(this, VoteRewardListener(server, playerManager, economyService))
         }
 
         private fun registerCommands() {
@@ -110,6 +119,8 @@ class VelocityCore
             commandRegistry.registerCommand(WarnCommand(server, commandUtils, punishmentManager, scope).warn)
 
             commandRegistry.registerCommand(VerifyCommand(verifyManager, playerManager, scope).command)
+
+            commandRegistry.registerCommand(VoteCommand().command)
 
             commandRegistry.registerCommand(PartyCommand(partySystemManager, commandUtils, server, scope).command)
 
