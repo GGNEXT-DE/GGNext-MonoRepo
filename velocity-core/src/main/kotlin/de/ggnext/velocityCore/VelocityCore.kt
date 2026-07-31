@@ -10,8 +10,8 @@ import com.velocitypowered.api.plugin.Dependency
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
-import de.ggnext.common.economy.EconomyService
 import de.ggnext.common.db.MongoManager
+import de.ggnext.common.economy.EconomyService
 import de.ggnext.common.logging.LogControl
 import de.ggnext.common.logging.LogLevel
 import de.ggnext.common.sentry.SentryBuilder
