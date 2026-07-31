@@ -5,15 +5,13 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.sk89q.worldedit.IncompleteRegionException
 import com.sk89q.worldedit.WorldEdit
 import com.sk89q.worldedit.bukkit.BukkitAdapter
-import com.sk89q.worldedit.entity.Entity
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy
 import com.sk89q.worldedit.function.operation.Operations
-import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.Region
-import de.ggnext.builder.types.ConfigPositionType
-import de.ggnext.builder.types.MarkerData
+import de.ggnext.common.types.ConfigPositionType
+import de.ggnext.common.types.MarkerData
 import io.papermc.paper.command.brigadier.Commands
 import kotlinx.serialization.json.Json
 import net.kyori.adventure.text.Component

@@ -11,9 +11,14 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.common.economy.EconomyService
+import de.ggnext.common.db.MongoManager
+import de.ggnext.common.logging.LogControl
+import de.ggnext.common.logging.LogLevel
+import de.ggnext.common.sentry.SentryBuilder
+import de.ggnext.common.sentry.SentryConfig
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.velocityCore.config.ConfigManager
-import de.ggnext.velocityCore.db.MongoManager
+import de.ggnext.velocityCore.config.VelocityConfig
 import de.ggnext.velocityCore.features.friends.FriendSystemManager
 import de.ggnext.velocityCore.features.friends.commands.FriendCommand
 import de.ggnext.velocityCore.features.hub.HubCommand
@@ -59,6 +64,7 @@ class VelocityCore
         private val scope by lazy { suspendingPluginContainer.pluginContainer.scope }
 
         val configManager = ConfigManager(dataFolder)
+        private lateinit var config: VelocityConfig
         private lateinit var mongoManager: MongoManager
         private lateinit var playerManager: PlayerManager
         private lateinit var punishmentManager: PunishmentManager
@@ -72,8 +78,17 @@ class VelocityCore
         suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
             configManager.load()
             configManager.save()
+            config = configManager.config
+            if (config.prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
-            mongoManager = MongoManager(configManager)
+            SentryBuilder.init(
+                SentryConfig(
+                    config.sentryDSN,
+                    config.prod,
+                ),
+            )
+
+            mongoManager = MongoManager(config.mongoConnection, config.database)
             playerManager = PlayerManager(mongoManager.database)
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)
@@ -88,7 +103,7 @@ class VelocityCore
             server.eventManager.register(this, TeamChatListener(server))
             server.eventManager.registerSuspend(
                 this,
-                PlayerListener(playerManager, punishmentManager, partySystemManager, configManager.config),
+                PlayerListener(playerManager, punishmentManager, partySystemManager, config),
             )
             server.eventManager.registerSuspend(this, PunishmentChatListener(punishmentManager))
             server.eventManager.register(this, MaintenanceListener(configManager.config))

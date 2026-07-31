@@ -19,6 +19,7 @@ data class RailwayProfileIndex(
 data class RailwayLevel(
     val xp: Long,
     val skillPoints: Int,
+    val unlockedTiers: Map<String, Int> = emptyMap(),
 ) {
     fun neededXpForLevel(level: Int): Long = (100 * level.toDouble().pow(2)).toLong()
 

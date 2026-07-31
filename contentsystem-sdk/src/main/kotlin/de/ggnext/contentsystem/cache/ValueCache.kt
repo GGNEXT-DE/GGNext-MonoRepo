@@ -21,6 +21,15 @@ internal object ValueCache {
     inline fun <reified T : ConfigValue<*>> getTyped(key: String): T =
         cache[key] as? T ?: error("Value '$key' not found or wrong type (expected ${T::class.simpleName})")
 
+    /**
+     * Retrieves a list of values from the cache whose keys start with the given [prefix]
+     * and filters them to ensure they match the expected type [T].
+     */
+    inline fun <reified T : ConfigValue<*>> getByPrefix(prefix: String): List<T> =
+        cache.values
+            .filterIsInstance<T>()
+            .filter { it.key.startsWith(prefix) }
+
     fun remove(key: String) {
         cache.remove(key)
     }

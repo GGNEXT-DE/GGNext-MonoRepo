@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
     compileOnly(libs.mongodb)
 }

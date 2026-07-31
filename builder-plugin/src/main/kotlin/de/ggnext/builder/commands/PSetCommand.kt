@@ -2,7 +2,7 @@ package de.ggnext.builder.commands
 
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
-import de.ggnext.builder.types.ConfigPositionType
+import de.ggnext.common.types.ConfigPositionType
 import io.papermc.paper.command.brigadier.Commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

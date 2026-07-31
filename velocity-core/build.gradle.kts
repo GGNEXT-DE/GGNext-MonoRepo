@@ -25,8 +25,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        mergeServiceFiles {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        }
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        mergeServiceFiles()
     }
 }

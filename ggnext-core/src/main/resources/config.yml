@@ -1,3 +1,6 @@
 mongo:
   connectionString: "mongodb://localhost:27017"
+  database: "ggnext"
 prod: false
+sentry:
+  dsn: "sentry-dsn"

@@ -1,7 +1,7 @@
 package de.ggnext.railway.zone
 
+import de.ggnext.common.types.ConfigPositionType
 import de.ggnext.railway.profile.RailwayProfileManager
-import de.ggnext.railway.zone.config.ConfigPositionType
 import de.ggnext.railway.zone.config.ZoneConfig
 import de.ggnext.railway.zone.instance.ZoneInstanceManager
 import de.ggnext.railway.zone.instance.ZoneLoader

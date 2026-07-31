@@ -1,5 +1,6 @@
 package de.ggnext.railway.zone.config
 
+import de.ggnext.common.types.MarkerData
 import kotlinx.serialization.json.Json
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -29,7 +30,7 @@ class ZoneConfigLoader(
             val jsonFile = directory.resolve("markers.json")
             if (!jsonFile.exists() || !jsonFile.isFile) return@forEach
 
-            val markers = Json.decodeFromString<List<Marker>>(jsonFile.readText())
+            val markers = Json.decodeFromString<List<MarkerData>>(jsonFile.readText())
 
             zoneConfigs.add(ZoneConfig(name, schemFile, markers))
         }
