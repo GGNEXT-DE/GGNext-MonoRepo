@@ -19,7 +19,7 @@ class PlayerListener(
     private val config: VelocityConfig,
 ) {
     @Subscribe
-    suspend fun onLoginEvent(event: LoginEvent) {
+    suspend fun onJoinListener(event: LoginEvent) {
         val player = event.player
 
         if (config.globalMaintenanceMode && !player.hasPermission("maintenance.join")) {
