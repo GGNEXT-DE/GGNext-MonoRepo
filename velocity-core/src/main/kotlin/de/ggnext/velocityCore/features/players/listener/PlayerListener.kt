@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.connection.LoginEvent
 import com.velocitypowered.api.event.connection.PreLoginEvent
+import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import de.ggnext.velocityCore.config.VelocityConfig
 import de.ggnext.velocityCore.features.party.PartySystemManager
 import de.ggnext.velocityCore.features.players.PlayerManager
@@ -19,6 +20,19 @@ class PlayerListener(
     private val config: VelocityConfig,
 ) {
     @Subscribe
+    suspend fun onPostCreation(event: ServerPostConnectEvent) {
+        if (event.previousServer != null) return
+        
+        val player = event.player
+
+        playerManager.getPlayer(player.uniqueId) ?: run {
+            playerManager.createPlayer(player.uniqueId, player.username)
+            return
+        }
+        playerManager.loginPlayer(player.uniqueId, player.username)
+    }
+
+    @Subscribe
     suspend fun onJoinListener(event: LoginEvent) {
         val player = event.player
 
@@ -29,12 +43,6 @@ class PlayerListener(
                 )
             return
         }
-
-        playerManager.getPlayer(player.uniqueId) ?: run {
-            playerManager.createPlayer(player.uniqueId, player.username)
-            return
-        }
-        playerManager.loginPlayer(player.uniqueId, player.username)
     }
 
     @Subscribe
