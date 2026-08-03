@@ -22,7 +22,7 @@ class PlayerListener(
     @Subscribe
     suspend fun onPostCreation(event: ServerPostConnectEvent) {
         if (event.previousServer != null) return
-        
+
         val player = event.player
 
         playerManager.getPlayer(player.uniqueId) ?: run {
