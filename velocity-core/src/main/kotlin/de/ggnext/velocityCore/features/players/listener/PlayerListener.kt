@@ -1,8 +1,11 @@
 package de.ggnext.velocityCore.features.players.listener
 
+import com.velocitypowered.api.event.ResultedEvent
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.connection.LoginEvent
+import com.velocitypowered.api.event.connection.PreLoginEvent
+import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import de.ggnext.velocityCore.config.VelocityConfig
 import de.ggnext.velocityCore.features.party.PartySystemManager
 import de.ggnext.velocityCore.features.players.PlayerManager
@@ -17,27 +20,48 @@ class PlayerListener(
     private val config: VelocityConfig,
 ) {
     @Subscribe
+    suspend fun onPostCreation(event: ServerPostConnectEvent) {
+        if (event.previousServer != null) return
+
+        val player = event.player
+
+        playerManager.getPlayer(player.uniqueId) ?: run {
+            playerManager.createPlayer(player.uniqueId, player.username)
+            return
+        }
+        playerManager.loginPlayer(player.uniqueId, player.username)
+    }
+
+    @Subscribe
     suspend fun onJoinListener(event: LoginEvent) {
         val player = event.player
-        val activeBan = punishmentManager.getActiveBan(player.uniqueId)
 
         if (config.globalMaintenanceMode && !player.hasPermission("maintenance.join")) {
-            return player.disconnect(Component.text("Currently under maintenance.", NamedTextColor.RED))
+            event.result =
+                ResultedEvent.ComponentResult.denied(
+                    Component.text("Currently under maintenance.", NamedTextColor.RED),
+                )
+            return
+        }
+    }
+
+    @Subscribe
+    suspend fun onPreJoinListener(event: PreLoginEvent) {
+        val uniqueId = event.uniqueId
+        if (uniqueId == null) {
+            event.result = PreLoginEvent.PreLoginComponentResult.denied(Component.text("You are not logged in!", NamedTextColor.RED))
+            return
         }
 
-        if (activeBan != null) {
-            if ((activeBan.revokedBy == null && activeBan.expiresAt > System.currentTimeMillis()) ||
-                (activeBan.revokedBy == null && activeBan.expiresAt == -1L)
-            ) {
-                return player.disconnect(Component.text("You are banned: ${activeBan.reason}", NamedTextColor.RED))
+        punishmentManager
+            .getActiveBan(uniqueId)
+            ?.let { activeBan ->
+                event.result =
+                    PreLoginEvent.PreLoginComponentResult.denied(
+                        Component.text("You are banned: ${activeBan.reason}", NamedTextColor.RED),
+                    )
+                return
             }
-        }
-
-        if (playerManager.getPlayer(player.uniqueId) == null) {
-            playerManager.createPlayer(event.player.uniqueId, player.username)
-        } else {
-            playerManager.loginPlayer(player.uniqueId, player.username)
-        }
     }
 
     @Subscribe
