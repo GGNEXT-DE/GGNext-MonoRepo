@@ -55,10 +55,7 @@ class PlayerListener(
 
         punishmentManager
             .getActiveBan(uniqueId)
-            ?.takeIf { activeBan ->
-                activeBan.revokedBy == null &&
-                    (activeBan.expiresAt > System.currentTimeMillis() || activeBan.expiresAt == -1L)
-            }?.let { activeBan ->
+            ?.let { activeBan ->
                 event.result =
                     PreLoginEvent.PreLoginComponentResult.denied(
                         Component.text("You are banned: ${activeBan.reason}", NamedTextColor.RED),
