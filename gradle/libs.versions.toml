@@ -5,6 +5,7 @@ mccoroutine = "2.22.0"
 interfaces = "2.1.0-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
 scoreboard = "2.8.1"
+nuvotifier = "2.7.2"
 
 [libraries]
 # Fawe
@@ -30,6 +31,10 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 scoreboard-library-api = { module = "net.megavex:scoreboard-library-api", version.ref = "scoreboard" }
 scoreboard-library-implementation = { module = "net.megavex:scoreboard-library-implementation", version.ref = "scoreboard" }
 scoreboard-library-extra-kotlin = { module = "net.megavex:scoreboard-library-extra-kotlin", version.ref = "scoreboard" }
+
+# NuVotifier
+nuvotifier-api = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-api", version.ref = "nuvotifier" }
+nuvotifier-velocity = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-velocity", version.ref = "nuvotifier" }
 
 [bundles]
 ggnext-core = [

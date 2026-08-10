@@ -9,8 +9,8 @@ dependencies {
     implementation(libs.bundles.ggnext.velocity)
     implementation(project(":contentsystem-sdk"))
     implementation(project(":ggnext-common"))
-    compileOnly("com.github.NuVotifier.NuVotifier:nuvotifier-api:2.7.2")
-    compileOnly("com.github.NuVotifier.NuVotifier:nuvotifier-velocity:2.7.2")
+    compileOnly(libs.nuvotifier.api)
+    compileOnly(libs.nuvotifier.velocity)
 }
 
 tasks {
@@ -19,6 +19,7 @@ tasks {
         downloadPlugins {
             modrinth("luckperms", "v5.5.53-velocity")
             modrinth("SignedVelocity", "1.4.1")
+            github("nuvotifier", "NuVotifier", "v2.7.3", "nuvotifier.jar")
         }
     }
     build {
