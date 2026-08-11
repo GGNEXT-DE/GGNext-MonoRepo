@@ -6,7 +6,6 @@ import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.velocityCore.config.ConfigManager
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.language
-import net.kyori.adventure.text.Component
 
 class ToggleMtCommand(
     val configManager: ConfigManager,

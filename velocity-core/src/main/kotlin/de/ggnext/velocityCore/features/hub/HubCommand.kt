@@ -6,8 +6,6 @@ import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.velocityCore.utils.language
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 
 class HubCommand(
     private val server: ProxyServer,
