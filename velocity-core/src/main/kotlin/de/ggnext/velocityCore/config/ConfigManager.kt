@@ -25,7 +25,9 @@ data class VelocityConfig(
     @Setting("sentry-dsn") var sentryDSN: String = "sentry",
 )
 
-class ConfigManager(dataDirectory: Path) {
+class ConfigManager(
+    dataDirectory: Path,
+) {
     private val path = dataDirectory.resolve("config.yml")
     private val loader = YamlConfigurationLoader.builder().path(path).build()
 
