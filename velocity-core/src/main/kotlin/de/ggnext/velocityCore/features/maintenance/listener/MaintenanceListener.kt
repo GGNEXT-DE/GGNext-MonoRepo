@@ -23,14 +23,14 @@ class MaintenanceListener(
                 ?.serverInfo
                 ?.name
 
-        if (config.maintenanceServers.contains(server) && !player.hasPermission("maintenance.join")) {
+        if (config.maintenance.servers.contains(server) && !player.hasPermission("maintenance.join")) {
             player.disconnect(Component.text("Currently under maintenance.", NamedTextColor.RED))
         }
     }
 
     @Subscribe
     fun onProxyPing(event: ProxyPingEvent) {
-        if (config.globalMaintenanceMode) {
+        if (config.maintenance.global) {
             val builder = event.ping.asBuilder()
             builder.description(
                 MiniMessage.miniMessage().deserialize(

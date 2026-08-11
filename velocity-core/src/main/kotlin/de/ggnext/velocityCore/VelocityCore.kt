@@ -88,7 +88,7 @@ class VelocityCore
                 ),
             )
 
-            mongoManager = MongoManager(config.mongoConnection, config.database)
+            mongoManager = MongoManager(config.mongo.connection, config.mongo.database)
             playerManager = PlayerManager(mongoManager.database)
             punishmentManager = PunishmentManager(mongoManager.database)
             commandUtils = CommandUtils(server, playerManager)

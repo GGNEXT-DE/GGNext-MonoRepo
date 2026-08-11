@@ -36,7 +36,7 @@ class PlayerListener(
     suspend fun onJoinListener(event: LoginEvent) {
         val player = event.player
 
-        if (config.globalMaintenanceMode && !player.hasPermission("maintenance.join")) {
+        if (config.maintenance.global && !player.hasPermission("maintenance.join")) {
             event.result =
                 ResultedEvent.ComponentResult.denied(
                     Component.text("Currently under maintenance.", NamedTextColor.RED),

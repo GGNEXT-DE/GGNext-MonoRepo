@@ -21,7 +21,7 @@ class EditMtCommand(
                             .requiredArgumentBuilder("server", StringArgumentType.word())
                             .executes { ctx ->
                                 val server = ctx.getArgument("server", String::class.java)
-                                configManager.config.maintenanceServers += server
+                                configManager.config.maintenance.servers += server
                                 configManager.save()
                                 ctx.source.sendMessage(Component.text("$server zu maintenance hinzugefügt!"))
                                 Command.SINGLE_SUCCESS
@@ -35,7 +35,7 @@ class EditMtCommand(
                             .requiredArgumentBuilder("server", StringArgumentType.word())
                             .executes { ctx ->
                                 val server = ctx.getArgument("server", String::class.java)
-                                configManager.config.maintenanceServers -= server
+                                configManager.config.maintenance.servers -= server
                                 configManager.save()
                                 ctx.source.sendMessage(Component.text("$server von maintenance entfernt!"))
                                 Command.SINGLE_SUCCESS
@@ -46,7 +46,7 @@ class EditMtCommand(
                     .literalArgumentBuilder("list")
                     .executes { ctx ->
                         ctx.source.sendMessage(
-                            Component.text("Maintenance servers: ${configManager.config.maintenanceServers.joinToString(", ")}"),
+                            Component.text("Maintenance servers: ${configManager.config.maintenance.servers.joinToString(", ")}"),
                         )
                         Command.SINGLE_SUCCESS
                     },
