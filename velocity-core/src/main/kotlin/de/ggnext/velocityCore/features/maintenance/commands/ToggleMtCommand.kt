@@ -17,10 +17,10 @@ class ToggleMtCommand(
 
                 val config = configManager.config
 
-                config.globalMaintenanceMode = !config.globalMaintenanceMode
+                config.maintenance.global = !config.maintenance.global
                 configManager.save()
 
-                sender.sendMessage(Component.text("Maintenance: ${config.globalMaintenanceMode}"))
+                sender.sendMessage(Component.text("Maintenance: ${config.maintenance.global}"))
 
                 Command.SINGLE_SUCCESS
             }.build()
