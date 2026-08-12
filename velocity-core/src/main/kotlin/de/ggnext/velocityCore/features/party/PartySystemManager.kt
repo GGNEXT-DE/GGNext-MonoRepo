@@ -11,6 +11,7 @@ import de.ggnext.velocityCore.features.players.PlayerManager
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 class PartySystemManager(
     private val playerManager: PlayerManager,
@@ -20,7 +21,7 @@ class PartySystemManager(
     private val inviteExpiryMinutes by NumberStore("numbers.velocity.partysystem.invite.expiry")
 
     private val inviteExpiryMillis: Long
-        get() = inviteExpiryMinutes.toLong() * 60 * 1000L
+        get() = inviteExpiryMinutes.minutes.inWholeMilliseconds
 
     private val mutex = Mutex()
 

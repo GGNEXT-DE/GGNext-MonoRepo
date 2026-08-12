@@ -4,16 +4,13 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import de.ggnext.common.player.Player
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
-import org.bson.Document
 import java.util.UUID
 
 class EconomyService(
     database: MongoDatabase,
 ) {
     private val players = database.getCollection<Player>("players")
-    private val legacyNetworkEconomy = database.getCollection<Document>("network_econemy")
 
     suspend fun getGems(playerId: UUID): Int = players.find(Filters.eq("_id", playerId)).firstOrNull()?.gems ?: 0
 
