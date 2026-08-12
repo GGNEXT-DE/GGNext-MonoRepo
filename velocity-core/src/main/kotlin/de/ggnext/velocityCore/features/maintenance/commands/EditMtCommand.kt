@@ -3,8 +3,10 @@ package de.ggnext.velocityCore.features.maintenance.commands
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.velocitypowered.api.command.BrigadierCommand
+import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.velocityCore.config.ConfigManager
-import net.kyori.adventure.text.Component
+import de.ggnext.velocityCore.utils.asPlayerOrNull
+import de.ggnext.velocityCore.utils.language
 
 class EditMtCommand(
     private val configManager: ConfigManager,
@@ -20,10 +22,13 @@ class EditMtCommand(
                         BrigadierCommand
                             .requiredArgumentBuilder("server", StringArgumentType.word())
                             .executes { ctx ->
+                                val player = ctx.source.asPlayerOrNull() ?: return@executes 0
                                 val server = ctx.getArgument("server", String::class.java)
                                 configManager.config.maintenance.servers += server
                                 configManager.save()
-                                ctx.source.sendMessage(Component.text("$server zu maintenance hinzugefügt!"))
+
+                                val msg by TranslationStore("translations.velocity.maintenance.server_added")
+                                player.sendMessage(msg.get(player.language(), listOf(server)))
                                 Command.SINGLE_SUCCESS
                             },
                     ),
@@ -34,10 +39,13 @@ class EditMtCommand(
                         BrigadierCommand
                             .requiredArgumentBuilder("server", StringArgumentType.word())
                             .executes { ctx ->
+                                val player = ctx.source.asPlayerOrNull() ?: return@executes 0
                                 val server = ctx.getArgument("server", String::class.java)
                                 configManager.config.maintenance.servers -= server
                                 configManager.save()
-                                ctx.source.sendMessage(Component.text("$server von maintenance entfernt!"))
+
+                                val msg by TranslationStore("translations.velocity.maintenance.server_removed")
+                                player.sendMessage(msg.get(player.language(), listOf(server)))
                                 Command.SINGLE_SUCCESS
                             },
                     ),
@@ -45,9 +53,13 @@ class EditMtCommand(
                 BrigadierCommand
                     .literalArgumentBuilder("list")
                     .executes { ctx ->
-                        ctx.source.sendMessage(
-                            Component.text("Maintenance servers: ${configManager.config.maintenance.servers.joinToString(", ")}"),
-                        )
+                        val player = ctx.source.asPlayerOrNull() ?: return@executes 0
+
+                        val msg by TranslationStore("translations.velocity.maintenance.server_list")
+                        val servers =
+                            configManager.config.maintenance.servers
+                                .joinToString(", ")
+                        player.sendMessage(msg.get(player.language(), listOf(servers)))
                         Command.SINGLE_SUCCESS
                     },
             ).build()

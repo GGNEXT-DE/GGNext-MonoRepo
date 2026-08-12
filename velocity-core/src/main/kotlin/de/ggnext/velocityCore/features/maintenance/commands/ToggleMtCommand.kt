@@ -2,8 +2,10 @@ package de.ggnext.velocityCore.features.maintenance.commands
 
 import com.mojang.brigadier.Command
 import com.velocitypowered.api.command.BrigadierCommand
+import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.velocityCore.config.ConfigManager
-import net.kyori.adventure.text.Component
+import de.ggnext.velocityCore.utils.asPlayerOrNull
+import de.ggnext.velocityCore.utils.language
 
 class ToggleMtCommand(
     val configManager: ConfigManager,
@@ -13,14 +15,15 @@ class ToggleMtCommand(
             .literalArgumentBuilder("toggle-maintenance")
             .requires { it.hasPermission("ggnext.velocity.maintenance") }
             .executes { ctx ->
-                val sender = ctx.source
+                val player = ctx.source.asPlayerOrNull() ?: return@executes 0
 
                 val config = configManager.config
 
                 config.maintenance.global = !config.maintenance.global
                 configManager.save()
 
-                sender.sendMessage(Component.text("Maintenance: ${config.maintenance.global}"))
+                val msg by TranslationStore("translations.velocity.maintenance.global")
+                player.sendMessage(msg.get(player.language(), listOf(config.maintenance.global.toString())))
 
                 Command.SINGLE_SUCCESS
             }.build()
