@@ -49,7 +49,7 @@ class JobManager(
             while (isActive) {
                 val currentTime = System.currentTimeMillis()
                 jobs.forEach { (id, job) ->
-                    if (currentTime >= job.lastRun + job.interval * 1000L) {
+                    if (currentTime >= job.lastRun + job.interval.seconds.inWholeMilliseconds) {
                         logger.info("Job $id started!")
                         runCatching { job.execute() }
                             .onFailure { logger.warning("Job $id failed!") }

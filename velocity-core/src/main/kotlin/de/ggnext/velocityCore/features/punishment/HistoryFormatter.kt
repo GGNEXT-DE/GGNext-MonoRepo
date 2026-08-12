@@ -84,8 +84,8 @@ object HistoryFormatter {
     }
 
     private fun statusColor(punishment: PunishmentData): NamedTextColor =
-        if ((punishment.revokedBy == null && punishment.expiresAt > System.currentTimeMillis()) ||
-            (punishment.revokedBy == null && punishment.expiresAt == -1L)
+        if (punishment.revokedBy == null &&
+            (punishment.expiresAt == -1L || punishment.expiresAt > System.currentTimeMillis())
         ) {
             NamedTextColor.GREEN
         } else {

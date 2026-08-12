@@ -6,6 +6,8 @@ import com.noxcrew.interfaces.element.StaticElement
 import com.noxcrew.interfaces.interfaces.buildChestInterface
 import com.noxcrew.interfaces.properties.InterfaceProperty
 import com.noxcrew.interfaces.utilities.forEachInGrid
+import de.ggnext.common.logging.log
+import de.ggnext.common.logging.warn
 import de.ggnext.contentsystem.value.store.NumberStore
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.createFiller
@@ -334,6 +336,7 @@ class AuctionGui(
         } catch (exception: Exception) {
             player.inventory.setItemInMainHand(auctionItem)
             player.sendMessage(auctionCreateFailed.get(player.language()))
+            log.warn("Failed to create Auction $exception")
         }
     }
 

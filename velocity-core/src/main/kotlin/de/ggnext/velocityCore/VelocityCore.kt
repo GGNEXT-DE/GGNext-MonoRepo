@@ -75,7 +75,7 @@ class VelocityCore
         private lateinit var economyService: EconomyService
 
         @Subscribe
-        suspend fun onProxyInitialization(event: ProxyInitializeEvent) {
+        suspend fun onProxyInitialization() {
             configManager.load()
             configManager.save()
             config = configManager.config

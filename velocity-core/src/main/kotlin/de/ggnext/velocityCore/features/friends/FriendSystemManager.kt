@@ -8,6 +8,7 @@ import de.ggnext.velocityCore.features.friends.results.FriendRequestResult
 import de.ggnext.velocityCore.features.friends.results.RemoveResult
 import de.ggnext.velocityCore.features.players.PlayerManager
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 class FriendSystemManager(
     private val playerManager: PlayerManager,
@@ -15,7 +16,7 @@ class FriendSystemManager(
     private val requestExpiryDays by NumberStore("numbers.velocity.friendsystem.request.expiry")
 
     private val requestExpiryMillis: Long
-        get() = requestExpiryDays.toLong() * 24 * 60 * 60 * 1000L
+        get() = requestExpiryDays.days.inWholeMilliseconds
 
     private fun FriendRequest.isValid(): Boolean = System.currentTimeMillis() - sentAt <= requestExpiryMillis
 
