@@ -23,10 +23,10 @@ class VerifyCommand(
 
                 scope.launch {
                     if (playerManager.getPlayer(player.uniqueId)?.discordId != null) {
-                        val msg by TranslationStore("translations.velocity.verification.alreadyVerified")
+                        val msg by TranslationStore("translations.velocity.verification.already_verified")
                         player.sendMessage(msg.get(player.language()))
                     } else if (verifyManager.getActiveVerificationProcess(player.uniqueId) != null) {
-                        val msg by TranslationStore("translations.velocity.verification.activeProcess")
+                        val msg by TranslationStore("translations.velocity.verification.active_process")
                         player.sendMessage(
                             msg.get(
                                 player.language(),
@@ -35,7 +35,7 @@ class VerifyCommand(
                         )
                     } else {
                         val code = verifyManager.createVerification(player.uniqueId)
-                        val msg by TranslationStore("translations.velocity.verification.createProcess")
+                        val msg by TranslationStore("translations.velocity.verification.create_process")
                         player.sendMessage(msg.get(player.language(), listOf(code.toString())))
                     }
                 }
