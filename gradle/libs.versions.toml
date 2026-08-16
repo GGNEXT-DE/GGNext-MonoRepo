@@ -2,7 +2,7 @@
 fawe = "2.15.3"
 mongodb = "5.9.1"
 mccoroutine = "2.22.0"
-interfaces = "2.1.0-SNAPSHOT"
+interfaces = "2.1.1-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
 scoreboard = "2.8.1"
 nuvotifier = "2.7.2"
