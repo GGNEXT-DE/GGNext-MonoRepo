@@ -40,7 +40,7 @@ class WarnCommand(
 
                                 scope.launch {
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
-                                    val msg by TranslationStore("translations.punishment.warn.success")
+                                    val msg by TranslationStore("translations.velocity.punishment.warn.success")
 
                                     punishmentManager.warn(targetUUID, player.uniqueId, reason)
                                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
@@ -52,8 +52,8 @@ class WarnCommand(
             ).build()
 
     private fun Player.showWarning(reason: String) {
-        val title by TranslationStore("translations.punishment.warn.title")
-        val msg by TranslationStore("translations.punishment.warn.chat")
+        val title by TranslationStore("translations.velocity.punishment.warn.title")
+        val msg by TranslationStore("translations.velocity.punishment.warn.chat")
         showTitle(
             Title.title(
                 title.get(this.language()),

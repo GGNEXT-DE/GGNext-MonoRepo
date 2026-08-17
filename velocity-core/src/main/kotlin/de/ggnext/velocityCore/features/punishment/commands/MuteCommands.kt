@@ -39,15 +39,15 @@ class MuteCommands(
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                     if (punishmentManager.getActiveMute(targetUUID) != null) {
-                                        val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
+                                        val msg by TranslationStore("translations.velocity.punishment.mute.already_muted")
                                         player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                         return@launch
                                     }
 
                                     punishmentManager.mute(targetUUID, player.uniqueId, reason)
-                                    val msg by TranslationStore("translations.punishment.mute.success")
+                                    val msg by TranslationStore("translations.velocity.punishment.mute.success")
                                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
-                                    val msg1 by TranslationStore("translations.punishment.mute.muted")
+                                    val msg1 by TranslationStore("translations.velocity.punishment.mute.muted")
                                     proxy
                                         .getPlayer(targetName)
                                         .getOrNull()
@@ -79,15 +79,15 @@ class MuteCommands(
                                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                             if (punishmentManager.getActiveMute(targetUUID) != null) {
-                                                val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
+                                                val msg by TranslationStore("translations.velocity.punishment.mute.already_muted")
                                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                                 return@launch
                                             }
 
                                             punishmentManager.tempMute(targetUUID, player.uniqueId, duration, reason)
-                                            val msg by TranslationStore("translations.punishment.temp-mute.success")
+                                            val msg by TranslationStore("translations.velocity.punishment.temp_mute.success")
                                             player.sendMessage(msg.get(player.language(), listOf(targetName, durationInput)))
-                                            val msg1 by TranslationStore("translations.punishment.temp-mute.muted")
+                                            val msg1 by TranslationStore("translations.velocity.punishment.temp_mute.muted")
                                             proxy
                                                 .getPlayer(targetName)
                                                 .getOrNull()
@@ -113,10 +113,10 @@ class MuteCommands(
                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                             if (punishmentManager.revokeMute(targetUUID, player.uniqueId)) {
-                                val msg by TranslationStore("translations.punishment.unmute.success")
+                                val msg by TranslationStore("translations.velocity.punishment.unmute.success")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             } else {
-                                val msg by TranslationStore("translations.punishment.unmute.failed")
+                                val msg by TranslationStore("translations.velocity.punishment.unmute.failed")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             }
                         }

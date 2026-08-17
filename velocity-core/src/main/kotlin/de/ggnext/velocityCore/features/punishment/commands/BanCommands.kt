@@ -37,15 +37,15 @@ class BanCommands(
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                     if (punishmentManager.getActiveBan(targetUUID) != null) {
-                                        val msg by TranslationStore("translations.punishment.ban.alreadyBanned")
+                                        val msg by TranslationStore("translations.velocity.punishment.ban.already_banned")
                                         player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                         return@launch
                                     }
 
                                     punishmentManager.ban(targetUUID, player.uniqueId, reason)
-                                    val msg by TranslationStore("translations.punishment.ban.disconnect")
+                                    val msg by TranslationStore("translations.velocity.punishment.ban.disconnect")
                                     commandUtils.disconnectIfOnline(targetName, msg.get(player.language(), listOf(reason)))
-                                    val msg1 by TranslationStore("translations.punishment.ban.success")
+                                    val msg1 by TranslationStore("translations.velocity.punishment.ban.success")
                                     player.sendMessage(msg1.get(player.language(), listOf(targetName)))
                                 }
                                 Command.SINGLE_SUCCESS
@@ -75,18 +75,18 @@ class BanCommands(
                                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                                             if (punishmentManager.getActiveBan(targetUUID) != null) {
-                                                val msg by TranslationStore("translations.punishment.ban.alreadyBanned")
+                                                val msg by TranslationStore("translations.velocity.punishment.ban.already_banned")
                                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                                 return@launch
                                             }
 
                                             punishmentManager.tempBan(targetUUID, player.uniqueId, duration, reason)
-                                            val msg by TranslationStore("translations.punishment.temp-ban.disconnect")
+                                            val msg by TranslationStore("translations.velocity.punishment.temp_ban.disconnect")
                                             commandUtils.disconnectIfOnline(
                                                 targetName,
                                                 msg.get(player.language(), listOf(durationInput, reason)),
                                             )
-                                            val msg1 by TranslationStore("translations.punishment.temp-ban.success")
+                                            val msg1 by TranslationStore("translations.velocity.punishment.temp_ban.success")
                                             player.sendMessage(msg1.get(player.language(), listOf(targetName, durationInput)))
                                         }
                                         Command.SINGLE_SUCCESS
@@ -109,10 +109,10 @@ class BanCommands(
                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
                             if (punishmentManager.revokeBan(targetUUID, player.uniqueId)) {
-                                val msg by TranslationStore("translations.punishment.unban.success")
+                                val msg by TranslationStore("translations.velocity.punishment.unban.success")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             } else {
-                                val msg by TranslationStore("translations.punishment.unban.failed")
+                                val msg by TranslationStore("translations.velocity.punishment.unban.failed")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             }
                         }

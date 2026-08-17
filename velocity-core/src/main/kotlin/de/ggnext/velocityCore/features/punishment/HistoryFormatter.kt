@@ -22,9 +22,9 @@ object HistoryFormatter {
         punishments: List<PunishmentData>,
         site: Int,
     ): List<Component> {
-        val header by TranslationStore("translations.punishment.history.header")
+        val header by TranslationStore("translations.velocity.punishment.history.header")
 
-        val footer by TranslationStore("translations.punishment.history.footer")
+        val footer by TranslationStore("translations.velocity.punishment.history.footer")
 
         val maxSites: Int =
             punishments.size / 10 + (
@@ -32,7 +32,7 @@ object HistoryFormatter {
             )
 
         if (punishments.isEmpty()) {
-            val msg1 by TranslationStore("translations.punishment.history.empty")
+            val msg1 by TranslationStore("translations.velocity.punishment.history.empty")
             return listOf(
                 header.get(player.language(), listOf(targetName, filter.name.lowercase())),
                 msg1.get(player.language()),
