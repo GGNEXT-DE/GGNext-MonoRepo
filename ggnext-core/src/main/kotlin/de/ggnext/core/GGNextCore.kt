@@ -21,6 +21,10 @@ import de.ggnext.core.tab.TabListener
 import de.ggnext.core.tab.TabManager
 import de.ggnext.core.vanish.VanishCommand
 import de.ggnext.core.vanish.VanishManager
+import de.ggnext.sdk.GGNext
+import de.ggnext.sdk.feature.Content
+import de.ggnext.sdk.feature.content
+import de.ggnext.sdk.ggnext
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
@@ -28,6 +32,7 @@ import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
 class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var mongoManager: MongoManager
     private lateinit var economyService: EconomyService
+    private lateinit var ggnext: GGNext
     private lateinit var contentSystem: ContentSystem
     private lateinit var scoreboardLibrary: ScoreboardLibrary
     private lateinit var scoreBoardManager: ScoreBoardManager
@@ -50,8 +55,15 @@ class GGNextCore : SuspendingJavaPlugin() {
         mongoManager = MongoManager(config.getString("mongo.connectionString"), config.getString("mongo.database"))
         GGNextAPI.mongoManager = mongoManager
 
+        ggnext =
+            ggnext {
+                redis { url = config.getString("redis.uri") ?: "redis://127.0.0.1:6379" }
+                identity(config.getString("server-id") ?: "ggnext-core")
+                install(Content)
+            }
+
         registerCommands()
-        contentSystem = ContentSystem(mongoManager.database, scope).also { it.init() }
+        contentSystem = ContentSystem(ggnext.content, scope).also { it.init() }
 
         economyService = EconomyService(mongoManager.database)
 
