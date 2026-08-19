@@ -2,7 +2,6 @@ package de.ggnext.contentsystem.value.store
 
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.contentsystem.cache.ValueCache
-import de.ggnext.contentsystem.updater.MongoManager
 import de.ggnext.contentsystem.value.types.MaterialValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,10 +26,7 @@ class MaterialStore(
                     .append("type", "MATERIAL")
                     .append("value", "STICK")
 
-            ContentSystem.instance.scope.launch {
-                ContentSystem.instance.mongoManager.collection
-                    .insertOne(doc)
-            }
+            ContentSystem.instance.ensureDefault(doc)
 
             Material.valueOf("STICK")
         }

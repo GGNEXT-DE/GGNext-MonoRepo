@@ -2,8 +2,6 @@ package de.ggnext.contentsystem.value.store
 
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.contentsystem.cache.ValueCache
-import de.ggnext.contentsystem.updater.MongoManager
-import de.ggnext.contentsystem.value.types.MaterialValue
 import de.ggnext.contentsystem.value.types.Translation
 import de.ggnext.contentsystem.value.types.TranslationValue
 import kotlinx.coroutines.CoroutineScope
@@ -36,10 +34,7 @@ class TranslationStore(
                     .append("type", "TRANSLATION")
                     .append("value", valueDoc)
 
-            ContentSystem.instance.scope.launch {
-                ContentSystem.instance.mongoManager.collection
-                    .insertOne(doc)
-            }
+            ContentSystem.instance.ensureDefault(doc)
 
             defaultTranslation
         }

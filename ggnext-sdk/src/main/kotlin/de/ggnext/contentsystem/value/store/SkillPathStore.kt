@@ -33,10 +33,7 @@ class SkillPathStore(
                     .append("_id", key)
                     .append("type", "SKILL_PATH")
                     .append("value", listOf(defaultSkillTierDoc))
-            ContentSystem.instance.scope.launch {
-                ContentSystem.instance.mongoManager.collection
-                    .insertOne(doc)
-            }
+            ContentSystem.instance.ensureDefault(doc)
             defaultSkillPath
         }
 }
