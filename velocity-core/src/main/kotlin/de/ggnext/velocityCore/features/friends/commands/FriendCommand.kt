@@ -5,11 +5,11 @@ import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.friends.FriendSystemManager
-import de.ggnext.velocityCore.features.friends.results.AcceptResult
-import de.ggnext.velocityCore.features.friends.results.DenyResult
-import de.ggnext.velocityCore.features.friends.results.FriendRequestResult
-import de.ggnext.velocityCore.features.friends.results.RemoveResult
+import de.ggnext.protocol.friend.AcceptResult
+import de.ggnext.protocol.friend.DenyResult
+import de.ggnext.protocol.friend.FriendRequestResult
+import de.ggnext.protocol.friend.RemoveResult
+import de.ggnext.sdk.feature.FriendsSdk
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.language
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlin.jvm.optionals.getOrNull
 
 class FriendCommand(
-    private val friendSystemManager: FriendSystemManager,
+    private val friends: FriendsSdk,
     private val commandUtils: CommandUtils,
     private val proxy: ProxyServer,
     private val scope: CoroutineScope,
@@ -70,7 +70,7 @@ class FriendCommand(
     private fun runList(source: CommandSource): Int {
         val player = source.asPlayerOrNull() ?: return 1
         scope.launch {
-            val friends = friendSystemManager.getFriends(player.uniqueId)
+            val friends = friends.list(player.uniqueId)
             if (friends.isEmpty()) {
                 val empty by TranslationStore("translations.velocity.friendsystem.list.empty")
                 player.sendMessage(empty.get(player.language()))
@@ -95,7 +95,7 @@ class FriendCommand(
         scope.launch {
             val targetId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (friendSystemManager.createRequest(player.uniqueId, targetId)) {
+            when (friends.add(player.uniqueId, targetId)) {
                 FriendRequestResult.SENT -> {
                     val msg by TranslationStore("translations.velocity.friendsystem.add.sent")
                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
@@ -153,7 +153,7 @@ class FriendCommand(
         scope.launch {
             val targetId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (friendSystemManager.removeFriend(player.uniqueId, targetId)) {
+            when (friends.remove(player.uniqueId, targetId)) {
                 RemoveResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.friendsystem.remove.success")
                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
@@ -176,7 +176,7 @@ class FriendCommand(
         scope.launch {
             val fromId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (friendSystemManager.acceptRequest(player.uniqueId, fromId)) {
+            when (friends.accept(player.uniqueId, fromId)) {
                 AcceptResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.friendsystem.accept.success")
                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
@@ -209,7 +209,7 @@ class FriendCommand(
         scope.launch {
             val fromId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (friendSystemManager.denyRequest(player.uniqueId, fromId)) {
+            when (friends.deny(player.uniqueId, fromId)) {
                 DenyResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.friendsystem.deny.success")
                     player.sendMessage(msg.get(player.language(), listOf(targetName)))

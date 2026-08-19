@@ -12,15 +12,15 @@ data class Maintenance(
 )
 
 @ConfigSerializable
-data class Mongo(
-    var connection: String = "mongodb://localhost:27017",
-    var database: String = "ggnext",
+data class Redis(
+    var uri: String = "redis://127.0.0.1:6379",
 )
 
 @ConfigSerializable
 data class VelocityConfig(
     var maintenance: Maintenance = Maintenance(),
-    var mongo: Mongo = Mongo(),
+    var redis: Redis = Redis(),
+    @Setting("server-id") var serverId: String = "velocity-1",
     var prod: Boolean = false,
     @Setting("sentry-dsn") var sentryDSN: String = "sentry",
 )

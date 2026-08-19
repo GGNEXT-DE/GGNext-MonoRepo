@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command
 import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.punishment.PunishmentManager
+import de.ggnext.sdk.feature.PunishmentSdk
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.durationArgument
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class BanCommands(
     val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    val punishment: PunishmentSdk,
     private val scope: CoroutineScope,
     private val proxy: ProxyServer,
 ) {
@@ -36,13 +36,13 @@ class BanCommands(
                                 scope.launch {
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                                    if (punishmentManager.getActiveBan(targetUUID) != null) {
+                                    if (punishment.activeBan(targetUUID) != null) {
                                         val msg by TranslationStore("translations.punishment.ban.alreadyBanned")
                                         player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                         return@launch
                                     }
 
-                                    punishmentManager.ban(targetUUID, player.uniqueId, reason)
+                                    punishment.ban(targetUUID, player.uniqueId, reason)
                                     val msg by TranslationStore("translations.punishment.ban.disconnect")
                                     commandUtils.disconnectIfOnline(targetName, msg.get(player.language(), listOf(reason)))
                                     val msg1 by TranslationStore("translations.punishment.ban.success")
@@ -74,13 +74,13 @@ class BanCommands(
                                             val duration = commandUtils.parseDuration(durationInput, player) ?: return@launch
                                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                                            if (punishmentManager.getActiveBan(targetUUID) != null) {
+                                            if (punishment.activeBan(targetUUID) != null) {
                                                 val msg by TranslationStore("translations.punishment.ban.alreadyBanned")
                                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                                 return@launch
                                             }
 
-                                            punishmentManager.tempBan(targetUUID, player.uniqueId, duration, reason)
+                                            punishment.tempBan(targetUUID, player.uniqueId, duration, reason)
                                             val msg by TranslationStore("translations.punishment.temp-ban.disconnect")
                                             commandUtils.disconnectIfOnline(
                                                 targetName,
@@ -108,7 +108,7 @@ class BanCommands(
                         scope.launch {
                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                            if (punishmentManager.revokeBan(targetUUID, player.uniqueId)) {
+                            if (punishment.unban(targetUUID, player.uniqueId)) {
                                 val msg by TranslationStore("translations.punishment.unban.success")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             } else {

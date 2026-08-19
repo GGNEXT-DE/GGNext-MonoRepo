@@ -5,14 +5,14 @@ import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.party.PartyMember
-import de.ggnext.velocityCore.features.party.PartySystemManager
-import de.ggnext.velocityCore.features.party.results.AcceptResult
-import de.ggnext.velocityCore.features.party.results.DenyResult
-import de.ggnext.velocityCore.features.party.results.DisbandResult
-import de.ggnext.velocityCore.features.party.results.InviteResult
-import de.ggnext.velocityCore.features.party.results.KickResult
-import de.ggnext.velocityCore.features.party.results.LeaveResult
+import de.ggnext.protocol.party.AcceptResult
+import de.ggnext.protocol.party.DenyResult
+import de.ggnext.protocol.party.DisbandResult
+import de.ggnext.protocol.party.InviteResult
+import de.ggnext.protocol.party.KickResult
+import de.ggnext.protocol.party.LeaveResult
+import de.ggnext.protocol.party.PartyMember
+import de.ggnext.sdk.feature.PartySdk
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.language
@@ -23,7 +23,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 class PartyCommand(
-    private val partySystemManager: PartySystemManager,
+    private val party: PartySdk,
     private val commandUtils: CommandUtils,
     private val proxy: ProxyServer,
     private val scope: CoroutineScope,
@@ -96,7 +96,7 @@ class PartyCommand(
     private fun runList(source: CommandSource): Int {
         val player = source.asPlayerOrNull() ?: return 1
         scope.launch {
-            val members = partySystemManager.getPartyMembers(player.uniqueId)
+            val members = party.members(player.uniqueId)
             if (members.isEmpty()) {
                 val empty by TranslationStore("translations.velocity.partysystem.list.empty")
                 player.sendMessage(empty.get(player.language()))
@@ -127,7 +127,7 @@ class PartyCommand(
         scope.launch {
             val targetId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (partySystemManager.invitePlayer(player.uniqueId, targetId)) {
+            when (party.invite(player.uniqueId, targetId)) {
                 InviteResult.SENT -> {
                     val sent by TranslationStore("translations.velocity.partysystem.invite.sent")
                     player.sendMessage(sent.get(player.language(), listOf(targetName)))
@@ -175,12 +175,12 @@ class PartyCommand(
         scope.launch {
             val leaderId = commandUtils.resolveTargetUUID(leaderName, player) ?: return@launch
 
-            when (partySystemManager.acceptInvite(player.uniqueId, leaderId)) {
+            when (party.accept(player.uniqueId, leaderId)) {
                 AcceptResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.partysystem.accept.success")
                     player.sendMessage(msg.get(player.language(), listOf(leaderName)))
 
-                    val members = partySystemManager.getPartyMembers(player.uniqueId)
+                    val members = party.members(player.uniqueId)
                     notifyMembers(
                         members,
                         exclude = player.uniqueId,
@@ -221,7 +221,7 @@ class PartyCommand(
         scope.launch {
             val leaderId = commandUtils.resolveTargetUUID(leaderName, player) ?: return@launch
 
-            when (partySystemManager.denyInvite(player.uniqueId, leaderId)) {
+            when (party.deny(player.uniqueId, leaderId)) {
                 DenyResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.partysystem.deny.success")
                     player.sendMessage(msg.get(player.language(), listOf(leaderName)))
@@ -244,7 +244,7 @@ class PartyCommand(
         scope.launch {
             val targetId = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-            when (partySystemManager.kickPlayer(player.uniqueId, targetId)) {
+            when (party.kick(player.uniqueId, targetId)) {
                 KickResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.partysystem.kick.success")
                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
@@ -277,9 +277,9 @@ class PartyCommand(
     private fun runLeave(source: CommandSource): Int {
         val player = source.asPlayerOrNull() ?: return 1
         scope.launch {
-            val before = partySystemManager.getPartyMembers(player.uniqueId)
+            val before = party.members(player.uniqueId)
 
-            when (partySystemManager.leaveParty(player.uniqueId)) {
+            when (party.leave(player.uniqueId)) {
                 LeaveResult.LEFT -> {
                     val msg by TranslationStore("translations.velocity.partysystem.leave.left")
                     player.sendMessage(msg.get(player.language()))
@@ -316,9 +316,9 @@ class PartyCommand(
     private fun runDisband(source: CommandSource): Int {
         val player = source.asPlayerOrNull() ?: return 1
         scope.launch {
-            val before = partySystemManager.getPartyMembers(player.uniqueId)
+            val before = party.members(player.uniqueId)
 
-            when (partySystemManager.disbandParty(player.uniqueId)) {
+            when (party.disband(player.uniqueId)) {
                 DisbandResult.SUCCESS -> {
                     val msg by TranslationStore("translations.velocity.partysystem.disband.success")
                     player.sendMessage(msg.get(player.language()))

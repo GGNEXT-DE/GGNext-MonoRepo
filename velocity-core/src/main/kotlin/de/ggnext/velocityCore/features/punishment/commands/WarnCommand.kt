@@ -5,7 +5,7 @@ import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.punishment.PunishmentManager
+import de.ggnext.sdk.feature.PunishmentSdk
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.language
@@ -22,7 +22,7 @@ import kotlin.jvm.optionals.getOrNull
 class WarnCommand(
     val proxy: ProxyServer,
     val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    val punishment: PunishmentSdk,
     private val scope: CoroutineScope,
 ) {
     val warn =
@@ -42,7 +42,7 @@ class WarnCommand(
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
                                     val msg by TranslationStore("translations.punishment.warn.success")
 
-                                    punishmentManager.warn(targetUUID, player.uniqueId, reason)
+                                    punishment.warn(targetUUID, player.uniqueId, reason)
                                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                     proxy.getPlayer(targetName).getOrNull()?.showWarning(reason)
                                 }

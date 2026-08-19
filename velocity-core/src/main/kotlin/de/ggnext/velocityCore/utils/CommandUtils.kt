@@ -7,7 +7,7 @@ import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.players.PlayerManager
+import de.ggnext.sdk.feature.PlayersSdk
 import de.ggnext.velocityCore.features.punishment.DurationParser
 import net.kyori.adventure.text.Component
 import java.util.UUID
@@ -17,7 +17,7 @@ fun CommandSource.asPlayerOrNull(): Player? = this as? Player
 
 class CommandUtils(
     private val proxy: ProxyServer,
-    private val playerManager: PlayerManager,
+    private val players: PlayersSdk,
 ) {
     suspend fun resolveTargetUUID(
         username: String,
@@ -28,7 +28,7 @@ class CommandUtils(
             return onlinePlayer.uniqueId
         }
 
-        val storedPlayer = playerManager.getPlayer(username)
+        val storedPlayer = players.getByName(username)
         if (storedPlayer != null) {
             return storedPlayer.id
         }

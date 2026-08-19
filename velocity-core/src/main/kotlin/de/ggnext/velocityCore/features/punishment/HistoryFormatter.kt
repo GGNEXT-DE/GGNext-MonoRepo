@@ -2,6 +2,9 @@ package de.ggnext.velocityCore.features.punishment
 
 import com.velocitypowered.api.proxy.Player
 import de.ggnext.contentsystem.value.store.TranslationStore
+import de.ggnext.protocol.punishment.PunishmentEntry
+import de.ggnext.protocol.punishment.PunishmentHistoryFilter
+import de.ggnext.protocol.punishment.PunishmentType
 import de.ggnext.velocityCore.utils.language
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -19,7 +22,7 @@ object HistoryFormatter {
         player: Player,
         targetName: String,
         filter: PunishmentHistoryFilter,
-        punishments: List<PunishmentData>,
+        punishments: List<PunishmentEntry>,
         site: Int,
     ): List<Component> {
         val header by TranslationStore("translations.punishment.history.header")
@@ -72,8 +75,8 @@ object HistoryFormatter {
             )
     }
 
-    private fun statusText(punishment: PunishmentData): String {
-        if ((punishment.revokedBy != null) ||
+    private fun statusText(punishment: PunishmentEntry): String {
+        if ((punishment.revoked) ||
             (punishment.expiresAt <= System.currentTimeMillis() && punishment.expiresAt != -1L)
         ) {
             return "inactive"
@@ -83,9 +86,9 @@ object HistoryFormatter {
         return "active, expires ${formatTime(punishment.expiresAt)}"
     }
 
-    private fun statusColor(punishment: PunishmentData): NamedTextColor =
-        if ((punishment.revokedBy == null && punishment.expiresAt > System.currentTimeMillis()) ||
-            (punishment.revokedBy == null && punishment.expiresAt == -1L)
+    private fun statusColor(punishment: PunishmentEntry): NamedTextColor =
+        if ((!punishment.revoked && punishment.expiresAt > System.currentTimeMillis()) ||
+            (!punishment.revoked && punishment.expiresAt == -1L)
         ) {
             NamedTextColor.GREEN
         } else {

@@ -6,17 +6,17 @@ import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.connection.LoginEvent
 import com.velocitypowered.api.event.connection.PreLoginEvent
 import com.velocitypowered.api.event.player.ServerPostConnectEvent
+import de.ggnext.sdk.feature.PartySdk
+import de.ggnext.sdk.feature.PlayersSdk
+import de.ggnext.sdk.feature.PunishmentSdk
 import de.ggnext.velocityCore.config.VelocityConfig
-import de.ggnext.velocityCore.features.party.PartySystemManager
-import de.ggnext.velocityCore.features.players.PlayerManager
-import de.ggnext.velocityCore.features.punishment.PunishmentManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 
 class PlayerListener(
-    private val playerManager: PlayerManager,
-    private val punishmentManager: PunishmentManager,
-    private val partySystemManager: PartySystemManager,
+    private val players: PlayersSdk,
+    private val punishment: PunishmentSdk,
+    private val party: PartySdk,
     private val config: VelocityConfig,
 ) {
     @Subscribe
@@ -24,12 +24,7 @@ class PlayerListener(
         if (event.previousServer != null) return
 
         val player = event.player
-
-        playerManager.getPlayer(player.uniqueId) ?: run {
-            playerManager.createPlayer(player.uniqueId, player.username)
-            return
-        }
-        playerManager.loginPlayer(player.uniqueId, player.username)
+        players.login(player.uniqueId, player.username)
     }
 
     @Subscribe
@@ -53,21 +48,30 @@ class PlayerListener(
             return
         }
 
-        punishmentManager
-            .getActiveBan(uniqueId)
-            ?.let { activeBan ->
+        val activeBan =
+            try {
+                punishment.activeBan(uniqueId)
+            } catch (_: Exception) {
                 event.result =
                     PreLoginEvent.PreLoginComponentResult.denied(
-                        Component.text("You are banned: ${activeBan.reason}", NamedTextColor.RED),
+                        Component.text("Login service unavailable, please try again later.", NamedTextColor.RED),
                     )
                 return
             }
+
+        activeBan?.let {
+            event.result =
+                PreLoginEvent.PreLoginComponentResult.denied(
+                    Component.text("You are banned: ${it.reason}", NamedTextColor.RED),
+                )
+            return
+        }
     }
 
     @Subscribe
     suspend fun onLeaveListener(event: DisconnectEvent) {
         val player = event.player
-        partySystemManager.leaveParty(player.uniqueId)
-        playerManager.savePlaytime(player.uniqueId)
+        party.leave(player.uniqueId)
+        players.savePlaytime(player.uniqueId)
     }
 }

@@ -6,8 +6,9 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:4.1.0-SNAPSHOT")
     kapt("com.velocitypowered:velocity-api:4.1.0-SNAPSHOT")
 
-    implementation(libs.bundles.ggnext.velocity)
-    implementation(project(":contentsystem-sdk"))
+    implementation(libs.mccoroutine.velocity.api)
+    implementation(libs.mccoroutine.velocity.core)
+    implementation(project(":ggnext-sdk"))
     implementation(project(":ggnext-common"))
     compileOnly(libs.nuvotifier.api)
     compileOnly(libs.nuvotifier.velocity)

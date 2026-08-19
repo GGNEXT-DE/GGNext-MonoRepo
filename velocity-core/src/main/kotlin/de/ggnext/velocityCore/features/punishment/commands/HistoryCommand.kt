@@ -4,9 +4,9 @@ import com.mojang.brigadier.Command
 import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
+import de.ggnext.protocol.punishment.PunishmentHistoryFilter
+import de.ggnext.sdk.feature.PunishmentSdk
 import de.ggnext.velocityCore.features.punishment.HistoryFormatter
-import de.ggnext.velocityCore.features.punishment.PunishmentHistoryFilter
-import de.ggnext.velocityCore.features.punishment.PunishmentManager
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.filterArgument
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class HistoryCommand(
     val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    val punishment: PunishmentSdk,
     private val proxy: ProxyServer,
     private val scope: CoroutineScope,
 ) {
@@ -65,7 +65,7 @@ class HistoryCommand(
                     PunishmentHistoryFilter.ALL,
                 )
             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
-            val history = punishmentManager.getHistory(targetUUID, filter)
+            val history = punishment.history(targetUUID, filter)
 
             HistoryFormatter.format(player, targetName, filter, history, site).forEach(player::sendMessage)
         }

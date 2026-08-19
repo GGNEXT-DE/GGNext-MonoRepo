@@ -4,7 +4,7 @@ import com.mojang.brigadier.Command
 import com.velocitypowered.api.command.BrigadierCommand
 import com.velocitypowered.api.proxy.ProxyServer
 import de.ggnext.contentsystem.value.store.TranslationStore
-import de.ggnext.velocityCore.features.punishment.PunishmentManager
+import de.ggnext.sdk.feature.PunishmentSdk
 import de.ggnext.velocityCore.utils.CommandUtils
 import de.ggnext.velocityCore.utils.asPlayerOrNull
 import de.ggnext.velocityCore.utils.durationArgument
@@ -19,7 +19,7 @@ import kotlin.jvm.optionals.getOrNull
 class MuteCommands(
     val proxy: ProxyServer,
     val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    val punishment: PunishmentSdk,
     private val scope: CoroutineScope,
 ) {
     val mute =
@@ -38,13 +38,13 @@ class MuteCommands(
                                 scope.launch {
                                     val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                                    if (punishmentManager.getActiveMute(targetUUID) != null) {
+                                    if (punishment.activeMute(targetUUID) != null) {
                                         val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
                                         player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                         return@launch
                                     }
 
-                                    punishmentManager.mute(targetUUID, player.uniqueId, reason)
+                                    punishment.mute(targetUUID, player.uniqueId, reason)
                                     val msg by TranslationStore("translations.punishment.mute.success")
                                     player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                     val msg1 by TranslationStore("translations.punishment.mute.muted")
@@ -78,13 +78,13 @@ class MuteCommands(
                                             val duration = commandUtils.parseDuration(durationInput, player) ?: return@launch
                                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                                            if (punishmentManager.getActiveMute(targetUUID) != null) {
+                                            if (punishment.activeMute(targetUUID) != null) {
                                                 val msg by TranslationStore("translations.punishment.mute.alreadyMuted")
                                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                                                 return@launch
                                             }
 
-                                            punishmentManager.tempMute(targetUUID, player.uniqueId, duration, reason)
+                                            punishment.tempMute(targetUUID, player.uniqueId, duration, reason)
                                             val msg by TranslationStore("translations.punishment.temp-mute.success")
                                             player.sendMessage(msg.get(player.language(), listOf(targetName, durationInput)))
                                             val msg1 by TranslationStore("translations.punishment.temp-mute.muted")
@@ -112,7 +112,7 @@ class MuteCommands(
                         scope.launch {
                             val targetUUID = commandUtils.resolveTargetUUID(targetName, player) ?: return@launch
 
-                            if (punishmentManager.revokeMute(targetUUID, player.uniqueId)) {
+                            if (punishment.unmute(targetUUID, player.uniqueId)) {
                                 val msg by TranslationStore("translations.punishment.unmute.success")
                                 player.sendMessage(msg.get(player.language(), listOf(targetName)))
                             } else {
