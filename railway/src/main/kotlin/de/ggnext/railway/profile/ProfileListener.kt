@@ -1,7 +1,9 @@
 package de.ggnext.railway.profile
 
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
@@ -16,8 +18,21 @@ class ProfileListener(
         if (profiles.isEmpty()) {
             railwayProfileManager.createProfile(player, railwayProfileNames.random())
         }
-        while (railwayProfileManager.getActiveProfile(player) == null) {
+        if (railwayProfileManager.getActiveProfile(player) == null) {
             profileGui.openProfileGui(player)
+        }
+    }
+
+    @EventHandler
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        val player = event.player as? Player ?: return
+
+        if (profileGui.consumeNavigating(player)) {
+            return
+        }
+
+        if (railwayProfileManager.getActiveProfile(player) == null) {
+            profileGui.reopenProfileGui(player)
         }
     }
 
