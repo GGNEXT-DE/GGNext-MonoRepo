@@ -6,6 +6,9 @@ interfaces = "2.1.0-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
 scoreboard = "2.8.1"
 nuvotifier = "2.7.2"
+lettuce = "6.5.5.RELEASE"
+coroutines = "1.10.2"
+configurate = "4.1.2"
 
 [libraries]
 # Fawe
@@ -14,6 +17,7 @@ fawe-bukkit = { module = "com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit", ver
 
 # MongoDB
 mongodb = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb" }
+bson = { module = "org.mongodb:bson", version.ref = "mongodb" }
 
 # Mccoroutine
 mccoroutine-bukkit-api = { module = "com.github.shynixn.mccoroutine:mccoroutine-bukkit-api", version.ref = "mccoroutine" }
@@ -36,6 +40,16 @@ scoreboard-library-extra-kotlin = { module = "net.megavex:scoreboard-library-ext
 nuvotifier-api = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-api", version.ref = "nuvotifier" }
 nuvotifier-velocity = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-velocity", version.ref = "nuvotifier" }
 
+# Redis (Lettuce)
+lettuce-core = { module = "io.lettuce:lettuce-core", version.ref = "lettuce" }
+
+# Coroutines (backend / transport)
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+
+# Configurate (backend config)
+configurate-yaml = { module = "org.spongepowered:configurate-yaml", version.ref = "configurate" }
+configurate-extra-kotlin = { module = "org.spongepowered:configurate-extra-kotlin", version.ref = "configurate" }
+
 [bundles]
 ggnext-core = [
     "mccoroutine-bukkit-api",
@@ -51,4 +65,19 @@ ggnext-velocity = [
     "mongodb",
     "mccoroutine-velocity-api",
     "mccoroutine-velocity-core"
+]
+
+ggnext-backend = [
+    "mongodb",
+    "lettuce-core",
+    "kotlinx-coroutines-core",
+    "kotlinx-serialization-json",
+    "configurate-yaml",
+    "configurate-extra-kotlin"
+]
+
+ggnext-transport = [
+    "lettuce-core",
+    "kotlinx-coroutines-core",
+    "kotlinx-serialization-json"
 ]

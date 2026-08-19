@@ -17,4 +17,14 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ggnext-monorepo"
-include( "ggnext-core", "contentsystem-sdk", "velocity-core", "builder-plugin", "railway", "ggnext-common")
+include(
+    "ggnext-core",
+    "velocity-core",
+    "builder-plugin",
+    "railway",
+    "ggnext-common",
+    "ggnext-protocol",
+    "ggnext-transport",
+    "ggnext-sdk",
+    "ggnext-backend",
+)
