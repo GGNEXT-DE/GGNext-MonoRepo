@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    api(project(":ggnext-protocol"))
     implementation(libs.kotlinx.serialization.json)
     compileOnly(libs.mongodb)
 }

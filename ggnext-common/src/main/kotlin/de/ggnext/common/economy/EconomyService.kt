@@ -3,7 +3,7 @@ package de.ggnext.common.economy
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import de.ggnext.common.player.Player
+import de.ggnext.protocol.player.Player
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import org.bson.Document
