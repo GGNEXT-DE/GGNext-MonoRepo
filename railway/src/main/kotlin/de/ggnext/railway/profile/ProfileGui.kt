@@ -10,6 +10,7 @@ import de.ggnext.core.utils.createFiller
 import de.ggnext.core.utils.description
 import de.ggnext.core.utils.language
 import de.ggnext.core.utils.name
+import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -17,12 +18,28 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 class ProfileGui(
     private val plugin: JavaPlugin,
     private val profileManager: RailwayProfileManager,
 ) {
     private val previousGuiItemName by TranslationStore("translations.previous.gui")
+
+    private val navigating = ConcurrentHashMap.newKeySet<UUID>()
+
+    fun consumeNavigating(player: Player): Boolean = navigating.remove(player.uniqueId)
+
+    fun reopenProfileGui(player: Player) {
+        plugin.launch {
+            delay(50)
+
+            if (player.isOnline && profileManager.getActiveProfile(player) == null) {
+                openProfileGui(player)
+            }
+        }
+    }
 
     suspend fun openProfileGui(player: Player) {
         val title by TranslationStore(
@@ -84,6 +101,7 @@ class ProfileGui(
                                     }
 
                                     ClickType.RIGHT -> {
+                                        navigating.add(player.uniqueId)
                                         player.inventory.close()
                                         plugin.launch {
                                             openSpecProfileGui(player, profile)
@@ -103,8 +121,8 @@ class ProfileGui(
                                 if (profileManager.getActiveProfile(player) == null && profile != null) {
                                     profileManager.setActiveProfile(player, profile)
                                 }
+                                player.inventory.close()
                             }
-                            player.inventory.close()
                         }
                 }
             }
@@ -162,6 +180,7 @@ class ProfileGui(
                             drawable(ItemStack(Material.PAPER).name(previousGuiItemName.get(player.language()))),
                         ) {
                             plugin.launch {
+                                navigating.add(player.uniqueId)
                                 player.inventory.close()
                                 openProfileGui(player)
                             }
@@ -173,6 +192,7 @@ class ProfileGui(
                             drawable(ItemStack(Material.BARRIER).name(deletionItemName.get(player.language()))),
                         ) {
                             plugin.launch {
+                                navigating.add(player.uniqueId)
                                 player.inventory.close()
                                 openConfirmProfileGui(player, profile)
                             }
@@ -220,6 +240,7 @@ class ProfileGui(
                             drawable(ItemStack(Material.PAPER).name(previousGuiItemName.get(player.language()))),
                         ) {
                             plugin.launch {
+                                navigating.add(player.uniqueId)
                                 player.inventory.close()
                                 openProfileGui(player)
                             }
