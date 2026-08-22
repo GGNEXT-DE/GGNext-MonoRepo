@@ -41,10 +41,10 @@ dailyQuests.forEach { quest ->
 Keys follow a fixed schema:
 
 ```
-{numbers|translations}.{railway|velocity}.{system}.{feature}[.{subfeature}].{name}
+{numbers|translations}.{railway|velocity|core}.{system}.{feature}[.{subfeature}].{name}
 ```
 
-- Platform segment (`railway` or `velocity`) is always present.
+- Platform segment (`railway` or `velocity` or `core`) is always present.
 - All segments are lowercase.
 - Multi-word segments use snake_case (`already_banned`, not `alreadyBanned`).
 - `system` is the module/manager the key belongs to (`auction`, `friendsystem`, `punishment`, ...), written as one word without underscores.
