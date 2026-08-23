@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.10")
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:8.9.0")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:8.10.0")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:9.6.1")
     implementation("xyz.jpenilla.run-paper:xyz.jpenilla.run-paper.gradle.plugin:3.1.0")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:2.0.0-SNAPSHOT")
