@@ -2,8 +2,6 @@ package de.ggnext.core.tab
 
 import de.ggnext.contentsystem.value.store.TranslationStore
 import de.ggnext.core.utils.language
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 
 class TabManager {
