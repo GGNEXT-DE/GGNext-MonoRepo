@@ -2,6 +2,7 @@ package de.ggnext.contentsystem.value.store
 
 import de.ggnext.contentsystem.ContentSystem
 import de.ggnext.contentsystem.cache.ValueCache
+import de.ggnext.contentsystem.value.types.EffectType
 import de.ggnext.contentsystem.value.types.SkillPath
 import de.ggnext.contentsystem.value.types.SkillPathValue
 import de.ggnext.contentsystem.value.types.SkillTier
@@ -22,12 +23,12 @@ class SkillPathStore(
             val defaultSkillPath =
                 SkillPath(
                     key,
-                    listOf(SkillTier(2, mapOf("maxFuel" to 50.0))),
+                    listOf(SkillTier(2, mapOf(EffectType.MAX_FUEL to 50.0))),
                 )
             val defaultSkillTierDoc =
                 Document()
                     .append("cost", 2)
-                    .append("effects", Document("maxFuel", 50.0))
+                    .append("effects", Document(EffectType.MAX_FUEL.configKey, 50.0))
             val doc =
                 Document()
                     .append("_id", key)
