@@ -4,7 +4,7 @@ mongodb = "5.9.2"
 mccoroutine = "2.22.0"
 interfaces = "2.1.1-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
-scoreboard = "2.8.1"
+scoreboard = "2.8.2"
 nuvotifier = "2.7.2"
 
 [libraries]
