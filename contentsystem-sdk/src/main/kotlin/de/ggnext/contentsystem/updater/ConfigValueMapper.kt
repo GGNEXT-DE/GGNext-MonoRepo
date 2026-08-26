@@ -1,6 +1,7 @@
 package de.ggnext.contentsystem.updater
 
 import de.ggnext.contentsystem.value.types.ConfigValue
+import de.ggnext.contentsystem.value.types.EffectType
 import de.ggnext.contentsystem.value.types.MaterialValue
 import de.ggnext.contentsystem.value.types.NumberValue
 import de.ggnext.contentsystem.value.types.Quest
@@ -93,7 +94,10 @@ internal object ConfigValueMapper {
                         val effectsDoc = tierDoc.get("effects", Document::class.java) ?: Document()
                         SkillTier(
                             cost = tierDoc.getInteger("cost"),
-                            effects = effectsDoc.mapValues { (_, v) -> (v as Number).toDouble() },
+                            effects =
+                                effectsDoc.entries.associate { (k, v) ->
+                                    EffectType.fromConfigKey(k) to (v as Number).toDouble()
+                                },
                         )
                     }
                 SkillPathValue(

@@ -8,6 +8,18 @@ internal data class SkillPathValue(
     override val value: SkillPath,
 ) : ConfigValue<SkillPath>
 
+enum class EffectType(
+    val configKey: String,
+) {
+    MAX_FUEL("maxFuel"),
+    MAX_HEALTH("maxHealth"),
+    ;
+
+    companion object {
+        fun fromConfigKey(key: String): EffectType = entries.first { it.configKey == key }
+    }
+}
+
 /**
  * A single tier within a [SkillPath]. Tiers are cumulative and stack: unlocking
  * tier N means tiers 1..N-1 are also unlocked, and all their [effects] add up.
@@ -18,7 +30,7 @@ internal data class SkillPathValue(
  */
 data class SkillTier(
     val cost: Int,
-    val effects: Map<String, Double>,
+    val effects: Map<EffectType, Double>,
 )
 
 /**

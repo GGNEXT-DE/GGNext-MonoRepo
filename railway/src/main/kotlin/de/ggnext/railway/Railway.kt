@@ -12,6 +12,7 @@ import de.ggnext.railway.profile.ProfileGui
 import de.ggnext.railway.profile.ProfileListener
 import de.ggnext.railway.profile.RailwayProfileManager
 import de.ggnext.railway.skilltree.SkillTreeManager
+import de.ggnext.railway.skilltree.effect.EffectManager
 import de.ggnext.railway.trade.TradeCommand
 import de.ggnext.railway.trade.TradeGui
 import de.ggnext.railway.trade.TradeListener
@@ -33,6 +34,7 @@ class Railway : SuspendingJavaPlugin() {
     lateinit var auctionManager: AuctionManager
     lateinit var auctionGui: AuctionGui
     lateinit var skillTreeManager: SkillTreeManager
+    lateinit var effectManager: EffectManager
 
     override suspend fun onEnableAsync() {
         val zoneConfigs = ZoneConfigLoader(this).load()
@@ -44,6 +46,7 @@ class Railway : SuspendingJavaPlugin() {
         tradeManager = TradeManager()
         tradeGui = TradeGui(this, tradeManager)
         skillTreeManager = SkillTreeManager(railwayProfileManager)
+        effectManager = EffectManager()
         registerCommands()
         registerListeners()
 
