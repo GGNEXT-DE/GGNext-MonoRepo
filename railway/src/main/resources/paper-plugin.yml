@@ -1,7 +1,7 @@
 name: Railway
 version: '${version}'
 
-main: de.ggnext.railway.Railway
+main: eu.ggnext.railway.Railway
 api-version: '26.2'
 load: POSTWORLD
 
