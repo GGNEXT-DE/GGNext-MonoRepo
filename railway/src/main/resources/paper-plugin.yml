@@ -2,7 +2,7 @@ name: Railway
 version: '${version}'
 
 main: de.ggnext.railway.Railway
-api-version: '1.26.2'
+api-version: '26.2'
 load: POSTWORLD
 
 dependencies:
