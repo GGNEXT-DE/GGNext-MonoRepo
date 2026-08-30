@@ -6,6 +6,11 @@ interfaces = "2.1.1-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
 scoreboard = "2.8.2"
 nuvotifier = "2.7.2"
+jda = "6.4.2"
+jdaKtx = "0.14.2"
+kotlinxSerializationProperties = "1.9.0"
+dotenvKotlin = "6.5.1"
+lamp = "4.0.0-rc.18"
 
 [libraries]
 # Fawe
@@ -36,6 +41,17 @@ scoreboard-library-extra-kotlin = { module = "net.megavex:scoreboard-library-ext
 nuvotifier-api = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-api", version.ref = "nuvotifier" }
 nuvotifier-velocity = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-velocity", version.ref = "nuvotifier" }
 
+# JDA
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+jda-ktx = { module = "club.minnced:jda-ktx", version.ref = "jdaKtx" }
+
+kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "kotlinxSerializationProperties" }
+dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenvKotlin" }
+
+# Lamp
+lamp-common = { module = "io.github.revxrsal:lamp.common", version.ref = "lamp" }
+lamp-jda = { module = "io.github.revxrsal:lamp.jda", version.ref = "lamp" }
+
 [bundles]
 ggnext-core = [
     "mccoroutine-bukkit-api",
@@ -51,4 +67,14 @@ ggnext-velocity = [
     "mongodb",
     "mccoroutine-velocity-api",
     "mccoroutine-velocity-core"
+]
+
+dc-bot = [
+    "jda",
+    "jda-ktx",
+    "kotlinx-serialization-properties",
+    "dotenv-kotlin",
+    "mongodb",
+    "lamp-common",
+    "lamp-jda"
 ]
