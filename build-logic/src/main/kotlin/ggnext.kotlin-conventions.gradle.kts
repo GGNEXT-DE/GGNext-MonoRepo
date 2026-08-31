@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     id("com.diffplug.spotless")
     kotlin("plugin.serialization")
+    id("com.gradleup.shadow")
     id("io.sentry.jvm.gradle")
 }
 
@@ -21,5 +22,11 @@ spotless {
         trimTrailingWhitespace()
         leadingTabsToSpaces()
         endWithNewline()
+    }
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
     }
 }

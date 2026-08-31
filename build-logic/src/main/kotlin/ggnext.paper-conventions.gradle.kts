@@ -1,6 +1,5 @@
 plugins {
     id("ggnext.kotlin-conventions")
-    id("com.gradleup.shadow")
     id("xyz.jpenilla.run-paper")
     id("io.papermc.paperweight.userdev")
 }
@@ -12,9 +11,6 @@ dependencies {
 }
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
     runServer {
         minecraftVersion("26.2")
         jvmArgs("-Xms2G", "-Xmx2G")
