@@ -67,8 +67,11 @@ class Main {
         jda.addEventListener(RulesButtonHandler(config))
 
         val teamTempVoice = TempVoice(config.TEAM_TEMP_ID, "Team-Channel")
+        jda.addEventListener(teamTempVoice)
         val sosTempVoice = TempVoice(config.SOS_TEMP_ID, "Sos-Channel")
+        jda.addEventListener(sosTempVoice)
         val mainTempVoice = TempVoice(config.MAIN_TEMP_ID, "Channel")
+        jda.addEventListener(mainTempVoice)
 
         Runtime.getRuntime().addShutdownHook(
             Thread {
