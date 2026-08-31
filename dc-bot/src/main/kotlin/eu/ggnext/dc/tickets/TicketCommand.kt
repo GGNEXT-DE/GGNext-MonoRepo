@@ -15,9 +15,13 @@ class TicketCommand {
     fun sendTicket(actor: SlashCommandActor) {
         val channel = actor.channel()
 
+        val ticketEmbedTitle by StringStore("strings.discord.ticket.title")
+        val ticketEmbedDescription by StringStore("strings.discord.ticket.description")
+
         val embed =
             EmbedBuilder {
-                title = "Ticket"
+                title = ticketEmbedTitle
+                description = ticketEmbedDescription
             }.build()
         channel.sendMessageEmbeds(embed).addComponents(ActionRow.of(getSelectMenu())).queue()
 
@@ -26,15 +30,11 @@ class TicketCommand {
 
     private fun getSelectMenu(): StringSelectMenu {
         val helpDescription by StringStore("strings.discord.help.description")
-        val bugReportDescription by StringStore("strings.discord.bug.report.description")
-        val userReportDescription by StringStore("strings.discord.user.report.description")
         val applicationDescription by StringStore("strings.discord.application.description")
 
         return StringSelectMenu
             .create("ticket:select")
             .addOption("Help", "support", helpDescription)
-            .addOption("Bug-Report", "bug-report", bugReportDescription)
-            .addOption("User-Report", "user-report", userReportDescription)
             .addOption("Application", "application", applicationDescription)
             .build()
     }

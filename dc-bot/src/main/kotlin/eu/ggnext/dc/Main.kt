@@ -57,8 +57,8 @@ class Main {
         lamp.register(TicketCommand())
         lamp.accept(slashCommands(jda))
 
-        jda.addEventListener(TicketDropDownHandler())
-        jda.addEventListener(TicketButtonHandler())
+        jda.addEventListener(TicketDropDownHandler(config))
+        jda.addEventListener(TicketButtonHandler(config))
 
         Runtime.getRuntime().addShutdownHook(
             Thread {
