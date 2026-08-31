@@ -4,3 +4,4 @@ pre-commit:
   commands:
     format:
       run: ./gradlew spotlessApply
+      stage_fixed: true
