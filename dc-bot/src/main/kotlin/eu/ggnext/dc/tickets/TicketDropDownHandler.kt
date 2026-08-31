@@ -58,12 +58,12 @@ class TicketDropDownHandler(
                 TicketType.APPLICATION -> {
                     channel.sendMessage(managerRole.asMention).queue()
                 }
+
                 TicketType.SUPPORT -> {
                     channel.sendMessage("${managerRole.asMention} | ${supporterRole.asMention}").queue()
                 }
             }
         }
-
 
         val embed =
             EmbedBuilder {

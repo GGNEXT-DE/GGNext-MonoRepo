@@ -12,4 +12,5 @@ data class BotConfig(
     val TICKET_LOG_ID: String,
     val SUPPORT_ID: String,
     val MANAGER_ID: String,
+    val VERIFIED_ID: String,
 )

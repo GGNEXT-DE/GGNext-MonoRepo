@@ -7,6 +7,8 @@ import eu.ggnext.common.db.MongoManager
 import eu.ggnext.contentsystem.ContentSystem
 import eu.ggnext.dc.config.BotConfig
 import eu.ggnext.dc.config.ConfigManager
+import eu.ggnext.dc.rules.RulesButtonHandler
+import eu.ggnext.dc.rules.RulesCommand
 import eu.ggnext.dc.tickets.TicketButtonHandler
 import eu.ggnext.dc.tickets.TicketCommand
 import eu.ggnext.dc.tickets.TicketDropDownHandler
@@ -55,10 +57,13 @@ class Main {
 
         val lamp = JDALamp.builder<SlashCommandActor>().build()
         lamp.register(TicketCommand())
+        lamp.register(RulesCommand())
         lamp.accept(slashCommands(jda))
 
         jda.addEventListener(TicketDropDownHandler(config))
         jda.addEventListener(TicketButtonHandler(config))
+
+        jda.addEventListener(RulesButtonHandler(config))
 
         Runtime.getRuntime().addShutdownHook(
             Thread {
