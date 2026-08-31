@@ -13,4 +13,7 @@ data class BotConfig(
     val SUPPORT_ID: String,
     val MANAGER_ID: String,
     val VERIFIED_ID: String,
+    val TEAM_TEMP_ID: String,
+    val MAIN_TEMP_ID: String,
+    val SOS_TEMP_ID: String,
 )

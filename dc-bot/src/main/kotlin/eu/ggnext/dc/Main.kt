@@ -9,6 +9,7 @@ import eu.ggnext.dc.config.BotConfig
 import eu.ggnext.dc.config.ConfigManager
 import eu.ggnext.dc.rules.RulesButtonHandler
 import eu.ggnext.dc.rules.RulesCommand
+import eu.ggnext.dc.tempvoice.TempVoice
 import eu.ggnext.dc.tickets.TicketButtonHandler
 import eu.ggnext.dc.tickets.TicketCommand
 import eu.ggnext.dc.tickets.TicketDropDownHandler
@@ -65,8 +66,16 @@ class Main {
 
         jda.addEventListener(RulesButtonHandler(config))
 
+        val teamTempVoice = TempVoice(config.TEAM_TEMP_ID, "Team-Channel")
+        val sosTempVoice = TempVoice(config.SOS_TEMP_ID, "Sos-Channel")
+        val mainTempVoice = TempVoice(config.MAIN_TEMP_ID, "Channel")
+
         Runtime.getRuntime().addShutdownHook(
             Thread {
+                val guild = jda.getGuildById(config.GUILD_ID) ?: return@Thread
+                teamTempVoice.handleShutdown(guild)
+                mainTempVoice.handleShutdown(guild)
+                sosTempVoice.handleShutdown(guild)
             },
         )
         jda.awaitShutdown()
