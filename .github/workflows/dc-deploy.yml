@@ -1,0 +1,49 @@
+name: Discord Bot Deploy
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dc-bot/**'
+      - 'ggnext-common/**'
+      - 'build-logic/**'
+      - 'gradle/**'
+      - 'settings.gradle.kts'
+      - '.github/workflows/dc-deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: dc-bot/Dockerfile
+          push: true
+          tags: ghcr.io/ggnext-de/dc-bot:latest
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            echo ${{ secrets.TOKEN }} | docker login ghcr.io -u Crayson09 --password-stdin
+            cd /opt/docker/dc-bot
+            docker compose pull
+            docker compose up -d

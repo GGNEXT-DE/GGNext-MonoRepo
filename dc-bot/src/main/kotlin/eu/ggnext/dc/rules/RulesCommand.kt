@@ -18,8 +18,10 @@ class RulesCommand {
 
         val acceptButton = Button.of(ButtonStyle.SUCCESS, "rules:accept", "Accept the rules")
 
-        channel.sendMessageEmbeds(getRulesEmbed().build())
-            .addComponents(ActionRow.of(acceptButton)).queue()
+        channel
+            .sendMessageEmbeds(getRulesEmbed().build())
+            .addComponents(ActionRow.of(acceptButton))
+            .queue()
         actor.replyToInteraction("Embed send").setEphemeral(true).queue()
     }
 
