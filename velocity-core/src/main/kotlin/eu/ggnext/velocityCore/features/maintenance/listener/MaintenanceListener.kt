@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.proxy.ProxyPingEvent
 import com.velocitypowered.api.proxy.server.ServerPing
+import eu.ggnext.contentsystem.value.store.TranslationStore
 import eu.ggnext.velocityCore.config.VelocityConfig
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -30,15 +31,10 @@ class MaintenanceListener(
 
     @Subscribe
     fun onProxyPing(event: ProxyPingEvent) {
+        val maintenanceMode by TranslationStore("translations.velocity.global_maintenance_mode")
         if (config.maintenance.global) {
             val builder = event.ping.asBuilder()
-            builder.description(
-                MiniMessage.miniMessage().deserialize(
-                    "<bold>  </bold>            <green><bold>GGNEXT NETWORK</bold></green><gray>" +
-                        " [</gray><red>26.2+</red><gray>]</gray>\n" +
-                        "                      <red>Wartungsarbeiten</red>",
-                ),
-            )
+            builder.description(maintenanceMode.get("en"))
             builder.version(ServerPing.Version(-1, "maintenance"))
             builder.maximumPlayers(0)
             builder.onlinePlayers(0)
