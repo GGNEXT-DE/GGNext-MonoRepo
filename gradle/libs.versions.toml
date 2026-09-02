@@ -11,6 +11,7 @@ jdaKtx = "0.14.2"
 kotlinxSerializationProperties = "1.9.0"
 dotenvKotlin = "6.5.1"
 lamp = "4.0.0-rc.18"
+discordWebHooks = "0.8.4"
 
 [libraries]
 # Fawe
@@ -52,6 +53,8 @@ dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "d
 lamp-common = { module = "io.github.revxrsal:lamp.common", version.ref = "lamp" }
 lamp-jda = { module = "io.github.revxrsal:lamp.jda", version.ref = "lamp" }
 
+discord-webhooks = { module = "club.minnced:discord-webhooks", version.ref = "discordWebHooks" }
+
 [bundles]
 ggnext-core = [
     "mccoroutine-bukkit-api",
@@ -66,7 +69,8 @@ ggnext-core = [
 ggnext-velocity = [
     "mongodb",
     "mccoroutine-velocity-api",
-    "mccoroutine-velocity-core"
+    "mccoroutine-velocity-core",
+    "discord-webhooks"
 ]
 
 dc-bot = [
@@ -77,4 +81,8 @@ dc-bot = [
     "mongodb",
     "lamp-common",
     "lamp-jda"
+]
+
+ggnext-common = [
+    "kotlinx-serialization-json"
 ]
