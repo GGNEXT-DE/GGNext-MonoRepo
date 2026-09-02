@@ -35,6 +35,7 @@ import eu.ggnext.velocityCore.features.punishment.commands.BanCommands
 import eu.ggnext.velocityCore.features.punishment.commands.HistoryCommand
 import eu.ggnext.velocityCore.features.punishment.commands.MuteCommands
 import eu.ggnext.velocityCore.features.punishment.commands.WarnCommand
+import eu.ggnext.velocityCore.features.report.ReportCommand
 import eu.ggnext.velocityCore.features.team.TeamChatListener
 import eu.ggnext.velocityCore.features.verify.VerifyCommand
 import eu.ggnext.velocityCore.features.verify.VerifyManager
@@ -139,5 +140,7 @@ class VelocityCore
             commandRegistry.registerCommand(PartyCommand(partySystemManager, commandUtils, server, scope).command)
 
             commandRegistry.registerCommand(FriendCommand(friendSystemManager, commandUtils, server, scope).command)
+
+            commandRegistry.registerCommand(ReportCommand(server, scope, commandUtils).command)
         }
     }

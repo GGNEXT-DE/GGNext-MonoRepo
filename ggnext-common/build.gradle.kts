@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.ggnext.common)
     compileOnly(libs.mongodb)
 }
