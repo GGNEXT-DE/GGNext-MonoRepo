@@ -44,7 +44,7 @@ class RailwayProfileManager(
                 railwayDollars = defaultRailwayDollars.toDouble(),
                 name = name,
                 level = RailwayLevel(0L, 0),
-                completedQuests = emptySet()
+                completedQuests = emptySet(),
             )
 
         profileCollection.insertOne(railwayProfile)
