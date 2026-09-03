@@ -8,7 +8,7 @@ import eu.ggnext.velocityCore.utils.asPlayerOrNull
 import eu.ggnext.velocityCore.utils.language
 
 class ToggleMtCommand(
-    val configManager: ConfigManager,
+    private val configManager: ConfigManager,
 ) {
     val command =
         BrigadierCommand

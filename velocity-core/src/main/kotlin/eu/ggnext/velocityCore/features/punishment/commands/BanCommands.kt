@@ -15,8 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class BanCommands(
-    val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    private val commandUtils: CommandUtils,
+    private val punishmentManager: PunishmentManager,
     private val scope: CoroutineScope,
     private val proxy: ProxyServer,
 ) {

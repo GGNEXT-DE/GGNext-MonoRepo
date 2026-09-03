@@ -20,9 +20,9 @@ import java.time.Duration
 import kotlin.jvm.optionals.getOrNull
 
 class WarnCommand(
-    val proxy: ProxyServer,
-    val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    private val proxy: ProxyServer,
+    private val commandUtils: CommandUtils,
+    private val punishmentManager: PunishmentManager,
     private val scope: CoroutineScope,
 ) {
     val warn =

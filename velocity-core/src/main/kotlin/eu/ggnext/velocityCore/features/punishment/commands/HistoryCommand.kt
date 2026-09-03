@@ -16,8 +16,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class HistoryCommand(
-    val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    private val commandUtils: CommandUtils,
+    private val punishmentManager: PunishmentManager,
     private val proxy: ProxyServer,
     private val scope: CoroutineScope,
 ) {

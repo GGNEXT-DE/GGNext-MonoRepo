@@ -16,9 +16,9 @@ import kotlinx.coroutines.launch
 import kotlin.jvm.optionals.getOrNull
 
 class MuteCommands(
-    val proxy: ProxyServer,
-    val commandUtils: CommandUtils,
-    val punishmentManager: PunishmentManager,
+    private val proxy: ProxyServer,
+    private val commandUtils: CommandUtils,
+    private val punishmentManager: PunishmentManager,
     private val scope: CoroutineScope,
 ) {
     val mute =

@@ -13,7 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 // Note: global maintenance permission check (maintenance.join) is handled in PlayerListener#onJoinListener,
 // since LoginEvent is required for permission checks on the authenticating player.
 class MaintenanceListener(
-    val config: VelocityConfig,
+    private val config: VelocityConfig,
 ) {
     @Subscribe
     fun onChooseInitialServer(event: PlayerChooseInitialServerEvent) {
