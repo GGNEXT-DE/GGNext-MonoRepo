@@ -44,6 +44,7 @@ class RailwayProfileManager(
                 railwayDollars = defaultRailwayDollars.toDouble(),
                 name = name,
                 level = RailwayLevel(0L, 0),
+                completedQuests = emptySet(),
             )
 
         profileCollection.insertOne(railwayProfile)
@@ -54,6 +55,8 @@ class RailwayProfileManager(
         )
         return railwayProfile
     }
+
+    suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
 
     suspend fun getProfile(profileId: UUID): RailwayProfile? = profileCollection.find(Filters.eq("_id", profileId)).firstOrNull()
 
@@ -82,8 +85,6 @@ class RailwayProfileManager(
         profiles.firstOrNull { it.name == name }?.let { return it }
         return null
     }
-
-    suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
 
     suspend fun deleteProfile(
         player: Player,
@@ -160,4 +161,9 @@ class RailwayProfileManager(
         profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("level.skillPoints", -amount))
         return true
     }
+
+    suspend fun addCompletedQuest(
+        profile: RailwayProfile,
+        questId: String,
+    ) = profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.addToSet("completedQuests", questId))
 }
