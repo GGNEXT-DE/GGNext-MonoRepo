@@ -9,6 +9,7 @@ data class RailwayProfile(
     val name: String,
     val railwayDollars: Double,
     val level: RailwayLevel,
+    val completedQuests: Set<String>
 )
 
 data class RailwayProfileIndex(
