@@ -1,6 +1,5 @@
 plugins {
     id("ggnext.kotlin-conventions")
-    id("com.gradleup.shadow")
     id("xyz.jpenilla.run-paper")
     id("io.papermc.paperweight.userdev")
 }
@@ -8,15 +7,12 @@ plugins {
 paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 dependencies {
-    paperweight.paperDevBundle("26.1.2.build.+")
+    paperweight.paperDevBundle("26.2.build.+")
 }
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
     runServer {
-        minecraftVersion("26.1.2")
+        minecraftVersion("26.2")
         jvmArgs("-Xms2G", "-Xmx2G")
     }
     processResources {

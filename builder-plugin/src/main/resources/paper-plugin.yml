@@ -1,7 +1,7 @@
 name: BuilderPlugin
 version: '${version}'
 
-main: de.ggnext.builder.BuilderPlugin
+main: eu.ggnext.builder.BuilderPlugin
 api-version: '1.21.11'
 load: POSTWORLD
 

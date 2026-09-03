@@ -12,8 +12,9 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://maven.noxcrew.com/public")
+        maven("https://jitpack.io")
     }
 }
 
 rootProject.name = "ggnext-monorepo"
-include( "ggnext-core", "contentsystem-sdk", "velocity-core", "builder-plugin", "railway", "ggnext-common")
+include( "ggnext-core", "contentsystem-sdk", "velocity-core", "builder-plugin", "railway", "ggnext-common", "dc-bot")

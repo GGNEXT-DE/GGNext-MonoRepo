@@ -1,6 +1,6 @@
 name: GGNextCore
 version: '${version}'
 
-main: de.ggnext.core.GGNextCore
-api-version: '1.21.11'
+main: eu.ggnext.core.GGNextCore
+api-version: '26.2'
 load: POSTWORLD

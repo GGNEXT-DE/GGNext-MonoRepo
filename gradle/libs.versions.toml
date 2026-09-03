@@ -1,10 +1,17 @@
 [versions]
 fawe = "2.15.3"
-mongodb = "5.9.0"
+mongodb = "5.10.0"
 mccoroutine = "2.22.0"
-interfaces = "2.1.0-SNAPSHOT"
+interfaces = "2.1.1-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
-scoreboard = "2.8.1"
+scoreboard = "2.8.2"
+nuvotifier = "2.7.2"
+jda = "6.4.2"
+jdaKtx = "0.14.2"
+kotlinxSerializationProperties = "1.9.0"
+dotenvKotlin = "6.5.1"
+lamp = "4.0.0-rc.18"
+discordWebHooks = "0.8.4"
 
 [libraries]
 # Fawe
@@ -31,6 +38,23 @@ scoreboard-library-api = { module = "net.megavex:scoreboard-library-api", versio
 scoreboard-library-implementation = { module = "net.megavex:scoreboard-library-implementation", version.ref = "scoreboard" }
 scoreboard-library-extra-kotlin = { module = "net.megavex:scoreboard-library-extra-kotlin", version.ref = "scoreboard" }
 
+# NuVotifier
+nuvotifier-api = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-api", version.ref = "nuvotifier" }
+nuvotifier-velocity = { module = "com.github.NuVotifier.NuVotifier:nuvotifier-velocity", version.ref = "nuvotifier" }
+
+# JDA
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+jda-ktx = { module = "club.minnced:jda-ktx", version.ref = "jdaKtx" }
+
+kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "kotlinxSerializationProperties" }
+dotenv-kotlin = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenvKotlin" }
+
+# Lamp
+lamp-common = { module = "io.github.revxrsal:lamp.common", version.ref = "lamp" }
+lamp-jda = { module = "io.github.revxrsal:lamp.jda", version.ref = "lamp" }
+
+discord-webhooks = { module = "club.minnced:discord-webhooks", version.ref = "discordWebHooks" }
+
 [bundles]
 ggnext-core = [
     "mccoroutine-bukkit-api",
@@ -45,5 +69,20 @@ ggnext-core = [
 ggnext-velocity = [
     "mongodb",
     "mccoroutine-velocity-api",
-    "mccoroutine-velocity-core"
+    "mccoroutine-velocity-core",
+    "discord-webhooks"
+]
+
+dc-bot = [
+    "jda",
+    "jda-ktx",
+    "kotlinx-serialization-properties",
+    "dotenv-kotlin",
+    "mongodb",
+    "lamp-common",
+    "lamp-jda"
+]
+
+ggnext-common = [
+    "kotlinx-serialization-json"
 ]
