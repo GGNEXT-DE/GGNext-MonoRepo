@@ -56,6 +56,8 @@ class RailwayProfileManager(
         return railwayProfile
     }
 
+    suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
+
     suspend fun getProfile(profileId: UUID): RailwayProfile? = profileCollection.find(Filters.eq("_id", profileId)).firstOrNull()
 
     suspend fun getProfiles(player: Player): List<RailwayProfile> {
