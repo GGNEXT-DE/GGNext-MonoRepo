@@ -1,4 +1,4 @@
-package de.ggnext.railway.quest
+package eu.ggnext.railway.quest
 
 import java.util.UUID
 
