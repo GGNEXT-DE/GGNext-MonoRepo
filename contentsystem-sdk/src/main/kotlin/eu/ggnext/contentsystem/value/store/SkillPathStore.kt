@@ -40,4 +40,12 @@ class SkillPathStore(
             }
             defaultSkillPath
         }
+
+    companion object {
+        fun getAllSkillPaths(): List<SkillPath> =
+            ValueCache
+                .getByPrefix<SkillPathValue>("skill_path.")
+                .map { it.value }
+                .sortedBy { it.id }
+    }
 }

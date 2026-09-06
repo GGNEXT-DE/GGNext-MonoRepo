@@ -12,7 +12,12 @@ import eu.ggnext.railway.profile.ProfileGui
 import eu.ggnext.railway.profile.ProfileListener
 import eu.ggnext.railway.profile.RailwayProfileManager
 import eu.ggnext.railway.skilltree.SkillTreeManager
+import eu.ggnext.railway.skilltree.command.MenuCommand
 import eu.ggnext.railway.skilltree.effect.EffectManager
+import eu.ggnext.railway.skilltree.gui.MenuGui
+import eu.ggnext.railway.skilltree.gui.SkillPathDetailGui
+import eu.ggnext.railway.skilltree.gui.SkilltreeOverviewGui
+import eu.ggnext.railway.skilltree.listener.SkilltreeListener
 import eu.ggnext.railway.trade.TradeCommand
 import eu.ggnext.railway.trade.TradeGui
 import eu.ggnext.railway.trade.TradeListener
@@ -35,6 +40,9 @@ class Railway : SuspendingJavaPlugin() {
     lateinit var auctionGui: AuctionGui
     lateinit var skillTreeManager: SkillTreeManager
     lateinit var effectManager: EffectManager
+    lateinit var menuGui: MenuGui
+    lateinit var skilltreeOverviewGui: SkilltreeOverviewGui
+    lateinit var skillPathDetailGui: SkillPathDetailGui
 
     override suspend fun onEnableAsync() {
         val zoneConfigs =
@@ -58,6 +66,15 @@ class Railway : SuspendingJavaPlugin() {
             SkillTreeManager(railwayProfileManager)
         effectManager =
             EffectManager()
+        skillPathDetailGui =
+            SkillPathDetailGui(this, railwayProfileManager, skillTreeManager)
+        skilltreeOverviewGui =
+            SkilltreeOverviewGui(this, railwayProfileManager, skillPathDetailGui)
+        menuGui =
+            MenuGui(this, railwayProfileManager, skilltreeOverviewGui)
+        // Set up cross-references for navigation
+        skillPathDetailGui.setSkilltreeOverviewGui(skilltreeOverviewGui)
+        skilltreeOverviewGui.setMenuGui(menuGui)
         registerCommands()
         registerListeners()
 
@@ -85,6 +102,7 @@ class Railway : SuspendingJavaPlugin() {
             commands.register(ZoneSCommand(this, zoneManager).command)
             commands.register(ZoneCCommand(this, zoneManager).command)
             commands.register(ProfileCommand(profileGui, this).command)
+            commands.register(MenuCommand(menuGui, this).command)
             commands.register(TradeCommand(tradeManager, tradeGui).command)
             commands.register(
                 AuctionCommand(this, auctionGui).command,
@@ -99,6 +117,7 @@ class Railway : SuspendingJavaPlugin() {
             registerSuspendingEvents(ZoneListener(zoneManager), this@Railway)
             registerSuspendingEvents(ProfileListener(railwayProfileManager, profileGui), this@Railway)
             registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
+            registerSuspendingEvents(SkilltreeListener(skilltreeOverviewGui, skillPathDetailGui), this@Railway)
         }
     }
 }
