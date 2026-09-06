@@ -37,7 +37,7 @@ jobs:
           tags: ghcr.io/ggnext-de/dc-bot:latest
 
       - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
