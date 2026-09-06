@@ -24,7 +24,7 @@ fun Logger.warn(message: String) = warning(message)
 fun Logger.error(message: String) = severe(message)
 
 object LogControl {
-    private const val ROOT = "de.ggnext"
+    private const val ROOT = "eu.ggnext"
 
     fun logger(clazz: Class<*>): Logger = Logger.getLogger(clazz.name)
 
