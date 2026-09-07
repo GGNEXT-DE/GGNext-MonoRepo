@@ -12,7 +12,8 @@ enum class EffectType(
     val configKey: String,
 ) {
     MAX_FUEL("maxFuel"),
-    MAX_HEALTH("maxHealth"),
+    ZONE_RARITY("zoneRarity"),
+    MAX_WAGONS("maxWagons"),
     ;
 
     companion object {

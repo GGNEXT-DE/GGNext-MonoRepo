@@ -40,6 +40,26 @@ class SkilltreeOverviewGui(
 
     fun consumeNavigating(player: Player): Boolean = navigating.remove(player.uniqueId)
 
+    /**
+     * Gets icon and description for the given skill path ID
+     */
+    private fun getPathIcon(pathId: String): Material =
+        when (pathId.lowercase()) {
+            "motor" -> Material.DIAMOND_PICKAXE
+            "speicher" -> Material.BARREL
+            "zugkraft" -> Material.MINECART
+            else -> Material.BLUE_DYE
+        }
+
+    /**
+     * Gets translation keys for path name and description
+     */
+    private fun getPathTranslationKeys(pathId: String): Pair<String, String> =
+        Pair(
+            "translations.railway.skilltree.overview.path.$pathId.name",
+            "translations.railway.skilltree.overview.path.$pathId.description",
+        )
+
     suspend fun openSkilltreeOverviewGui(player: Player) {
         val profile =
             profileManager.getActiveProfile(player)
@@ -72,20 +92,30 @@ class SkilltreeOverviewGui(
 
                         if (row >= 5) return@forEachIndexed // Don't overflow
 
+                        val icon = getPathIcon(skillPath.id)
+                        val (nameKey, descKey) = getPathTranslationKeys(skillPath.id)
+                        val pathNameTranslation by TranslationStore(nameKey)
+                        val pathDescTranslation by TranslationStore(descKey)
+                        val pathName = pathNameTranslation.getAsText(player.language())
+                        val pathDescription = pathDescTranslation.getAsText(player.language())
+
                         val unlockedCount = profile.level.unlockedTiers[skillPath.id] ?: 0
                         val totalTiers = skillPath.tiers.size
-                        val progressText = "$unlockedCount / $totalTiers"
+                        val progressText = "Tier $unlockedCount / $totalTiers"
+                        val progressLoreText = progressLore.getAsText(player.language())
 
                         pane[row, column] =
                             StaticElement(
                                 drawable(
-                                    ItemStack(Material.DIAMOND_PICKAXE)
-                                        .name(Component.text(skillPath.id, NamedTextColor.AQUA))
+                                    ItemStack(icon)
+                                        .name(Component.text(pathName, NamedTextColor.AQUA))
                                         .description(
                                             listOf(
+                                                Component.text(pathDescription, NamedTextColor.GRAY),
+                                                Component.empty(),
                                                 Component.text(
-                                                    "Tier $progressText unlocked",
-                                                    NamedTextColor.GRAY,
+                                                    "$progressText $progressLoreText",
+                                                    NamedTextColor.YELLOW,
                                                 ),
                                             ),
                                         ),

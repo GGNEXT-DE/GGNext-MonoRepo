@@ -36,14 +36,53 @@ class SkillPathDetailGui(
 
     private val detailTitle by TranslationStore("translations.railway.skilltree.detail.title")
     private val backItemName by TranslationStore("translations.railway.skilltree.detail.back.name")
-    private val tierCostLore by TranslationStore("translations.railway.skilltree.detail.cost")
-    private val tierEffectsLore by TranslationStore("translations.railway.skilltree.detail.effects")
     private val cannotAffordMessage by TranslationStore("translations.railway.skilltree.detail.cannot_afford")
-    private val tierUnlockedMessage by TranslationStore("translations.railway.skilltree.detail.unlocked")
+    private val tierLockedLore by TranslationStore("translations.railway.skilltree.detail.tier.locked")
+    private val tierUnlockedLore by TranslationStore("translations.railway.skilltree.detail.tier.unlocked")
+    private val tierNextAffordableLore by TranslationStore("translations.railway.skilltree.detail.tier.next.affordable")
+    private val tierNextUnaffordableLore by TranslationStore("translations.railway.skilltree.detail.tier.next.unaffordable")
+    private val tierCostLabel by TranslationStore("translations.railway.skilltree.detail.tier.cost_label")
 
     private val navigating = ConcurrentHashMap.newKeySet<UUID>()
 
     fun consumeNavigating(player: Player): Boolean = navigating.remove(player.uniqueId)
+
+    /**
+     * Calculates the position (row, col) for a tier using a snake pattern.
+     * Pattern: columns go top→bottom, bottom→top, top→bottom, etc.
+     * With 1-slot buffer: rows 1-4, cols 1-7
+     */
+    private fun getSnakeTierPosition(tierIndex: Int): Pair<Int, Int> {
+        val column = (tierIndex / 4) + 1 // Column 1-7
+        val isEvenColumn = column % 2 == 1 // Odd columns: top→bottom
+        val rowInColumn = tierIndex % 4 // 0-3
+
+        val row =
+            if (isEvenColumn) {
+                1 + rowInColumn // Rows 1-4
+            } else {
+                4 - rowInColumn // Rows 4-1
+            }
+
+        return Pair(row, column)
+    }
+
+    /**
+     * Gets the icon for the given SkillPath ID
+     */
+    private fun getIconForPath(pathId: String): Material =
+        when (pathId.lowercase()) {
+            "motor" -> Material.DIAMOND_PICKAXE
+            "speicher" -> Material.BARREL
+            "zugkraft" -> Material.MINECART
+            else -> Material.BLUE_DYE
+        }
+
+    /**
+     * Gets a displayable name for the effect type
+     */
+    private fun getEffectTranslationKey(effectType: EffectType): String =
+        "translations.railway.skilltree.detail.effects.${effectType.configKey}"
 
     suspend fun openPathDetailGui(
         player: Player,
@@ -67,6 +106,7 @@ class SkillPathDetailGui(
                 }
 
                 withTransform { pane, _ ->
+                    // Fill background
                     forEachInGrid(6, 9) { row, column ->
                         pane[row, column] =
                             StaticElement(
@@ -74,71 +114,128 @@ class SkillPathDetailGui(
                             )
                     }
 
-                    skillPath.tiers.forEachIndexed { tierIndex, tier ->
-                        val row = (tierIndex / 7) + 1
-                        val column = (tierIndex % 7) + 1
+                    val icon = getIconForPath(pathId)
 
-                        if (row >= 5) return@forEachIndexed // Don't overflow
+                    skillPath.tiers.forEachIndexed { tierIndex, tier ->
+                        val (row, column) = getSnakeTierPosition(tierIndex)
+
+                        if (row < 1 || row > 4 || column < 1 || column > 7) {
+                            return@forEachIndexed
+                        }
 
                         val tierNumber = tierIndex + 1
                         val isUnlocked = tierIndex < unlockedCount
                         val isNextPurchasable = tierIndex == unlockedCount
                         val canAfford = skillTreeManager.canUnlock(profile, pathId)
 
+                        // Visual state
                         val material =
                             when {
                                 isUnlocked -> Material.GREEN_STAINED_GLASS
-                                isNextPurchasable -> Material.GOLD_BLOCK
+                                isNextPurchasable && canAfford -> Material.GOLD_BLOCK
+                                isNextPurchasable && !canAfford -> Material.RED_STAINED_GLASS
                                 else -> Material.GRAY_STAINED_GLASS
                             }
 
                         val itemName =
-                            if (isUnlocked) {
-                                Component.text("Tier $tierNumber", NamedTextColor.GREEN)
-                            } else if (isNextPurchasable) {
-                                Component.text("Tier $tierNumber", NamedTextColor.YELLOW)
-                            } else {
-                                Component.text("Tier $tierNumber", NamedTextColor.DARK_GRAY)
+                            when {
+                                isUnlocked -> {
+                                    Component.text("Tier $tierNumber", NamedTextColor.GREEN)
+                                }
+
+                                isNextPurchasable && canAfford -> {
+                                    Component.text("Tier $tierNumber", NamedTextColor.YELLOW)
+                                }
+
+                                isNextPurchasable && !canAfford -> {
+                                    Component.text("Tier $tierNumber", NamedTextColor.RED)
+                                }
+
+                                else -> {
+                                    Component.text("Tier $tierNumber", NamedTextColor.DARK_GRAY)
+                                }
                             }
 
                         val lore = mutableListOf<Component>()
 
-                        // Add cost
-                        lore.add(Component.text("Cost: ${tier.cost} SP", NamedTextColor.GRAY))
+                        // Cost
+                        val costLabelText = tierCostLabel.getAsText(player.language())
+                        lore.add(
+                            Component.text(
+                                "$costLabelText ${tier.cost} SP",
+                                if (profile.level.skillPoints >= tier.cost) {
+                                    NamedTextColor.GREEN
+                                } else {
+                                    NamedTextColor.RED
+                                },
+                            ),
+                        )
 
-                        // Add effects
+                        // Effects
                         if (tier.effects.isNotEmpty()) {
                             lore.add(Component.empty())
                             tier.effects.forEach { (effectType, value) ->
-                                val effectName =
-                                    when (effectType) {
-                                        EffectType.MAX_FUEL -> "Max Fuel"
-                                        EffectType.MAX_HEALTH -> "Max Health"
+                                val effectNameTranslation by
+                                    TranslationStore(getEffectTranslationKey(effectType))
+                                val effectName = effectNameTranslation.getAsText(player.language())
+                                val displayValue =
+                                    if (effectType == EffectType.ZONE_RARITY) {
+                                        "${value.toInt()}%"
+                                    } else {
+                                        "+${value.toLong()}"
                                     }
                                 lore.add(
                                     Component.text(
-                                        "+ $effectName: +${value.toLong()}",
+                                        "$effectName: $displayValue",
                                         NamedTextColor.AQUA,
                                     ),
                                 )
                             }
                         }
 
+                        // Status
+                        lore.add(Component.empty())
+                        when {
+                            isUnlocked -> {
+                                val statusText = tierUnlockedLore.getAsText(player.language())
+                                lore.add(Component.text(statusText, NamedTextColor.GREEN))
+                            }
+
+                            isNextPurchasable -> {
+                                val statusText =
+                                    if (canAfford) {
+                                        tierNextAffordableLore.getAsText(player.language())
+                                    } else {
+                                        tierNextUnaffordableLore.getAsText(player.language())
+                                    }
+                                lore.add(
+                                    Component.text(
+                                        statusText,
+                                        if (canAfford) NamedTextColor.YELLOW else NamedTextColor.RED,
+                                    ),
+                                )
+                            }
+
+                            else -> {
+                                val statusText = tierLockedLore.getAsText(player.language())
+                                lore.add(Component.text(statusText, NamedTextColor.DARK_GRAY))
+                            }
+                        }
+
                         pane[row, column] =
                             StaticElement(
                                 drawable(
-                                    ItemStack(material)
+                                    ItemStack(icon)
                                         .name(itemName)
                                         .description(lore),
                                 ),
                             ) {
-                                if (isNextPurchasable) {
+                                if (isNextPurchasable && canAfford) {
                                     plugin.launch {
                                         val success =
                                             skillTreeManager.unlock(profile, pathId)
 
                                         if (success) {
-                                            // Re-fetch the profile from the database to get updated data
                                             val updatedProfile =
                                                 profileManager.getProfile(profile.id)
                                             if (updatedProfile != null) {
@@ -148,9 +245,7 @@ class SkillPathDetailGui(
                                             }
                                         } else {
                                             player.sendMessage(
-                                                cannotAffordMessage.get(
-                                                    player.language(),
-                                                ),
+                                                cannotAffordMessage.get(player.language()),
                                             )
                                         }
                                     }

@@ -20,32 +20,90 @@ class SkillPathStore(
         runCatching {
             ValueCache.getTyped<SkillPathValue>(key).value
         }.getOrElse {
-            val defaultSkillPath =
-                SkillPath(
-                    key,
-                    listOf(SkillTier(2, mapOf(EffectType.MAX_FUEL to 50.0))),
-                )
-            val defaultSkillTierDoc =
-                Document()
-                    .append("cost", 2)
-                    .append("effects", Document(EffectType.MAX_FUEL.configKey, 50.0))
-            val doc =
-                Document()
-                    .append("_id", key)
-                    .append("type", "SKILL_PATH")
-                    .append("value", listOf(defaultSkillTierDoc))
-            ContentSystem.instance.scope.launch {
-                ContentSystem.instance.mongoManager.collection
-                    .insertOne(doc)
+            // Create default based on the path ID
+            val pathId = key.removePrefix("skill_path.")
+            when (pathId) {
+                "motor" -> {
+                    SkillPath(
+                        pathId,
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.ZONE_RARITY to 5.0)),
+                            SkillTier(14, mapOf(EffectType.ZONE_RARITY to 10.0)),
+                            SkillTier(28, mapOf(EffectType.ZONE_RARITY to 15.0)),
+                        ),
+                    )
+                }
+
+                "speicher" -> {
+                    SkillPath(
+                        pathId,
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.MAX_FUEL to 100.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 200.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 300.0)),
+                        ),
+                    )
+                }
+
+                "zugkraft" -> {
+                    SkillPath(
+                        pathId,
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.MAX_WAGONS to 1.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_WAGONS to 2.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_WAGONS to 3.0)),
+                        ),
+                    )
+                }
+
+                else -> {
+                    SkillPath(
+                        pathId,
+                        listOf(SkillTier(2, mapOf(EffectType.MAX_FUEL to 50.0))),
+                    )
+                }
             }
-            defaultSkillPath
         }
 
     companion object {
-        fun getAllSkillPaths(): List<SkillPath> =
-            ValueCache
-                .getByPrefix<SkillPathValue>("skill_path.")
-                .map { it.value }
-                .sortedBy { it.id }
+        fun getAllSkillPaths(): List<SkillPath> {
+            val cached =
+                ValueCache
+                    .getByPrefix<SkillPathValue>("skill_path.")
+                    .map { it.value }
+                    .sortedBy { it.id }
+
+            // If no data is cached, return default sample data
+            if (cached.isEmpty()) {
+                return listOf(
+                    SkillPath(
+                        "motor",
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.ZONE_RARITY to 5.0)),
+                            SkillTier(14, mapOf(EffectType.ZONE_RARITY to 10.0)),
+                            SkillTier(28, mapOf(EffectType.ZONE_RARITY to 15.0)),
+                        ),
+                    ),
+                    SkillPath(
+                        "speicher",
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.MAX_FUEL to 100.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 200.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 300.0)),
+                        ),
+                    ),
+                    SkillPath(
+                        "zugkraft",
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.MAX_WAGONS to 1.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_WAGONS to 2.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_WAGONS to 3.0)),
+                        ),
+                    ),
+                )
+            }
+
+            return cached
+        }
     }
 }

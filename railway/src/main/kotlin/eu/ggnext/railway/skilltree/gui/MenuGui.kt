@@ -27,6 +27,8 @@ class MenuGui(
     private val menuTitle by TranslationStore("translations.railway.menu.title")
     private val dollarsItemName by TranslationStore("translations.railway.menu.dollars.name")
     private val levelItemName by TranslationStore("translations.railway.menu.level.name")
+    private val levelLabel by TranslationStore("translations.railway.menu.level.label")
+    private val xpLabel by TranslationStore("translations.railway.menu.level.xp_label")
     private val skillPointsItemName by TranslationStore("translations.railway.menu.skill_points.name")
     private val skilltreeItemName by TranslationStore("translations.railway.menu.skilltree.name")
 
@@ -83,9 +85,12 @@ class MenuGui(
                                     .name(levelItemName.get(player.language()))
                                     .description(
                                         listOf(
-                                            Component.text("Level: $currentLevel", NamedTextColor.AQUA),
                                             Component.text(
-                                                "XP: $xpProgress / $xpNeeded ($progressPercent%)",
+                                                "${levelLabel.getAsText(player.language())}: $currentLevel",
+                                                NamedTextColor.AQUA,
+                                            ),
+                                            Component.text(
+                                                "${xpLabel.getAsText(player.language())}: $xpProgress / $xpNeeded ($progressPercent%)",
                                                 NamedTextColor.GRAY,
                                             ),
                                         ),
