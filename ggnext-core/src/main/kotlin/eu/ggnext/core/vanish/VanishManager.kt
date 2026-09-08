@@ -30,10 +30,9 @@ class VanishManager(
 
     fun toggle(player: Player) {
         if (vanishedPlayer.contains(player.uniqueId)) {
-            vanish(player)
-        }
-        if (!vanishedPlayer.contains(player.uniqueId)) {
             show(player)
+        } else {
+            vanish(player)
         }
     }
 }
