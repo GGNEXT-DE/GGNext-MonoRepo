@@ -4,6 +4,8 @@ import dev.minn.jda.ktx.jdabuilder.default
 import dev.minn.jda.ktx.jdabuilder.intents
 import dev.minn.jda.ktx.jdabuilder.scope
 import eu.ggnext.common.db.MongoManager
+import eu.ggnext.common.sentry.SentryBuilder
+import eu.ggnext.common.sentry.SentryConfig
 import eu.ggnext.contentsystem.ContentSystem
 import eu.ggnext.dc.config.BotConfig
 import eu.ggnext.dc.config.ConfigManager
@@ -34,6 +36,10 @@ class Main {
 
     init {
         config = ConfigManager.loadConfig()
+
+        SentryBuilder.init(
+            SentryConfig(config.SENTRY_DSN, config.PROD),
+        )
 
         jda =
             default(config.TOKEN) {

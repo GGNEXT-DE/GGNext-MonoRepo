@@ -1,11 +1,16 @@
 package eu.ggnext.common.sentry
 
+import eu.ggnext.common.logging.log
+import eu.ggnext.common.logging.warn
 import io.sentry.Sentry
 
 object SentryBuilder {
     fun init(config: SentryConfig) {
         if (!config.prod) return
-        require(!config.dsn.isNullOrBlank()) { "dsn is required" }
+        if (config.dsn.isNullOrBlank()) {
+            log.warn("Dsn is required")
+            return
+        }
         Sentry.init { options ->
             options.dsn = config.dsn
         }

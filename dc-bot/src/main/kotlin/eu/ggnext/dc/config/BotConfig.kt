@@ -16,4 +16,6 @@ data class BotConfig(
     val TEAM_TEMP_ID: String,
     val MAIN_TEMP_ID: String,
     val SOS_TEMP_ID: String,
+    val SENTRY_DSN: String,
+    val PROD: Boolean,
 )
