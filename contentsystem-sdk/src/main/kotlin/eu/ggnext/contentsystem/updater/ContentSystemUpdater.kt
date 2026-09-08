@@ -9,7 +9,7 @@ import org.bson.Document
  */
 internal object ContentSystemUpdater {
     fun onUpdate(doc: Document) {
-        val value = ConfigValueMapper.fromDoc(doc)
+        val value = ConfigValueMapper.fromDoc(doc) ?: return
         ValueCache.set(value)
     }
 }

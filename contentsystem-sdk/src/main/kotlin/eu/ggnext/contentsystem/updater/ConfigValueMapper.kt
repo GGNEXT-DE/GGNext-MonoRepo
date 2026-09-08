@@ -1,5 +1,7 @@
 package eu.ggnext.contentsystem.updater
 
+import eu.ggnext.common.logging.log
+import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.types.ConfigValue
 import eu.ggnext.contentsystem.value.types.EffectType
 import eu.ggnext.contentsystem.value.types.MaterialValue
@@ -23,9 +25,23 @@ import kotlin.collections.emptyList
  * The document must contain an `_id` (used as key), a `type`, and a `value` field.
  */
 internal object ConfigValueMapper {
-    fun fromDoc(doc: Document): ConfigValue<*> {
-        val key = doc.getString("_id")
-        return when (val type = doc.getString("type")) {
+    /**
+     * Returns `null` (and logs a warning) instead of throwing if [doc] cannot be mapped,
+     * so a single malformed value cannot take down the whole plugin.
+     */
+    fun fromDoc(doc: Document): ConfigValue<*>? {
+        val key = doc.getString("_id") ?: "<unknown>"
+        return runCatching { mapValue(key, doc) }
+            .onFailure { e ->
+                log.warn("Failed to map ContentSystem value '$key' (type=${doc.getString("type")}): ${e.message}")
+            }.getOrNull()
+    }
+
+    private fun mapValue(
+        key: String,
+        doc: Document,
+    ): ConfigValue<*> =
+        when (val type = doc.getString("type")) {
             "NUMBER" -> {
                 NumberValue(
                     key = key,
@@ -110,5 +126,4 @@ internal object ConfigValueMapper {
                 error("Unknown type: $type")
             }
         }
-    }
 }
