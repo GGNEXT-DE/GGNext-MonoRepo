@@ -49,7 +49,7 @@ data class Translation(
      */
     internal fun getAsText(
         locale: String,
-        args: List<String>,
+        args: List<String> = emptyList(),
     ): String = TranslationEngine.resolve(raw(locale), locale, args)
 
     /** Returns the raw, unresolved translation string for the given [locale]. */
