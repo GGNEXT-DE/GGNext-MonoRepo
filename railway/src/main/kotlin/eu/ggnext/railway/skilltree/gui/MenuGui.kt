@@ -33,8 +33,11 @@ class MenuGui(
     private val skilltreeItemName by TranslationStore("translations.railway.menu.skilltree.name")
 
     suspend fun openMenuGui(player: Player) {
-        val profile =
+        val activeProfile =
             profileManager.getActiveProfile(player)
+                ?: return
+        val profile =
+            profileManager.getProfile(activeProfile.id)
                 ?: return
 
         val title by TranslationStore("translations.railway.menu.title")
@@ -85,14 +88,14 @@ class MenuGui(
                                     .name(levelItemName.get(player.language()))
                                     .description(
                                         listOf(
-                                            Component.text(
-                                                "${levelLabel.getAsText(player.language())}: $currentLevel",
-                                                NamedTextColor.AQUA,
-                                            ),
-                                            Component.text(
-                                                "${xpLabel.getAsText(player.language())}: $xpProgress / $xpNeeded ($progressPercent%)",
-                                                NamedTextColor.GRAY,
-                                            ),
+                                            levelLabel
+                                                .get(player.language())
+                                                .append(Component.text(": $currentLevel", NamedTextColor.AQUA)),
+                                            xpLabel
+                                                .get(player.language())
+                                                .append(
+                                                    Component.text(": $xpProgress / $xpNeeded ($progressPercent%)", NamedTextColor.GRAY),
+                                                ),
                                         ),
                                     ),
                             ),

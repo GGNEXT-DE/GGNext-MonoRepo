@@ -33,7 +33,6 @@ class SkilltreeOverviewGui(
     }
 
     private val skilltreeOverviewTitle by TranslationStore("translations.railway.skilltree.overview.gui.title")
-    private val progressLore by TranslationStore("translations.railway.skilltree.overview.progress")
     private val backItemName by TranslationStore("translations.railway.skilltree.overview.back.name")
 
     private val navigating = ConcurrentHashMap.newKeySet<UUID>()
@@ -61,9 +60,18 @@ class SkilltreeOverviewGui(
         )
 
     suspend fun openSkilltreeOverviewGui(player: Player) {
-        val profile =
+        val activeProfile =
             profileManager.getActiveProfile(player)
-                ?: return
+        if (activeProfile == null) {
+            player.sendMessage(Component.text("Kein aktives Profil gefunden", NamedTextColor.RED))
+            return
+        }
+        val profile =
+            profileManager.getProfile(activeProfile.id)
+        if (profile == null) {
+            player.sendMessage(Component.text("Profil konnte nicht geladen werden", NamedTextColor.RED))
+            return
+        }
 
         val title by TranslationStore("translations.railway.skilltree.overview.gui.title")
 
@@ -96,27 +104,28 @@ class SkilltreeOverviewGui(
                         val (nameKey, descKey) = getPathTranslationKeys(skillPath.id)
                         val pathNameTranslation by TranslationStore(nameKey)
                         val pathDescTranslation by TranslationStore(descKey)
-                        val pathName = pathNameTranslation.getAsText(player.language())
-                        val pathDescription = pathDescTranslation.getAsText(player.language())
+                        val pathName = pathNameTranslation.get(player.language())
+                        val pathDescription = pathDescTranslation.get(player.language())
 
                         val unlockedCount = profile.level.unlockedTiers[skillPath.id] ?: 0
                         val totalTiers = skillPath.tiers.size
-                        val progressText = "Tier $unlockedCount / $totalTiers"
-                        val progressLoreText = progressLore.getAsText(player.language())
+                        val progressLoreTranslation by TranslationStore("translations.railway.skilltree.overview.progress")
+                        val progressLore =
+                            progressLoreTranslation.get(
+                                player.language(),
+                                listOf("$unlockedCount", "$totalTiers"),
+                            )
 
                         pane[row, column] =
                             StaticElement(
                                 drawable(
                                     ItemStack(icon)
-                                        .name(Component.text(pathName, NamedTextColor.AQUA))
+                                        .name(pathName)
                                         .description(
                                             listOf(
-                                                Component.text(pathDescription, NamedTextColor.GRAY),
+                                                pathDescription.color(NamedTextColor.GRAY),
                                                 Component.empty(),
-                                                Component.text(
-                                                    "$progressText $progressLoreText",
-                                                    NamedTextColor.YELLOW,
-                                                ),
+                                                progressLore.color(NamedTextColor.YELLOW),
                                             ),
                                         ),
                                 ),

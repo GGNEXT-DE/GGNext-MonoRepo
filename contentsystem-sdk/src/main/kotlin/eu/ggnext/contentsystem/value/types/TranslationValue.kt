@@ -47,7 +47,7 @@ data class Translation(
      * @param args arguments used to replace index placeholders (`{0}`, `{1}`, ...)
      * @return the fully resolved, but not yet deserialized, string
      */
-    fun getAsText(
+    internal fun getAsText(
         locale: String,
         args: List<String> = emptyList(),
     ): String = TranslationEngine.resolve(raw(locale), locale, args)

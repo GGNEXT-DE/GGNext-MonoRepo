@@ -88,8 +88,11 @@ class SkillPathDetailGui(
         player: Player,
         pathId: String,
     ) {
-        val profile =
+        val activeProfile =
             profileManager.getActiveProfile(player)
+                ?: return
+        val profile =
+            profileManager.getProfile(activeProfile.id)
                 ?: return
 
         val skillPath by SkillPathStore("skill_path.$pathId")
@@ -159,16 +162,17 @@ class SkillPathDetailGui(
                         val lore = mutableListOf<Component>()
 
                         // Cost
-                        val costLabelText = tierCostLabel.getAsText(player.language())
                         lore.add(
-                            Component.text(
-                                "$costLabelText ${tier.cost} SP",
-                                if (profile.level.skillPoints >= tier.cost) {
-                                    NamedTextColor.GREEN
-                                } else {
-                                    NamedTextColor.RED
-                                },
-                            ),
+                            tierCostLabel
+                                .get(player.language())
+                                .append(Component.text(" ${tier.cost} SP"))
+                                .color(
+                                    if (profile.level.skillPoints >= tier.cost) {
+                                        NamedTextColor.GREEN
+                                    } else {
+                                        NamedTextColor.RED
+                                    },
+                                ),
                         )
 
                         // Effects
@@ -177,7 +181,6 @@ class SkillPathDetailGui(
                             tier.effects.forEach { (effectType, value) ->
                                 val effectNameTranslation by
                                     TranslationStore(getEffectTranslationKey(effectType))
-                                val effectName = effectNameTranslation.getAsText(player.language())
                                 val displayValue =
                                     if (effectType == EffectType.ZONE_RARITY) {
                                         "${value.toInt()}%"
@@ -185,10 +188,11 @@ class SkillPathDetailGui(
                                         "+${value.toLong()}"
                                     }
                                 lore.add(
-                                    Component.text(
-                                        "$effectName: $displayValue",
-                                        NamedTextColor.AQUA,
-                                    ),
+                                    effectNameTranslation
+                                        .get(
+                                            player.language(),
+                                            listOf(displayValue),
+                                        ).color(NamedTextColor.AQUA),
                                 )
                             }
                         }
@@ -197,28 +201,33 @@ class SkillPathDetailGui(
                         lore.add(Component.empty())
                         when {
                             isUnlocked -> {
-                                val statusText = tierUnlockedLore.getAsText(player.language())
-                                lore.add(Component.text(statusText, NamedTextColor.GREEN))
+                                lore.add(
+                                    tierUnlockedLore
+                                        .get(player.language())
+                                        .color(NamedTextColor.GREEN),
+                                )
                             }
 
                             isNextPurchasable -> {
-                                val statusText =
-                                    if (canAfford) {
-                                        tierNextAffordableLore.getAsText(player.language())
-                                    } else {
-                                        tierNextUnaffordableLore.getAsText(player.language())
-                                    }
                                 lore.add(
-                                    Component.text(
-                                        statusText,
+                                    (
+                                        if (canAfford) {
+                                            tierNextAffordableLore.get(player.language())
+                                        } else {
+                                            tierNextUnaffordableLore.get(player.language())
+                                        }
+                                    ).color(
                                         if (canAfford) NamedTextColor.YELLOW else NamedTextColor.RED,
                                     ),
                                 )
                             }
 
                             else -> {
-                                val statusText = tierLockedLore.getAsText(player.language())
-                                lore.add(Component.text(statusText, NamedTextColor.DARK_GRAY))
+                                lore.add(
+                                    tierLockedLore
+                                        .get(player.language())
+                                        .color(NamedTextColor.DARK_GRAY),
+                                )
                             }
                         }
 
