@@ -32,8 +32,9 @@ class SkilltreeOverviewGui(
         this.menuGui = gui
     }
 
-    private val skilltreeOverviewTitle by TranslationStore("translations.railway.skilltree.overview.gui.title")
     private val backItemName by TranslationStore("translations.railway.skilltree.overview.back.name")
+    private val noActiveProfileError by TranslationStore("translations.railway.skilltree.overview.error.no_active_profile")
+    private val couldNotLoadProfileError by TranslationStore("translations.railway.skilltree.overview.error.could_not_load_profile")
 
     private val navigating = ConcurrentHashMap.newKeySet<UUID>()
 
@@ -63,13 +64,17 @@ class SkilltreeOverviewGui(
         val activeProfile =
             profileManager.getActiveProfile(player)
         if (activeProfile == null) {
-            player.sendMessage(Component.text("Kein aktives Profil gefunden", NamedTextColor.RED))
+            player.sendMessage(
+                noActiveProfileError.get(player.language()).color(NamedTextColor.RED),
+            )
             return
         }
         val profile =
             profileManager.getProfile(activeProfile.id)
         if (profile == null) {
-            player.sendMessage(Component.text("Profil konnte nicht geladen werden", NamedTextColor.RED))
+            player.sendMessage(
+                couldNotLoadProfileError.get(player.language()).color(NamedTextColor.RED),
+            )
             return
         }
 
