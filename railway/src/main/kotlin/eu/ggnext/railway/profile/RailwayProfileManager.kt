@@ -5,6 +5,8 @@ import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import eu.ggnext.common.db.MongoManager
 import eu.ggnext.contentsystem.value.store.NumberStore
+import eu.ggnext.contentsystem.value.types.Quest
+import eu.ggnext.contentsystem.value.types.QuestTrackingType
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import org.bukkit.entity.Player
@@ -45,6 +47,7 @@ class RailwayProfileManager(
                 name = name,
                 level = RailwayLevel(0L, 0),
                 completedQuests = emptySet(),
+                activeQuests = emptySet(),
             )
 
         profileCollection.insertOne(railwayProfile)
@@ -162,8 +165,39 @@ class RailwayProfileManager(
         return true
     }
 
-    suspend fun addCompletedQuest(
+    suspend fun completeQuest(
         profile: RailwayProfile,
         questId: String,
-    ) = profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.addToSet("completedQuests", questId))
+    ) {
+        profileCollection.updateOne(
+            Filters.eq("_id", profile.id),
+            Updates.combine(
+                Updates.addToSet("completedQuests", questId),
+                Updates.pullByFilter(Filters.eq("activeQuests", Filters.eq("questId", questId))),
+            ),
+        )
+    }
+
+    suspend fun addActiveQuest(
+        profile: RailwayProfile,
+        questId: String,
+        type: QuestTrackingType,
+    ) {
+        val questProgress = QuestProgress(questId, type)
+        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.addToSet("activeQuests", questProgress))
+    }
+
+    suspend fun getActiveQuests(profile: RailwayProfile): Set<QuestProgress> =
+        profileCollection.find(Filters.eq("_id", profile.id)).firstOrNull()?.activeQuests ?: emptySet()
+
+    suspend fun updateActiveQuest(
+        profile: RailwayProfile,
+        questId: String,
+        questProgress: QuestProgress,
+    ) {
+        profileCollection.updateOne(
+            Filters.and(Filters.eq("_id", profile.id), Filters.eq("activeQuests.questId", questId)),
+            Updates.set("activeQuests.$.currentValue", questProgress.currentValue),
+        )
+    }
 }

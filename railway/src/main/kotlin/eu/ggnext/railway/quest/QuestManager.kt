@@ -2,31 +2,29 @@ package eu.ggnext.railway.quest
 
 import eu.ggnext.contentsystem.value.store.QuestStore
 import eu.ggnext.contentsystem.value.types.Quest
+import eu.ggnext.railway.profile.QuestProgress
 import eu.ggnext.railway.profile.RailwayProfileManager
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 
 class QuestManager(
     private val profileManager: RailwayProfileManager,
 ) {
-    private val activeQuests = ConcurrentHashMap<UUID, MutableList<QuestProgress>>()
-
-    fun getActiveQuests(profileId: UUID): List<QuestProgress> =
-        activeQuests[profileId]?.let { list -> synchronized(list) { list.toList() } } ?: emptyList()
+    suspend fun getActiveQuests(profileId: UUID): Set<QuestProgress> {
+        val profile = profileManager.getProfile(profileId) ?: return emptySet()
+        return profileManager.getActiveQuests(profile)
+    }
 
     suspend fun startQuest(
         questId: String,
         profileId: UUID,
     ) {
-        getQuest(questId) ?: return
+        val quest = getQuest(questId) ?: return
         val profile = profileManager.getProfile(profileId) ?: return
         if (profile.completedQuests.contains(questId)) return
 
-        val list = activeQuests.computeIfAbsent(profileId) { mutableListOf() }
-        synchronized(list) {
-            if (list.any { it.questId == questId }) return
-            list.add(QuestProgress(questId, profileId))
-        }
+        if (getActiveQuests(profileId).any { it.questId == questId }) return
+
+        profileManager.addActiveQuest(profile, questId, quest.trackingType)
     }
 
     suspend fun updateQuest(
@@ -34,24 +32,19 @@ class QuestManager(
         profileId: UUID,
     ) {
         val quest = getQuest(questId) ?: return
-        val list = activeQuests[profileId] ?: return
+        val profile = profileManager.getProfile(profileId) ?: return
 
-        val questProgress: QuestProgress
-        val shouldComplete: Boolean
+        val questProgress = profile.activeQuests.firstOrNull { it.questId == questId } ?: return
 
-        synchronized(list) {
-            questProgress = list.firstOrNull { it.questId == questId } ?: return
-            questProgress.currentValue++
-            shouldComplete = questProgress.currentValue >= quest.targetValue
-            if (shouldComplete) list.remove(questProgress)
+        questProgress.currentValue++
+        if (questProgress.currentValue < quest.targetValue) {
+            profileManager.updateActiveQuest(profile, questId, questProgress)
+            return
         }
 
-        if (!shouldComplete) return
-
-        val profile = profileManager.getProfile(profileId) ?: return
         profileManager.addDollars(profile, quest.rewardMoney)
         profileManager.addXp(profile, quest.rewardXp.toLong())
-        profileManager.addCompletedQuest(profile, questId)
+        profileManager.completeQuest(profile, questId)
     }
 
     private fun getQuest(questId: String): Quest? {

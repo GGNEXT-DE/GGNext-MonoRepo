@@ -11,6 +11,8 @@ import eu.ggnext.railway.profile.ProfileCommand
 import eu.ggnext.railway.profile.ProfileGui
 import eu.ggnext.railway.profile.ProfileListener
 import eu.ggnext.railway.profile.RailwayProfileManager
+import eu.ggnext.railway.quest.QuestListener
+import eu.ggnext.railway.quest.QuestManager
 import eu.ggnext.railway.skilltree.SkillTreeManager
 import eu.ggnext.railway.skilltree.command.MenuCommand
 import eu.ggnext.railway.skilltree.effect.EffectManager
@@ -33,6 +35,7 @@ import org.bukkit.Bukkit
 class Railway : SuspendingJavaPlugin() {
     lateinit var zoneManager: ZoneManager
     lateinit var railwayProfileManager: RailwayProfileManager
+    lateinit var questManager: QuestManager
     lateinit var profileGui: ProfileGui
     lateinit var tradeManager: TradeManager
     lateinit var tradeGui: TradeGui
@@ -50,6 +53,8 @@ class Railway : SuspendingJavaPlugin() {
                 .load()
         railwayProfileManager =
             RailwayProfileManager(GGNextAPI.mongoManager)
+        questManager =
+            QuestManager(railwayProfileManager)
         auctionManager =
             AuctionManager(GGNextAPI.mongoManager)
         auctionGui =
@@ -118,6 +123,7 @@ class Railway : SuspendingJavaPlugin() {
             registerSuspendingEvents(ProfileListener(railwayProfileManager, profileGui), this@Railway)
             registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
             registerSuspendingEvents(SkilltreeListener(skilltreeOverviewGui, skillPathDetailGui), this@Railway)
+            registerSuspendingEvents(QuestListener(questManager, railwayProfileManager), this@Railway)
         }
     }
 }

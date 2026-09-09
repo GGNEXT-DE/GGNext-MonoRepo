@@ -1,5 +1,6 @@
 package eu.ggnext.railway.profile
 
+import eu.ggnext.contentsystem.value.types.QuestTrackingType
 import org.bson.codecs.pojo.annotations.BsonId
 import java.util.UUID
 import kotlin.math.pow
@@ -10,6 +11,7 @@ data class RailwayProfile(
     val railwayDollars: Double,
     val level: RailwayLevel,
     val completedQuests: Set<String>,
+    val activeQuests: Set<QuestProgress>,
 )
 
 data class RailwayProfileIndex(
@@ -33,6 +35,12 @@ data class RailwayLevel(
             return level
         }
 }
+
+data class QuestProgress(
+    val questId: String,
+    val type: QuestTrackingType,
+    var currentValue: Int = 0,
+)
 
 val railwayProfileNames =
     listOf(
