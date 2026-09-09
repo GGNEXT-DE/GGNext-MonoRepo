@@ -15,6 +15,7 @@ import eu.ggnext.dc.tempvoice.TempVoice
 import eu.ggnext.dc.tickets.TicketButtonHandler
 import eu.ggnext.dc.tickets.TicketCommand
 import eu.ggnext.dc.tickets.TicketDropDownHandler
+import eu.ggnext.dc.verify.VerifyCommand
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Activity
@@ -65,6 +66,7 @@ class Main {
         val lamp = JDALamp.builder<SlashCommandActor>().build()
         lamp.register(TicketCommand())
         lamp.register(RulesCommand())
+        lamp.register(VerifyCommand(mongoManager))
         lamp.accept(slashCommands(jda))
 
         jda.addEventListener(TicketDropDownHandler(config))
