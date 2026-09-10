@@ -19,7 +19,8 @@ class ScoreBoardManager(
         val scoreboard = scoreBoardLibrary.createSidebar()
 
         scoreboard.addPlayer(player)
-        showDefaultScoreboard(scoreboard)
+        // Don't show default scoreboard - let sub-plugins (like Railway) handle the content
+        // showDefaultScoreboard(scoreboard)
 
         scoreboards[player.uniqueId] = scoreboard
     }
