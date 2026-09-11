@@ -194,10 +194,12 @@ class RailwayProfileManager(
         profile: RailwayProfile,
         questId: String,
         questProgress: QuestProgress,
-    ) {
-        profileCollection.updateOne(
-            Filters.and(Filters.eq("_id", profile.id), Filters.eq("activeQuests.questId", questId)),
-            Updates.set("activeQuests.$.currentValue", questProgress.currentValue),
-        )
+    ): Boolean {
+        val result =
+            profileCollection.updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.eq("activeQuests.questId", questId)),
+                Updates.set("activeQuests.$.currentValue", questProgress.currentValue),
+            )
+        return result.modifiedCount > 0
     }
 }

@@ -39,7 +39,7 @@ data class RailwayLevel(
 data class QuestProgress(
     val questId: String,
     val type: QuestTrackingType,
-    var currentValue: Int = 0,
+    val currentValue: Int = 0,
 )
 
 val railwayProfileNames =

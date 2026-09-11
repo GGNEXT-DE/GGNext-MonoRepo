@@ -1,5 +1,7 @@
 package eu.ggnext.railway.quest
 
+import eu.ggnext.common.logging.log
+import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.store.QuestStore
 import eu.ggnext.contentsystem.value.types.Quest
 import eu.ggnext.railway.profile.QuestProgress
@@ -36,9 +38,13 @@ class QuestManager(
 
         val questProgress = profile.activeQuests.firstOrNull { it.questId == questId } ?: return
 
-        questProgress.currentValue++
-        if (questProgress.currentValue < quest.targetValue) {
-            profileManager.updateActiveQuest(profile, questId, questProgress)
+        val updatedProgress = questProgress.copy(currentValue = questProgress.currentValue + 1)
+
+        if (updatedProgress.currentValue < quest.targetValue) {
+            val updated = profileManager.updateActiveQuest(profile, questId, updatedProgress)
+            if (!updated) {
+                log.warn("Failed to update the active quest $questId from profile $profileId")
+            }
             return
         }
 
