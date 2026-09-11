@@ -19,7 +19,6 @@ class ScoreBoardManager(
         val scoreboard = scoreBoardLibrary.createSidebar()
 
         scoreboard.addPlayer(player)
-        showDefaultScoreboard(scoreboard)
 
         scoreboards[player.uniqueId] = scoreboard
     }
@@ -34,19 +33,5 @@ class ScoreBoardManager(
     fun shutdown() {
         scoreboards.forEach { it.value.close() }
         scoreboards.clear()
-    }
-
-    fun showDefaultScoreboard(scoreboard: Sidebar) {
-        val lines =
-            SidebarComponent
-                .builder()
-                .addBlankLine()
-                .addStaticLine { Component.text("play.ggnext.de", NamedTextColor.AQUA) }
-                .build()
-
-        ComponentSidebarLayout(
-            SidebarComponent.staticLine(Component.text("GGNext", NamedTextColor.GREEN)),
-            lines,
-        ).apply(scoreboard)
     }
 }
