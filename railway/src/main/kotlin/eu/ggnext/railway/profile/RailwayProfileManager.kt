@@ -30,17 +30,19 @@ class RailwayProfileManager(
         player: Player,
         name: String,
     ): RailwayProfile? {
-        val currentProfileAmount =
+        val indexedProfileAmount =
             profileIndexCollection
                 .find(Filters.eq("_id", player.uniqueId))
                 .firstOrNull()
                 ?.profileIds
                 ?.size
                 ?: 0
+        val currentProfileAmount = getProfiles(player).size
 
         logger.info(
             "Creating Railway profile for ${player.name} (${player.uniqueId}): " +
-                "name='$name', nameLength=${name.length}, currentProfiles=$currentProfileAmount, " +
+                "name='$name', nameLength=${name.length}, indexedProfiles=$indexedProfileAmount, " +
+                "existingProfiles=$currentProfileAmount, " +
                 "maxProfiles=$maxRailwayAccounts, maxNameLength=$maxNameLength",
         )
 
