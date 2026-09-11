@@ -25,6 +25,7 @@ class RailwayScoreBoardManager(
 ) {
     private val playerRefreshTasks = ConcurrentHashMap<UUID, Long>()
     private val refreshIntervalTicks = 40L // 2 seconds (40 ticks = 2 seconds at 20 TPS)
+    private val progressBarLength = 10
     private var autoRefreshJob: Job? = null
     private val isShuttingDown = AtomicBoolean(false)
 
@@ -89,7 +90,7 @@ class RailwayScoreBoardManager(
         val characterName = profile.name
         val dollars = profile.railwayDollars
         val level = profile.level.currentLevel
-        val currentXp = profile.level.xp.toLong()
+        val currentXp = profile.level.xp
         val maxXp = (100L * level * level)
         val skillPoints = profile.level.skillPoints
         val zone = player.world.name // or custom zone tracking
@@ -108,7 +109,7 @@ class RailwayScoreBoardManager(
 
         // Level and XP Progress Bar
         val xpPercent = if (maxXp > 0) ((currentXp * 100) / maxXp).toInt() else 0
-        val xpProgressBar = createProgressBar(xpPercent, 10)
+        val xpProgressBar = createProgressBar(xpPercent)
         lines.add(
             Component.text("[$xpProgressBar] $xpPercent%", NamedTextColor.GRAY),
         )
@@ -207,7 +208,7 @@ class RailwayScoreBoardManager(
                             log.warn("Railway Scoreboard auto-refresh error: ${e.message}")
                         }
                     }
-                    kotlinx.coroutines.delay((refreshIntervalTicks * 50).toLong())
+                    kotlinx.coroutines.delay((refreshIntervalTicks * 50).milliseconds)
                 }
             }
     }
@@ -218,12 +219,9 @@ class RailwayScoreBoardManager(
         playerRefreshTasks.clear()
     }
 
-    private fun createProgressBar(
-        percent: Int,
-        length: Int,
-    ): String {
-        val filled = (percent * length / 100).coerceIn(0, length)
-        val empty = length - filled
+    private fun createProgressBar(percent: Int): String {
+        val filled = (percent * progressBarLength / 100).coerceIn(0, progressBarLength)
+        val empty = progressBarLength - filled
         return "█".repeat(filled) + "░".repeat(empty)
     }
 }
