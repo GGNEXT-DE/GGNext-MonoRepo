@@ -75,6 +75,7 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         playerInputManager = PlayerInputManager(this)
         GGNextAPI.playerInputManager = playerInputManager
+        playerInputManager.startCleanupTask()
 
         server.pluginManager.registerEvents(PlayerInputListener(this, playerInputManager), this)
 

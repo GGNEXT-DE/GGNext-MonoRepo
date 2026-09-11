@@ -6,6 +6,7 @@ import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.store.TranslationStore
 import eu.ggnext.core.utils.language
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
@@ -23,10 +24,17 @@ typealias InputCallback = suspend (String) -> Unit
 class PlayerInputManager(
     private val plugin: JavaPlugin,
 ) {
+    companion object {
+        private const val MAX_INPUT_LENGTH = 256
+        private const val INPUT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+        private const val CLEANUP_INTERVAL_MS = 60 * 1000L // 1 minute
+    }
+
     private val activeInputs = ConcurrentHashMap<UUID, InputSession>()
     private val promptKey by TranslationStore("translations.core.input.prompt")
     private val inputCancelledKey by TranslationStore("translations.core.input.cancelled")
     private val inputAcceptedKey by TranslationStore("translations.core.input.accepted")
+    private val alreadyActiveKey by TranslationStore("translations.core.input.already_active")
     private val logger = LogControl.logger(this::class.java)
 
     data class InputSession(
@@ -50,7 +58,7 @@ class PlayerInputManager(
     ) {
         if (activeInputs.containsKey(player.uniqueId)) {
             player.sendMessage(
-                Component.text("You already have an active input request!", NamedTextColor.RED),
+                alreadyActiveKey.get(player.language()).color(NamedTextColor.RED),
             )
             return
         }
@@ -77,25 +85,40 @@ class PlayerInputManager(
         player: Player,
         message: String,
     ) {
+        // Input validation
+        if (message.isEmpty()) return
+        if (message.length > MAX_INPUT_LENGTH) {
+            player.sendMessage(
+                Component.text("Input is too long (max $MAX_INPUT_LENGTH characters)", NamedTextColor.RED),
+            )
+            return
+        }
+        if (message.startsWith("/")) {
+            player.sendMessage(
+                Component.text("Commands are not allowed as input", NamedTextColor.RED),
+            )
+            return
+        }
+
         val session = activeInputs[player.uniqueId] ?: return
 
         when (message.lowercase()) {
             "cancel" -> {
-                cancelInput(player, session)
+                cancelInput(player)
             }
 
             else -> {
-                completeInput(player, session, message)
+                completeInput(player, message)
             }
         }
     }
 
     private suspend fun completeInput(
         player: Player,
-        session: InputSession,
         message: String,
     ) {
-        activeInputs.remove(player.uniqueId)
+        // Atomic remove to prevent race conditions
+        val session = activeInputs.remove(player.uniqueId) ?: return
 
         try {
             session.callback(message)
@@ -122,23 +145,29 @@ class PlayerInputManager(
         }
     }
 
-    private suspend fun cancelInput(
-        player: Player,
-        session: InputSession,
-    ) {
-        activeInputs.remove(player.uniqueId)
-        player.sendMessage(
-            inputCancelledKey.get(player.language()).color(NamedTextColor.YELLOW),
-        )
+    /**
+     * Cancel input for a player (called when player quits or on request).
+     */
+    suspend fun cancelInput(player: Player) {
+        // Atomic remove to prevent race conditions
+        val session = activeInputs.remove(player.uniqueId) ?: return
 
-        // Reopen previous GUI if provided
-        session.previousGuiReopener?.let {
-            plugin.launch {
-                delay(50)
-                try {
-                    it()
-                } catch (e: Exception) {
-                    logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+        if (player.isOnline) {
+            player.sendMessage(
+                inputCancelledKey.get(player.language()).color(NamedTextColor.YELLOW),
+            )
+        }
+
+        // Reopen previous GUI if provided and player is online
+        if (player.isOnline) {
+            session.previousGuiReopener?.let {
+                plugin.launch {
+                    delay(50)
+                    try {
+                        it()
+                    } catch (e: Exception) {
+                        logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+                    }
                 }
             }
         }
@@ -151,8 +180,35 @@ class PlayerInputManager(
 
     /**
      * Cleanup input sessions (called on plugin disable).
+     * Also starts a background task to cleanup expired sessions.
      */
     fun shutdown() {
         activeInputs.clear()
+    }
+
+    /**
+     * Start cleanup task to remove expired input sessions.
+     */
+    fun startCleanupTask() {
+        plugin.launch {
+            while (plugin.isEnabled && isActive) {
+                try {
+                    cleanupExpiredSessions()
+                } catch (e: Exception) {
+                    logger.warning("Error cleaning up expired input sessions: ${e.message}")
+                }
+                delay(CLEANUP_INTERVAL_MS)
+            }
+        }
+    }
+
+    private fun cleanupExpiredSessions() {
+        val now = System.currentTimeMillis()
+        activeInputs.forEach { (uuid, session) ->
+            if (now - session.createdAt > INPUT_TIMEOUT_MS) {
+                activeInputs.remove(uuid)
+                logger.warning("Cleaned up expired input session for player $uuid after timeout")
+            }
+        }
     }
 }
