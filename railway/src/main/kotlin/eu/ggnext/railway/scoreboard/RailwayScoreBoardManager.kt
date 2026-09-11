@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 class RailwayScoreBoardManager(
     private val plugin: JavaPlugin,
