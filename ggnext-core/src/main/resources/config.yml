@@ -1,5 +1,5 @@
 mongo:
-  connectionString: "mongodb://localhost:27017"
+  connectionString: "mongodb://enjagura:IB0b56eNq1u8YDDM@172.28.0.5:27017/?authSource=ggnext&replicaSet=rs0-staging"
   database: "ggnext"
 prod: false
 sentry:
