@@ -9,7 +9,7 @@ class CommandVisibilityFilter(
 ) : Listener {
     @EventHandler
     fun onPlayerCommandSend(event: PlayerCommandSendEvent) {
-        if (prod) {
+        if (prod && !event.player.hasPermission("group.team")) {
             val newCommandList =
                 event.commands
                     .filter { it.startsWith("ggnextcore:") || it.startsWith("railway:") }

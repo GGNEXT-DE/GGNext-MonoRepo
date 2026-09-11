@@ -41,7 +41,7 @@ dailyQuests.forEach { quest ->
 Keys follow a fixed schema:
 
 ```
-{numbers|translations}.{railway|velocity|core}.{system}.{feature}[.{subfeature}].{name}
+{numbers|translations|strings|quests|skill_path}.{railway|velocity|core|discord}.{system}.{feature}[.{subfeature}].{name}
 ```
 
 - Platform segment (`railway` or `velocity` or `core`) is always present.
