@@ -6,6 +6,7 @@ import com.noxcrew.interfaces.element.StaticElement
 import com.noxcrew.interfaces.interfaces.buildChestInterface
 import com.noxcrew.interfaces.utilities.forEachInGrid
 import eu.ggnext.contentsystem.value.store.TranslationStore
+import eu.ggnext.core.api.GGNextAPI
 import eu.ggnext.core.utils.createFiller
 import eu.ggnext.core.utils.description
 import eu.ggnext.core.utils.language
@@ -117,11 +118,29 @@ class ProfileGui(
                     pane[2, 4] =
                         StaticElement(drawable(ItemStack(Material.NAME_TAG).name(createItemName.get(player.language())))) {
                             plugin.launch {
-                                val profile = profileManager.createProfile(player, railwayProfileNames.random())
-                                if (profileManager.getActiveProfile(player) == null && profile != null) {
-                                    profileManager.setActiveProfile(player, profile)
-                                }
-                                player.inventory.close()
+                                val successMsg by TranslationStore("translations.railway.profile.create.success")
+                                val errorMsg by TranslationStore("translations.railway.profile.create.error")
+
+                                GGNextAPI.playerInputManager.requestInput(
+                                    player = player,
+                                    callback = { profileName ->
+                                        val profile = profileManager.createProfile(player, profileName)
+                                        if (profile != null) {
+                                            if (profileManager.getActiveProfile(player) == null) {
+                                                profileManager.setActiveProfile(player, profile)
+                                            }
+                                            player.sendMessage(successMsg.get(player.language()))
+                                        } else {
+                                            player.sendMessage(errorMsg.get(player.language()))
+                                        }
+                                    },
+                                    previousGuiReopener =
+                                        suspend {
+                                            openProfileGui(player)
+                                        },
+                                )
+
+                                player.closeInventory()
                             }
                         }
                 }

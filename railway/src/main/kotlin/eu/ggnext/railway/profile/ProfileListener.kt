@@ -1,5 +1,6 @@
 package eu.ggnext.railway.profile
 
+import eu.ggnext.core.api.GGNextAPI
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -14,10 +15,6 @@ class ProfileListener(
     @EventHandler
     suspend fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         val player = event.player
-        val profiles = railwayProfileManager.getProfiles(player)
-        if (profiles.isEmpty()) {
-            railwayProfileManager.createProfile(player, railwayProfileNames.random())
-        }
         if (railwayProfileManager.getActiveProfile(player) == null) {
             profileGui.openProfileGui(player)
         }
@@ -28,6 +25,11 @@ class ProfileListener(
         val player = event.player as? Player ?: return
 
         if (profileGui.consumeNavigating(player)) {
+            return
+        }
+
+        // Don't reopen GUI if player is currently entering input
+        if (GGNextAPI.playerInputManager.hasActiveInput(player)) {
             return
         }
 

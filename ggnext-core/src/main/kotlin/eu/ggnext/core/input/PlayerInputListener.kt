@@ -2,6 +2,7 @@ package eu.ggnext.core.input
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import io.papermc.paper.event.player.AsyncChatEvent
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -25,7 +26,7 @@ class PlayerInputListener(
         event.isCancelled = true
 
         // Extract text from component
-        val message = event.message().toString()
+        val message = PlainTextComponentSerializer.plainText().serialize(event.message())
 
         // Process the input asynchronously
         plugin.launch {
