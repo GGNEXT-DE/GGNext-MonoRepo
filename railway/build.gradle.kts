@@ -15,7 +15,12 @@ tasks {
             modrinth("fastasyncworldedit", "2.15.3")
             modrinth("luckperms", "v5.5.53-bukkit")
         }
-        dependsOn("copyCore")
+        dependsOn("copyCore", "cleanWorldLock")
+    }
+
+    register<Delete>("cleanWorldLock") {
+        description = "Clean world session lock file"
+        delete(layout.projectDirectory.file("run/world/session.lock"))
     }
 
     shadowJar {

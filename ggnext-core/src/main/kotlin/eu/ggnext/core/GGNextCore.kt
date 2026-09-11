@@ -75,7 +75,6 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         playerInputManager = PlayerInputManager(this)
         GGNextAPI.playerInputManager = playerInputManager
-        playerInputManager.startCleanupTask()
 
         server.pluginManager.registerEvents(PlayerInputListener(this, playerInputManager), this)
 
@@ -86,6 +85,8 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         jobManager = JobManager(scope, logger).also { it.startAll() }
         GGNextAPI.jobManager = jobManager
+
+        playerInputManager.startCleanupTask()
 
         log.info("GGNext Core enabled!")
     }
