@@ -2,6 +2,7 @@ package eu.ggnext.railway.scoreboard.listener
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import eu.ggnext.common.logging.log
+import eu.ggnext.common.logging.warn
 import eu.ggnext.railway.profile.RailwayProfileManager
 import eu.ggnext.railway.scoreboard.RailwayScoreBoardManager
 import org.bukkit.event.EventHandler
@@ -16,6 +17,12 @@ class RailwayScoreBoardListener(
     private val scoreBoardManager: RailwayScoreBoardManager,
     private val profileManager: RailwayProfileManager,
 ) : Listener {
+    companion object {
+        private const val PROFILE_LOAD_ATTEMPTS = 20
+        private const val PROFILE_LOAD_RETRY_DELAY_MS = 100L
+        private const val PROFILE_LOAD_TIMEOUT_MS = (PROFILE_LOAD_ATTEMPTS * PROFILE_LOAD_RETRY_DELAY_MS)
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         log.info("Railway: Preparing scoreboard for ${event.player.name}")
@@ -24,17 +31,23 @@ class RailwayScoreBoardListener(
 
             // Wait for active profile to be set by ProfileGui
             var attempts = 0
-            while (profileManager.getActiveProfile(player) == null && attempts < 20) {
+            while (profileManager.getActiveProfile(player) == null && attempts < PROFILE_LOAD_ATTEMPTS) {
                 attempts++
-                kotlinx.coroutines.delay(100)
+                kotlinx.coroutines.delay(PROFILE_LOAD_RETRY_DELAY_MS)
             }
 
-            val activeProfile = profileManager.getActiveProfile(player)
+            val activeProfile =
+                try {
+                    profileManager.getActiveProfile(player)
+                } catch (e: Exception) {
+                    log.warn("Railway: Error loading active profile for ${player.name}: ${e.message}")
+                    null
+                }
             if (activeProfile != null) {
                 log.info("Railway: Updating scoreboard for ${player.name} with profile: ${activeProfile.name}")
                 scoreBoardManager.activateForPlayer(player)
             } else {
-                log.info("Railway: No active profile for ${player.name}")
+                log.warn("Railway: No active profile for ${player.name} after ${PROFILE_LOAD_TIMEOUT_MS}ms")
             }
         }
     }
