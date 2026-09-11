@@ -1,12 +1,13 @@
 package eu.ggnext.core.input
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import eu.ggnext.common.logging.LogControl
+import eu.ggnext.common.job.Job
+import eu.ggnext.common.logging.log
 import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.store.TranslationStore
+import eu.ggnext.core.api.GGNextAPI
 import eu.ggnext.core.utils.language
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
@@ -35,7 +36,6 @@ class PlayerInputManager(
     private val inputCancelledKey by TranslationStore("translations.core.input.cancelled")
     private val inputAcceptedKey by TranslationStore("translations.core.input.accepted")
     private val alreadyActiveKey by TranslationStore("translations.core.input.already_active")
-    private val logger = LogControl.logger(this::class.java)
 
     data class InputSession(
         val playerId: UUID,
@@ -100,8 +100,6 @@ class PlayerInputManager(
             return
         }
 
-        val session = activeInputs[player.uniqueId] ?: return
-
         when (message.lowercase()) {
             "cancel" -> {
                 cancelInput(player)
@@ -126,7 +124,7 @@ class PlayerInputManager(
                 inputAcceptedKey.get(player.language()).color(NamedTextColor.GREEN),
             )
         } catch (e: Exception) {
-            logger.warn("Error processing input for ${player.name}: ${e.message}")
+            log.warn("Error processing input for ${player.name}: ${e.message}")
             player.sendMessage(
                 Component.text("An error occurred processing your input", NamedTextColor.RED),
             )
@@ -139,7 +137,7 @@ class PlayerInputManager(
                 try {
                     it()
                 } catch (e: Exception) {
-                    logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+                    log.warn("Error reopening GUI for ${player.name}: ${e.message}")
                 }
             }
         }
@@ -166,7 +164,7 @@ class PlayerInputManager(
                     try {
                         it()
                     } catch (e: Exception) {
-                        logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+                        log.warn("Error reopening GUI for ${player.name}: ${e.message}")
                     }
                 }
             }
@@ -190,24 +188,24 @@ class PlayerInputManager(
      * Start cleanup task to remove expired input sessions.
      */
     fun startCleanupTask() {
-        plugin.launch {
-            while (plugin.isEnabled && isActive) {
-                try {
-                    cleanupExpiredSessions()
-                } catch (e: Exception) {
-                    logger.warning("Error cleaning up expired input sessions: ${e.message}")
-                }
-                delay(CLEANUP_INTERVAL_MS)
-            }
-        }
+        GGNextAPI.jobManager.registerJob(PlayerInputCleanupJob())
     }
 
-    private fun cleanupExpiredSessions() {
-        val now = System.currentTimeMillis()
-        activeInputs.forEach { (uuid, session) ->
-            if (now - session.createdAt > INPUT_TIMEOUT_MS) {
-                activeInputs.remove(uuid)
-                logger.warning("Cleaned up expired input session for player $uuid after timeout")
+    /**
+     * Background job that periodically removes expired input sessions.
+     */
+    private inner class PlayerInputCleanupJob : Job {
+        override val id = "player-input-cleanup-job"
+        override val interval = 60 // 1 minute in seconds
+        override var lastRun: Long = System.currentTimeMillis()
+
+        override suspend fun execute() {
+            val now = System.currentTimeMillis()
+            activeInputs.forEach { (uuid, session) ->
+                if (now - session.createdAt > INPUT_TIMEOUT_MS) {
+                    activeInputs.remove(uuid)
+                    log.warn("Cleaned up expired input session for player $uuid after timeout")
+                }
             }
         }
     }

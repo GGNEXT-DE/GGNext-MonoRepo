@@ -1,7 +1,8 @@
 package eu.ggnext.core.input
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import eu.ggnext.common.logging.LogControl
+import eu.ggnext.common.logging.log
+import eu.ggnext.common.logging.warn
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
@@ -19,8 +20,6 @@ class PlayerInputListener(
     private val plugin: JavaPlugin,
     private val inputManager: PlayerInputManager,
 ) : Listener {
-    private val logger = LogControl.logger(this::class.java)
-
     @EventHandler(priority = EventPriority.HIGH)
     fun onPlayerChat(event: AsyncChatEvent) {
         val player = event.player
@@ -38,7 +37,7 @@ class PlayerInputListener(
                 inputManager.processInput(player, message)
             }
         } catch (e: Exception) {
-            logger.warning("Error processing player input for ${player.name}: ${e.message}")
+            log.warn("Error processing player input for ${player.name}: ${e.message}")
         }
     }
 
