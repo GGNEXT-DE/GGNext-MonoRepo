@@ -2,6 +2,7 @@ package eu.ggnext.velocityCore.features.verify
 
 import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import eu.ggnext.common.verify.VerifyPlayer
 import kotlinx.coroutines.flow.firstOrNull
 import java.security.SecureRandom
 import java.util.UUID

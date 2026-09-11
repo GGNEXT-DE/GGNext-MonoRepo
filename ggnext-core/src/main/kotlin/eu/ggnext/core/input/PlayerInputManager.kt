@@ -1,9 +1,11 @@
 package eu.ggnext.core.input
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import eu.ggnext.common.logging.LogControl
+import eu.ggnext.common.job.Job
+import eu.ggnext.common.logging.log
 import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.store.TranslationStore
+import eu.ggnext.core.api.GGNextAPI
 import eu.ggnext.core.utils.language
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
@@ -23,11 +25,17 @@ typealias InputCallback = suspend (String) -> Unit
 class PlayerInputManager(
     private val plugin: JavaPlugin,
 ) {
+    companion object {
+        private const val MAX_INPUT_LENGTH = 256
+        private const val INPUT_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+        private const val CLEANUP_INTERVAL_MS = 60 * 1000L // 1 minute
+    }
+
     private val activeInputs = ConcurrentHashMap<UUID, InputSession>()
     private val promptKey by TranslationStore("translations.core.input.prompt")
     private val inputCancelledKey by TranslationStore("translations.core.input.cancelled")
     private val inputAcceptedKey by TranslationStore("translations.core.input.accepted")
-    private val logger = LogControl.logger(this::class.java)
+    private val alreadyActiveKey by TranslationStore("translations.core.input.already_active")
 
     data class InputSession(
         val playerId: UUID,
@@ -50,7 +58,7 @@ class PlayerInputManager(
     ) {
         if (activeInputs.containsKey(player.uniqueId)) {
             player.sendMessage(
-                Component.text("You already have an active input request!", NamedTextColor.RED),
+                alreadyActiveKey.get(player.language()).color(NamedTextColor.RED),
             )
             return
         }
@@ -77,25 +85,38 @@ class PlayerInputManager(
         player: Player,
         message: String,
     ) {
-        val session = activeInputs[player.uniqueId] ?: return
+        // Input validation
+        if (message.isEmpty()) return
+        if (message.length > MAX_INPUT_LENGTH) {
+            player.sendMessage(
+                Component.text("Input is too long (max $MAX_INPUT_LENGTH characters)", NamedTextColor.RED),
+            )
+            return
+        }
+        if (message.startsWith("/")) {
+            player.sendMessage(
+                Component.text("Commands are not allowed as input", NamedTextColor.RED),
+            )
+            return
+        }
 
         when (message.lowercase()) {
             "cancel" -> {
-                cancelInput(player, session)
+                cancelInput(player)
             }
 
             else -> {
-                completeInput(player, session, message)
+                completeInput(player, message)
             }
         }
     }
 
     private suspend fun completeInput(
         player: Player,
-        session: InputSession,
         message: String,
     ) {
-        activeInputs.remove(player.uniqueId)
+        // Atomic remove to prevent race conditions
+        val session = activeInputs.remove(player.uniqueId) ?: return
 
         try {
             session.callback(message)
@@ -103,7 +124,7 @@ class PlayerInputManager(
                 inputAcceptedKey.get(player.language()).color(NamedTextColor.GREEN),
             )
         } catch (e: Exception) {
-            logger.warn("Error processing input for ${player.name}: ${e.message}")
+            log.warn("Error processing input for ${player.name}: ${e.message}")
             player.sendMessage(
                 Component.text("An error occurred processing your input", NamedTextColor.RED),
             )
@@ -116,29 +137,35 @@ class PlayerInputManager(
                 try {
                     it()
                 } catch (e: Exception) {
-                    logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+                    log.warn("Error reopening GUI for ${player.name}: ${e.message}")
                 }
             }
         }
     }
 
-    private suspend fun cancelInput(
-        player: Player,
-        session: InputSession,
-    ) {
-        activeInputs.remove(player.uniqueId)
-        player.sendMessage(
-            inputCancelledKey.get(player.language()).color(NamedTextColor.YELLOW),
-        )
+    /**
+     * Cancel input for a player (called when player quits or on request).
+     */
+    suspend fun cancelInput(player: Player) {
+        // Atomic remove to prevent race conditions
+        val session = activeInputs.remove(player.uniqueId) ?: return
 
-        // Reopen previous GUI if provided
-        session.previousGuiReopener?.let {
-            plugin.launch {
-                delay(50)
-                try {
-                    it()
-                } catch (e: Exception) {
-                    logger.warn("Error reopening GUI for ${player.name}: ${e.message}")
+        if (player.isOnline) {
+            player.sendMessage(
+                inputCancelledKey.get(player.language()).color(NamedTextColor.YELLOW),
+            )
+        }
+
+        // Reopen previous GUI if provided and player is online
+        if (player.isOnline) {
+            session.previousGuiReopener?.let {
+                plugin.launch {
+                    delay(50)
+                    try {
+                        it()
+                    } catch (e: Exception) {
+                        log.warn("Error reopening GUI for ${player.name}: ${e.message}")
+                    }
                 }
             }
         }
@@ -151,8 +178,35 @@ class PlayerInputManager(
 
     /**
      * Cleanup input sessions (called on plugin disable).
+     * Also starts a background task to cleanup expired sessions.
      */
     fun shutdown() {
         activeInputs.clear()
+    }
+
+    /**
+     * Start cleanup task to remove expired input sessions.
+     */
+    fun startCleanupTask() {
+        GGNextAPI.jobManager.registerJob(PlayerInputCleanupJob())
+    }
+
+    /**
+     * Background job that periodically removes expired input sessions.
+     */
+    private inner class PlayerInputCleanupJob : Job {
+        override val id = "player-input-cleanup-job"
+        override val interval = 60 // 1 minute in seconds
+        override var lastRun: Long = System.currentTimeMillis()
+
+        override suspend fun execute() {
+            val now = System.currentTimeMillis()
+            activeInputs.forEach { (uuid, session) ->
+                if (now - session.createdAt > INPUT_TIMEOUT_MS) {
+                    activeInputs.remove(uuid)
+                    log.warn("Cleaned up expired input session for player $uuid after timeout")
+                }
+            }
+        }
     }
 }
