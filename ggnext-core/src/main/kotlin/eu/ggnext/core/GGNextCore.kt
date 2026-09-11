@@ -15,6 +15,8 @@ import eu.ggnext.common.sentry.SentryConfig
 import eu.ggnext.contentsystem.ContentSystem
 import eu.ggnext.core.api.GGNextAPI
 import eu.ggnext.core.command.CommandVisibilityFilter
+import eu.ggnext.core.input.PlayerInputListener
+import eu.ggnext.core.input.PlayerInputManager
 import eu.ggnext.core.scoreboard.ScoreBoardListener
 import eu.ggnext.core.scoreboard.ScoreBoardManager
 import eu.ggnext.core.tab.TabListener
@@ -31,6 +33,7 @@ class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var contentSystem: ContentSystem
     private lateinit var scoreboardLibrary: ScoreboardLibrary
     private lateinit var scoreBoardManager: ScoreBoardManager
+    private lateinit var playerInputManager: PlayerInputManager
     private lateinit var tabManager: TabManager
     private lateinit var jobManager: JobManager
 
@@ -70,6 +73,11 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         server.pluginManager.registerEvents(ScoreBoardListener(scoreBoardManager), this)
 
+        playerInputManager = PlayerInputManager(this)
+        GGNextAPI.playerInputManager = playerInputManager
+
+        server.pluginManager.registerEvents(PlayerInputListener(this, playerInputManager), this)
+
         tabManager = TabManager()
         server.pluginManager.registerEvents(TabListener(tabManager), this)
 
@@ -85,6 +93,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         contentSystem.shutdown()
         mongoManager.close()
         scoreBoardManager.shutdown()
+        playerInputManager.shutdown()
 
         log.info("GGNext Core disabled!")
     }
