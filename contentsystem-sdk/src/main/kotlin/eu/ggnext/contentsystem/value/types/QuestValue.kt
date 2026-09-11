@@ -11,7 +11,6 @@ enum class QuestTrackingType {
     ITEM_MINED,
     ITEM_CRAFTED,
     BLOCKS_WALKED,
-    LOGIN_COUNT,
 }
 
 internal data class QuestValue(
