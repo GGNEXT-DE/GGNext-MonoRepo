@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.121-stable")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.123-stable")
 
     compileOnly(libs.mongodb)
 
