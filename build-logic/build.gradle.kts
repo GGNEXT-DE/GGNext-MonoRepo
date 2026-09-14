@@ -19,5 +19,5 @@ dependencies {
     implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.4.20")
     implementation("org.jetbrains.kotlin.kapt:org.jetbrains.kotlin.kapt.gradle.plugin:2.4.20")
     implementation("xyz.jpenilla.run-velocity:xyz.jpenilla.run-velocity.gradle.plugin:3.1.0")
-    implementation("io.sentry.jvm.gradle:io.sentry.jvm.gradle.gradle.plugin:6.20.0")
+    implementation("io.sentry.jvm.gradle:io.sentry.jvm.gradle.gradle.plugin:6.21.0")
 }
