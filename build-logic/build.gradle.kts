@@ -17,7 +17,7 @@ dependencies {
     implementation("xyz.jpenilla.run-paper:xyz.jpenilla.run-paper.gradle.plugin:3.1.0")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:2.0.0-beta.23")
     implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:2.4.10")
-    implementation("org.jetbrains.kotlin.kapt:org.jetbrains.kotlin.kapt.gradle.plugin:2.4.10")
+    implementation("org.jetbrains.kotlin.kapt:org.jetbrains.kotlin.kapt.gradle.plugin:2.4.20")
     implementation("xyz.jpenilla.run-velocity:xyz.jpenilla.run-velocity.gradle.plugin:3.1.0")
     implementation("io.sentry.jvm.gradle:io.sentry.jvm.gradle.gradle.plugin:6.21.0")
 }
