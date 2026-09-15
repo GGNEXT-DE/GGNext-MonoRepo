@@ -1,6 +1,5 @@
 package eu.ggnext.core.utils
 
-import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -18,11 +17,3 @@ fun playerArgument(name: String = "player"): RequiredArgumentBuilder<CommandSour
             }
             builder.buildFuture()
         }
-
-fun stringArgument(name: String = "string"): RequiredArgumentBuilder<CommandSourceStack, String> =
-    RequiredArgumentBuilder
-        .argument<CommandSourceStack, String>(name, StringArgumentType.string())
-
-fun intArgument(name: String = "int"): RequiredArgumentBuilder<CommandSourceStack, Int> =
-    RequiredArgumentBuilder
-        .argument<CommandSourceStack, Int>(name, IntegerArgumentType.integer())

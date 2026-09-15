@@ -11,13 +11,11 @@ class ProfileListener(
     private val railwayProfileManager: RailwayProfileManager,
     private val profileGui: ProfileGui,
 ) : Listener {
+    // Profile creation on join is handled exclusively by RailwayProfilePreloadListener
+    // (HIGHEST priority) to avoid a create-then-check race that could produce duplicate profiles.
     @EventHandler
     suspend fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         val player = event.player
-        val profiles = railwayProfileManager.getProfiles(player)
-        if (profiles.isEmpty()) {
-            railwayProfileManager.createProfile(player, railwayProfileNames.random())
-        }
         if (railwayProfileManager.getActiveProfileId(player) == null) {
             profileGui.openProfileGui(player)
         }
@@ -40,5 +38,6 @@ class ProfileListener(
     suspend fun onPlayerQuitEvent(event: PlayerQuitEvent) {
         val player = event.player
         railwayProfileManager.deleteActiveProfile(player)
+        profileGui.clearNavigating(player)
     }
 }

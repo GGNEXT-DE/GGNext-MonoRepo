@@ -32,12 +32,6 @@ class SkillTreeManager(
         if (!canUnlock(profile, pathId)) return false
 
         val currentCount = profile.level.unlockedTiers[pathId] ?: 0
-        val updatedLevel =
-            profile.level.copy(
-                skillPoints = profile.level.skillPoints - tier.cost,
-                unlockedTiers = profile.level.unlockedTiers + (pathId to currentCount + 1),
-            )
-        profileManager.updateProfile(profile.copy(level = updatedLevel))
-        return true
+        return profileManager.unlockSkillTier(profile, tier.cost, pathId, currentCount + 1)
     }
 }
