@@ -69,7 +69,7 @@ class ProfileGui(
 
                     profiles.forEachIndexed { index, profile ->
                         val profileStatusTextColor =
-                            if (profileManager.getActiveProfileId(player) == profile) {
+                            if (profileManager.getActiveProfileId(player) == profile.id) {
                                 NamedTextColor.GREEN
                             } else {
                                 NamedTextColor.RED
