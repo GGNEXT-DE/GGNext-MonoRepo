@@ -18,7 +18,7 @@ class ProfileListener(
         if (profiles.isEmpty()) {
             railwayProfileManager.createProfile(player, railwayProfileNames.random())
         }
-        if (railwayProfileManager.getActiveProfile(player) == null) {
+        if (railwayProfileManager.getActiveProfileId(player) == null) {
             profileGui.openProfileGui(player)
         }
     }
@@ -31,7 +31,7 @@ class ProfileListener(
             return
         }
 
-        if (railwayProfileManager.getActiveProfile(player) == null) {
+        if (railwayProfileManager.getActiveProfileId(player) == null) {
             profileGui.reopenProfileGui(player)
         }
     }

@@ -22,7 +22,7 @@ class RailwayProfileManager(
     private val defaultRailwayDollars by NumberStore("numbers.railway.profile.default_railway_dollars")
     private val maxNameLength by NumberStore("numbers.railway.profile.max_name_length")
 
-    private val activeProfiles = ConcurrentHashMap<UUID, RailwayProfile>()
+    private val activeProfiles = ConcurrentHashMap<UUID, UUID>()
 
     suspend fun createProfile(
         player: Player,
@@ -93,7 +93,7 @@ class RailwayProfileManager(
         player: Player,
         profileId: UUID,
     ) {
-        if (getActiveProfile(player)?.id == profileId) {
+        if (getActiveProfileId(player) == profileId) {
             return
         }
         profileCollection.deleteOne(Filters.eq("_id", profileId))
@@ -107,10 +107,10 @@ class RailwayProfileManager(
         player: Player,
         activeProfile: RailwayProfile,
     ) {
-        activeProfiles[player.uniqueId] = activeProfile
+        activeProfiles[player.uniqueId] = activeProfile.id
     }
 
-    fun getActiveProfile(player: Player): RailwayProfile? = activeProfiles[player.uniqueId]
+    fun getActiveProfileId(player: Player): UUID? = activeProfiles[player.uniqueId]
 
     fun deleteActiveProfile(player: Player) = activeProfiles.remove(player.uniqueId)
 

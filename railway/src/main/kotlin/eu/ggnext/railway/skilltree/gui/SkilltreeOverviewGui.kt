@@ -61,16 +61,16 @@ class SkilltreeOverviewGui(
         )
 
     suspend fun openSkilltreeOverviewGui(player: Player) {
-        val activeProfile =
-            profileManager.getActiveProfile(player)
-        if (activeProfile == null) {
+        val activeProfileId =
+            profileManager.getActiveProfileId(player)
+        if (activeProfileId == null) {
             player.sendMessage(
                 noActiveProfileError.get(player.language()).color(NamedTextColor.RED),
             )
             return
         }
         val profile =
-            profileManager.getProfile(activeProfile.id)
+            profileManager.getProfile(activeProfileId)
         if (profile == null) {
             player.sendMessage(
                 couldNotLoadProfileError.get(player.language()).color(NamedTextColor.RED),

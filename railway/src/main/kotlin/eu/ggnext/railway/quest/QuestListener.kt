@@ -21,26 +21,26 @@ class QuestListener(
     @EventHandler
     suspend fun onBlockBreak(event: BlockBreakEvent) {
         val player = event.player
-        val activeProfile = profileManager.getActiveProfile(player) ?: return
+        val activeProfileId = profileManager.getActiveProfileId(player) ?: return
 
-        val quests = questManager.getActiveQuests(activeProfile.id)
+        val quests = questManager.getActiveQuests(activeProfileId)
         if (quests.isEmpty()) return
 
         quests.filter { it.type == QuestTrackingType.ITEM_MINED }.forEach { quest ->
-            questManager.updateQuest(quest.questId, activeProfile.id)
+            questManager.updateQuest(quest.questId, activeProfileId)
         }
     }
 
     @EventHandler
     suspend fun onItemCrafted(event: ItemCraftedEvent) {
         val player = event.player
-        val activeProfile = profileManager.getActiveProfile(player) ?: return
+        val activeProfileId = profileManager.getActiveProfileId(player) ?: return
 
-        val quests = questManager.getActiveQuests(activeProfile.id)
+        val quests = questManager.getActiveQuests(activeProfileId)
         if (quests.isEmpty()) return
 
         quests.filter { it.type == QuestTrackingType.ITEM_CRAFTED }.forEach { quest ->
-            questManager.updateQuest(quest.questId, activeProfile.id)
+            questManager.updateQuest(quest.questId, activeProfileId)
         }
     }
 
@@ -57,13 +57,13 @@ class QuestListener(
         if (now - last < throttleMillis) return
         lastCheck[player.uniqueId] = now
 
-        val activeProfile = profileManager.getActiveProfile(player) ?: return
+        val activeProfileId = profileManager.getActiveProfileId(player) ?: return
 
-        val quests = questManager.getActiveQuests(activeProfile.id)
+        val quests = questManager.getActiveQuests(activeProfileId)
         if (quests.isEmpty()) return
 
         quests.filter { it.type == QuestTrackingType.BLOCKS_WALKED }.forEach { quest ->
-            questManager.updateQuest(quest.questId, activeProfile.id)
+            questManager.updateQuest(quest.questId, activeProfileId)
         }
     }
 
