@@ -306,9 +306,9 @@ class AuctionGui(
         player: Player,
         price: Long,
     ) {
-        val profile = profileManager.getActiveProfile(player)
+        val profileId = profileManager.getActiveProfileId(player)
 
-        if (profile == null) {
+        if (profileId == null) {
             player.sendMessage(noActiveProfile.get(player.language()))
             return
         }
@@ -325,7 +325,7 @@ class AuctionGui(
 
         try {
             auctionManager.createAuction(
-                sellerId = profile.id,
+                sellerId = profileId,
                 itemStack = auctionItem.serializeForAuction(),
                 price = price,
             )
@@ -344,19 +344,19 @@ class AuctionGui(
         player: Player,
         auction: AuctionItem,
     ) {
-        val activeProfile = profileManager.getActiveProfile(player)
+        val profileId = profileManager.getActiveProfileId(player)
 
-        if (activeProfile == null) {
+        if (profileId == null) {
             player.sendMessage(noActiveProfile.get(player.language()))
             return
         }
 
-        if (activeProfile.id == auction.sellerId) {
+        if (profileId == auction.sellerId) {
             player.sendMessage(ownAuction.get(player.language()))
             return
         }
 
-        val buyerProfile = profileManager.getProfile(activeProfile.id)
+        val buyerProfile = profileManager.getProfile(profileId)
         val sellerProfile = profileManager.getProfile(auction.sellerId)
 
         if (buyerProfile == null || sellerProfile == null) {
@@ -388,16 +388,16 @@ class AuctionGui(
         player: Player,
         page: Int = 0,
     ) {
-        val activeProfile = profileManager.getActiveProfile(player)
+        val profileId = profileManager.getActiveProfileId(player)
 
-        if (activeProfile == null) {
+        if (profileId == null) {
             player.sendMessage(noActiveProfile.get(player.language()))
             return
         }
 
         val claimPage =
             paginate(
-                auctionManager.getClaimableAuctions(activeProfile.id),
+                auctionManager.getClaimableAuctions(profileId),
                 page,
             )
         val claims = claimPage.entries
@@ -523,9 +523,9 @@ class AuctionGui(
         auction: AuctionItem,
         page: Int,
     ) {
-        val activeProfile = profileManager.getActiveProfile(player)
+        val profileId = profileManager.getActiveProfileId(player)
 
-        if (activeProfile == null) {
+        if (profileId == null) {
             player.sendMessage(noActiveProfile.get(player.language()))
             return
         }
@@ -543,7 +543,7 @@ class AuctionGui(
             return
         }
 
-        if (!auctionManager.claimAuction(auction.id, activeProfile.id)) {
+        if (!auctionManager.claimAuction(auction.id, profileId)) {
             player.sendMessage(itemAlreadyClaimed.get(player.language()))
             return
         }

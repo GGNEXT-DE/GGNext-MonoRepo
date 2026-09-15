@@ -31,20 +31,20 @@ class RailwayScoreBoardListener(
 
             // Wait for active profile to be set by ProfileGui
             var attempts = 0
-            while (profileManager.getActiveProfile(player) == null && attempts < PROFILE_LOAD_ATTEMPTS) {
+            while (profileManager.getActiveProfileId(player) == null && attempts < PROFILE_LOAD_ATTEMPTS) {
                 attempts++
                 kotlinx.coroutines.delay(PROFILE_LOAD_RETRY_DELAY_MS)
             }
 
-            val activeProfile =
+            val activeProfileId =
                 try {
-                    profileManager.getActiveProfile(player)
+                    profileManager.getActiveProfileId(player)
                 } catch (e: Exception) {
                     log.warn("Railway: Error loading active profile for ${player.name}: ${e.message}")
                     null
                 }
-            if (activeProfile != null) {
-                log.info("Railway: Updating scoreboard for ${player.name} with profile: ${activeProfile.name}")
+            if (activeProfileId != null) {
+                log.info("Railway: Updating scoreboard for ${player.name}")
                 scoreBoardManager.activateForPlayer(player)
             } else {
                 log.warn("Railway: No active profile for ${player.name} after ${PROFILE_LOAD_TIMEOUT_MS}ms")

@@ -29,7 +29,7 @@ class RailwayProfilePreloadListener(
                 profileManager.createProfile(player, railwayProfileNames.random())
             }
             // Set first profile as active if none is active
-            if (profileManager.getActiveProfile(player) == null) {
+            if (profileManager.getActiveProfileId(player) == null) {
                 val activeProfile = profileManager.getProfiles(player).firstOrNull()
                 if (activeProfile != null) {
                     profileManager.setActiveProfile(player, activeProfile)

@@ -15,7 +15,7 @@ class ProfileListener(
     @EventHandler
     suspend fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         val player = event.player
-        if (railwayProfileManager.getActiveProfile(player) == null) {
+        if (railwayProfileManager.getActiveProfileId(player) == null) {
             profileGui.openProfileGui(player)
         }
     }
@@ -33,7 +33,7 @@ class ProfileListener(
             return
         }
 
-        if (railwayProfileManager.getActiveProfile(player) == null) {
+        if (railwayProfileManager.getActiveProfileId(player) == null) {
             profileGui.reopenProfileGui(player)
         }
     }
