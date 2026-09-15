@@ -65,9 +65,14 @@ class RailwayScoreBoardManager(
     }
 
     suspend fun updateScoreboard(player: Player) {
+        val activeProfileId = profileManager.getActiveProfileId(player)
+        if (activeProfileId == null) {
+            log.warn("Railway Scoreboard: No active profile selected for ${player.name}")
+            return
+        }
         val profile =
             try {
-                profileManager.getActiveProfile(player)
+                profileManager.getProfile(activeProfileId)
             } catch (e: Exception) {
                 log.warn("Railway Scoreboard: Error loading profile for ${player.name}: ${e.message}")
                 return

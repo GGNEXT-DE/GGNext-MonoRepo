@@ -15,10 +15,10 @@ class ZoneSessionManager(
         zoneId: String,
         slot: Int,
     ): ZoneSession {
-        val activeProfile =
-            railwayProfileManager.getActiveProfile(player)
+        val activeProfileId =
+            railwayProfileManager.getActiveProfileId(player)
                 ?: throw IllegalStateException("Player ${player.uniqueId} has no active profile when entering zone $zoneId")
-        val session = ZoneSession(player.uniqueId, activeProfile.id, zoneId, slot)
+        val session = ZoneSession(player.uniqueId, activeProfileId, zoneId, slot)
         sessions[player.uniqueId] = session
         return session
     }

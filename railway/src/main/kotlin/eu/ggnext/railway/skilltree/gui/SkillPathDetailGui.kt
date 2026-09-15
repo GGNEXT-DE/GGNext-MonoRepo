@@ -88,11 +88,11 @@ class SkillPathDetailGui(
         player: Player,
         pathId: String,
     ) {
-        val activeProfile =
-            profileManager.getActiveProfile(player)
+        val activeProfileId =
+            profileManager.getActiveProfileId(player)
                 ?: return
         val profile =
-            profileManager.getProfile(activeProfile.id)
+            profileManager.getProfile(activeProfileId)
                 ?: return
 
         val skillPath by SkillPathStore("skill_path.$pathId")

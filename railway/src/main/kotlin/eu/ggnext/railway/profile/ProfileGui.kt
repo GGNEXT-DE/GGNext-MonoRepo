@@ -35,7 +35,7 @@ class ProfileGui(
         plugin.launch {
             delay(50)
 
-            if (player.isOnline && profileManager.getActiveProfile(player) == null) {
+            if (player.isOnline && profileManager.getActiveProfileId(player) == null) {
                 openProfileGui(player)
             }
         }
@@ -69,7 +69,7 @@ class ProfileGui(
 
                     profiles.forEachIndexed { index, profile ->
                         val profileStatusTextColor =
-                            if (profileManager.getActiveProfile(player) == profile) {
+                            if (profileManager.getActiveProfileId(player) == profile) {
                                 NamedTextColor.GREEN
                             } else {
                                 NamedTextColor.RED
@@ -118,7 +118,7 @@ class ProfileGui(
                         StaticElement(drawable(ItemStack(Material.NAME_TAG).name(createItemName.get(player.language())))) {
                             plugin.launch {
                                 val profile = profileManager.createProfile(player, railwayProfileNames.random())
-                                if (profileManager.getActiveProfile(player) == null && profile != null) {
+                                if (profileManager.getActiveProfileId(player) == null && profile != null) {
                                     profileManager.setActiveProfile(player, profile)
                                 }
                                 player.inventory.close()

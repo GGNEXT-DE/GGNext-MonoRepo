@@ -10,7 +10,6 @@ import eu.ggnext.core.utils.createFiller
 import eu.ggnext.core.utils.description
 import eu.ggnext.core.utils.language
 import eu.ggnext.core.utils.name
-import eu.ggnext.railway.profile.RailwayProfile
 import eu.ggnext.railway.profile.RailwayProfileManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -33,11 +32,11 @@ class MenuGui(
     private val skilltreeItemName by TranslationStore("translations.railway.menu.skilltree.name")
 
     suspend fun openMenuGui(player: Player) {
-        val activeProfile =
-            profileManager.getActiveProfile(player)
+        val activeProfileId =
+            profileManager.getActiveProfileId(player)
                 ?: return
         val profile =
-            profileManager.getProfile(activeProfile.id)
+            profileManager.getProfile(activeProfileId)
                 ?: return
 
         val title by TranslationStore("translations.railway.menu.title")
