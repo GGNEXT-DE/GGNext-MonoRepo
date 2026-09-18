@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.player.PlayerJoinEvent
 
 class TradeListener(
     private val tradeManager: TradeManager,
@@ -106,7 +107,12 @@ class TradeListener(
     }
 
     @EventHandler
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    suspend fun onPlayerJoin(event: PlayerJoinEvent) {
+        tradeManager.deliverPendingItems(event.player)
+    }
+
+    @EventHandler
+    suspend fun onInventoryClose(event: InventoryCloseEvent) {
         val player = event.player.toPlayer() ?: return
 
         val session =

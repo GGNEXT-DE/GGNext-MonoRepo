@@ -32,6 +32,8 @@ class ProfileGui(
 
     fun consumeNavigating(player: Player): Boolean = navigating.remove(player.uniqueId)
 
+    fun clearNavigating(player: Player) = navigating.remove(player.uniqueId)
+
     fun reopenProfileGui(player: Player) {
         plugin.launch {
             delay(50)

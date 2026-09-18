@@ -68,7 +68,7 @@ class Railway : SuspendingJavaPlugin() {
         zoneManager =
             ZoneManager(this, zoneConfigs, railwayProfileManager)
         tradeManager =
-            TradeManager()
+            TradeManager(GGNextAPI.mongoManager)
         tradeGui =
             TradeGui(this, tradeManager)
         skillTreeManager =

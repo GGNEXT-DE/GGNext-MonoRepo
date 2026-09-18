@@ -131,16 +131,7 @@ class PlayerInputManager(
         }
 
         // Reopen previous GUI if provided
-        session.previousGuiReopener?.let {
-            plugin.launch {
-                delay(50)
-                try {
-                    it()
-                } catch (e: Exception) {
-                    log.warn("Error reopening GUI for ${player.name}: ${e.message}")
-                }
-            }
-        }
+        reopenPreviousGui(session, player)
     }
 
     /**
@@ -154,18 +145,21 @@ class PlayerInputManager(
             player.sendMessage(
                 inputCancelledKey.get(player.language()).color(NamedTextColor.YELLOW),
             )
+            reopenPreviousGui(session, player)
         }
+    }
 
-        // Reopen previous GUI if provided and player is online
-        if (player.isOnline) {
-            session.previousGuiReopener?.let {
-                plugin.launch {
-                    delay(50)
-                    try {
-                        it()
-                    } catch (e: Exception) {
-                        log.warn("Error reopening GUI for ${player.name}: ${e.message}")
-                    }
+    private fun reopenPreviousGui(
+        session: InputSession,
+        player: Player,
+    ) {
+        session.previousGuiReopener?.let {
+            plugin.launch {
+                delay(50)
+                try {
+                    it()
+                } catch (e: Exception) {
+                    log.warn("Error reopening GUI for ${player.name}: ${e.message}")
                 }
             }
         }

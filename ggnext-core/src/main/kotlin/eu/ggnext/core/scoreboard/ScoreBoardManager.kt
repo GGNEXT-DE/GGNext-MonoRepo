@@ -1,11 +1,7 @@
 package eu.ggnext.core.scoreboard
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar
-import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
-import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
 import org.bukkit.entity.Player
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap

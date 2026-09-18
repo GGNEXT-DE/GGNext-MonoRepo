@@ -5,6 +5,7 @@ import eu.ggnext.common.logging.log
 import eu.ggnext.common.logging.warn
 import eu.ggnext.contentsystem.value.store.TranslationStore
 import eu.ggnext.core.utils.language
+import eu.ggnext.railway.profile.RailwayProfile
 import eu.ggnext.railway.profile.RailwayProfileManager
 import kotlinx.coroutines.Job
 import net.kyori.adventure.text.Component
@@ -81,6 +82,13 @@ class RailwayScoreBoardManager(
             log.warn("Railway Scoreboard: No active profile selected for ${player.name}")
             return
         }
+        renderScoreboard(player, profile)
+    }
+
+    private fun renderScoreboard(
+        player: Player,
+        profile: RailwayProfile,
+    ) {
         val sidebar =
             try {
                 coreSidebars.getScoreBoard(player)
@@ -200,15 +208,7 @@ class RailwayScoreBoardManager(
             plugin.launch {
                 while (!isShuttingDown.get()) {
                     try {
-                        org.bukkit.Bukkit.getOnlinePlayers().forEach { player ->
-                            val lastUpdate = playerRefreshTasks[player.uniqueId] ?: return@forEach
-                            val now = System.currentTimeMillis()
-
-                            if (now - lastUpdate >= (refreshIntervalTicks * 50)) { // Convert ticks to ms
-                                updateScoreboard(player)
-                                playerRefreshTasks[player.uniqueId] = now
-                            }
-                        }
+                        refreshDuePlayers()
                     } catch (e: Exception) {
                         if (!isShuttingDown.get()) {
                             log.warn("Railway Scoreboard auto-refresh error: ${e.message}")
@@ -217,6 +217,29 @@ class RailwayScoreBoardManager(
                     kotlinx.coroutines.delay((refreshIntervalTicks * 50).milliseconds)
                 }
             }
+    }
+
+    private suspend fun refreshDuePlayers() {
+        val now = System.currentTimeMillis()
+        val duePlayers =
+            org.bukkit.Bukkit.getOnlinePlayers().filter { player ->
+                val lastUpdate = playerRefreshTasks[player.uniqueId] ?: return@filter false
+                now - lastUpdate >= (refreshIntervalTicks * 50) // Convert ticks to ms
+            }
+        if (duePlayers.isEmpty()) return
+
+        val activeProfileIds = duePlayers.associateWith { profileManager.getActiveProfileId(it) }
+        val profilesById = profileManager.getProfilesByIds(activeProfileIds.values.filterNotNull())
+
+        duePlayers.forEach { player ->
+            val profile = activeProfileIds[player]?.let { profilesById[it] }
+            if (profile == null) {
+                log.warn("Railway Scoreboard: No active profile selected for ${player.name}")
+                return@forEach
+            }
+            renderScoreboard(player, profile)
+            playerRefreshTasks[player.uniqueId] = now
+        }
     }
 
     fun shutdown() {
