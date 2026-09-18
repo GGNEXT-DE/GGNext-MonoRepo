@@ -61,7 +61,30 @@ class RailwayProfileManager(
 
     suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
 
+    suspend fun unlockSkillTier(
+        profile: RailwayProfile,
+        cost: Int,
+        pathId: String,
+        newTierCount: Int,
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.gte("level.skillPoints", cost)),
+                Updates.combine(
+                    Updates.inc("level.skillPoints", -cost),
+                    Updates.set("level.unlockedTiers.$pathId", newTierCount),
+                ),
+            ).modifiedCount == 1L
+
     suspend fun getProfile(profileId: UUID): RailwayProfile? = profileCollection.find(Filters.eq("_id", profileId)).firstOrNull()
+
+    suspend fun getProfilesByIds(profileIds: Collection<UUID>): Map<UUID, RailwayProfile> {
+        if (profileIds.isEmpty()) return emptyMap()
+        return profileCollection
+            .find(Filters.`in`("_id", profileIds))
+            .toList()
+            .associateBy { it.id }
+    }
 
     suspend fun getProfiles(player: Player): List<RailwayProfile> {
         val profileIds =
@@ -122,11 +145,12 @@ class RailwayProfileManager(
     suspend fun removeDollars(
         profile: RailwayProfile,
         amount: Double,
-    ): Boolean {
-        if (profile.railwayDollars < amount) return false
-        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("railwayDollars", -amount))
-        return true
-    }
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.gte("railwayDollars", amount)),
+                Updates.inc("railwayDollars", -amount),
+            ).modifiedCount == 1L
 
     suspend fun addXp(
         profile: RailwayProfile,
@@ -159,11 +183,12 @@ class RailwayProfileManager(
     suspend fun removeSkillPoints(
         profile: RailwayProfile,
         amount: Int,
-    ): Boolean {
-        if (profile.level.skillPoints < amount) return false
-        profileCollection.updateOne(Filters.eq("_id", profile.id), Updates.inc("level.skillPoints", -amount))
-        return true
-    }
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.gte("level.skillPoints", amount)),
+                Updates.inc("level.skillPoints", -amount),
+            ).modifiedCount == 1L
 
     suspend fun completeQuest(
         profile: RailwayProfile,

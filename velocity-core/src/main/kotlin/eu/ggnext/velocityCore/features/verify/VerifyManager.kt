@@ -11,9 +11,10 @@ class VerifyManager(
     private val mongoDatabase: MongoDatabase,
 ) {
     val collection = mongoDatabase.getCollection<VerifyPlayer>("verify_requests")
+    private val secureRandom = SecureRandom()
 
     suspend fun createVerification(player: UUID): Int {
-        val code = SecureRandom().nextInt(900000) + 100000
+        val code = secureRandom.nextInt(900000) + 100000
         val verify =
             VerifyPlayer(
                 id = player,

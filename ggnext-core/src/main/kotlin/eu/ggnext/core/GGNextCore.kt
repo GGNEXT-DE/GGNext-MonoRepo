@@ -22,6 +22,7 @@ import eu.ggnext.core.scoreboard.ScoreBoardManager
 import eu.ggnext.core.tab.TabListener
 import eu.ggnext.core.tab.TabManager
 import eu.ggnext.core.vanish.VanishCommand
+import eu.ggnext.core.vanish.VanishListener
 import eu.ggnext.core.vanish.VanishManager
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
@@ -36,15 +37,17 @@ class GGNextCore : SuspendingJavaPlugin() {
     private lateinit var playerInputManager: PlayerInputManager
     private lateinit var tabManager: TabManager
     private lateinit var jobManager: JobManager
+    private lateinit var vanishManager: VanishManager
 
     override suspend fun onEnableAsync() {
         saveDefaultConfig()
-        if (config.getBoolean("prod")) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
+        val prod = config.getBoolean("prod")
+        if (prod) LogControl.setLevel(LogLevel.INFO) else LogControl.setLevel(LogLevel.DEBUG)
 
         SentryBuilder.init(
             SentryConfig(
                 config.getString("sentry.dsn"),
-                config.getBoolean("prod"),
+                prod,
             ),
         )
 
@@ -52,6 +55,9 @@ class GGNextCore : SuspendingJavaPlugin() {
 
         mongoManager = MongoManager(config.getString("mongo.connectionString"), config.getString("mongo.database"))
         GGNextAPI.mongoManager = mongoManager
+
+        vanishManager = VanishManager(this)
+        server.pluginManager.registerEvents(VanishListener(vanishManager), this)
 
         registerCommands()
         contentSystem = ContentSystem(mongoManager.database, scope).also { it.init() }
@@ -81,7 +87,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         tabManager = TabManager()
         server.pluginManager.registerEvents(TabListener(tabManager), this)
 
-        server.pluginManager.registerEvents(CommandVisibilityFilter(config.getBoolean("prod")), this)
+        server.pluginManager.registerEvents(CommandVisibilityFilter(prod), this)
 
         jobManager = JobManager(scope, logger).also { it.startAll() }
         GGNextAPI.jobManager = jobManager
@@ -104,7 +110,7 @@ class GGNextCore : SuspendingJavaPlugin() {
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands = event.registrar()
 
-            commands.register(VanishCommand(VanishManager(this)).command)
+            commands.register(VanishCommand(vanishManager).command)
         }
     }
 }

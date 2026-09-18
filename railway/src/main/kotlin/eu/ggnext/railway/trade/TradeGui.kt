@@ -141,9 +141,9 @@ class TradeGui(
                                 session.player2.accepted = self.accepted
                             }
 
-                            checkTradeCompletion(
-                                session,
-                            )
+                            plugin.launch {
+                                checkTradeCompletion(session)
+                            }
                         }
 
                     val partnerStatus =
@@ -190,7 +190,7 @@ class TradeGui(
         )
     }
 
-    private fun checkTradeCompletion(session: TradeSession) {
+    private suspend fun checkTradeCompletion(session: TradeSession) {
         if (!session.player1.accepted.value || !session.player2.accepted.value) {
             return
         }
