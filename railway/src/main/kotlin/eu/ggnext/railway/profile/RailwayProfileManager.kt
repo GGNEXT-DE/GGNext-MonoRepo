@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.model.Updates
 import eu.ggnext.common.db.MongoManager
+import eu.ggnext.common.logging.LogControl
 import eu.ggnext.contentsystem.value.store.NumberStore
 import eu.ggnext.contentsystem.value.types.Quest
 import eu.ggnext.contentsystem.value.types.QuestTrackingType
@@ -23,21 +24,36 @@ class RailwayProfileManager(
     private val maxNameLength by NumberStore("numbers.railway.profile.max_name_length")
 
     private val activeProfiles = ConcurrentHashMap<UUID, UUID>()
+    private val logger = LogControl.logger(this::class.java)
 
     suspend fun createProfile(
         player: Player,
         name: String,
     ): RailwayProfile? {
-        val currentProfileAmount =
+        val indexedProfileAmount =
             profileIndexCollection
                 .find(Filters.eq("_id", player.uniqueId))
                 .firstOrNull()
                 ?.profileIds
                 ?.size
                 ?: 0
+        val currentProfileAmount = getProfiles(player).size
 
-        if (currentProfileAmount >= maxRailwayAccounts) return null
-        if (name.length >= maxNameLength) return null
+        logger.info(
+            "Creating Railway profile for ${player.name} (${player.uniqueId}): " +
+                "name='$name', nameLength=${name.length}, indexedProfiles=$indexedProfileAmount, " +
+                "existingProfiles=$currentProfileAmount, " +
+                "maxProfiles=$maxRailwayAccounts, maxNameLength=$maxNameLength",
+        )
+
+        if (currentProfileAmount >= maxRailwayAccounts) {
+            logger.info("Railway profile creation rejected for ${player.name}: profile limit reached")
+            return null
+        }
+        if (name.length > maxNameLength) {
+            logger.info("Railway profile creation rejected for ${player.name}: name exceeds maximum length")
+            return null
+        }
 
         val profileId = UUID.randomUUID()
         val railwayProfile =
@@ -51,15 +67,31 @@ class RailwayProfileManager(
             )
 
         profileCollection.insertOne(railwayProfile)
+        logger.info("Inserted Railway profile $profileId for ${player.name}")
         profileIndexCollection.updateOne(
             Filters.eq("_id", player.uniqueId),
             Updates.addToSet("profileIds", profileId),
             UpdateOptions().upsert(true),
         )
+        logger.info("Added Railway profile $profileId to the profile index for ${player.name}")
         return railwayProfile
     }
 
     suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
+
+    suspend fun renameActiveProfile(
+        player: Player,
+        newName: String,
+    ): RailwayProfile? {
+        if (newName.length > maxNameLength) return null
+
+        val activeProfileId = getActiveProfileId(player) ?: return null
+        val profile = getProfile(activeProfileId) ?: return null
+
+        val renamedProfile = profile.copy(name = newName)
+        updateProfile(renamedProfile)
+        return renamedProfile
+    }
 
     suspend fun unlockSkillTier(
         profile: RailwayProfile,
