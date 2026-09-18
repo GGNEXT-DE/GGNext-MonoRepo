@@ -118,7 +118,7 @@ class Railway : SuspendingJavaPlugin() {
 
             commands.register(ZoneSCommand(this, zoneManager).command)
             commands.register(ZoneCCommand(this, zoneManager).command)
-            commands.register(ProfileCommand(profileGui, this).command)
+            commands.register(ProfileCommand(profileGui, railwayProfileManager, this).command)
             commands.register(MenuCommand(menuGui, this).command)
             commands.register(TradeCommand(tradeManager, tradeGui).command)
             commands.register(

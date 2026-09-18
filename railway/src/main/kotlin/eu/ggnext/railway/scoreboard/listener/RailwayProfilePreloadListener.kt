@@ -3,7 +3,6 @@ package eu.ggnext.railway.scoreboard.listener
 import com.github.shynixn.mccoroutine.bukkit.launch
 import eu.ggnext.common.logging.log
 import eu.ggnext.railway.profile.RailwayProfileManager
-import eu.ggnext.railway.profile.railwayProfileNames
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -20,14 +19,9 @@ class RailwayProfilePreloadListener(
 ) : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        log.info("Railway preload: Creating/loading profile for ${event.player.name}")
+        log.info("Railway preload: Loading profile for ${event.player.name}")
         plugin.launch {
             val player = event.player
-            val profiles = profileManager.getProfiles(player)
-            if (profiles.isEmpty()) {
-                log.info("Railway preload: Creating new profile for ${event.player.name}")
-                profileManager.createProfile(player, railwayProfileNames.random())
-            }
             // Set first profile as active if none is active
             if (profileManager.getActiveProfileId(player) == null) {
                 val activeProfile = profileManager.getProfiles(player).firstOrNull()

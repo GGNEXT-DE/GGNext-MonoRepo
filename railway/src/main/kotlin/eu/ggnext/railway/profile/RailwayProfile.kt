@@ -41,32 +41,3 @@ data class QuestProgress(
     val type: QuestTrackingType,
     val currentValue: Int = 0,
 )
-
-val railwayProfileNames =
-    listOf(
-        "Alpha",
-        "Beta",
-        "Gamma",
-        "Delta",
-        "Omega",
-        "PlayerOne",
-        "Shadow",
-        "Phoenix",
-        "Nexus",
-        "Matrix",
-        "Hunter",
-        "Ranger",
-        "Rogue",
-        "Knight",
-        "Mage",
-        "Nova",
-        "Cosmo",
-        "Vortex",
-        "Titan",
-        "Echo",
-        "User1",
-        "User2",
-        "User3",
-        "Guest",
-        "Admin",
-    )

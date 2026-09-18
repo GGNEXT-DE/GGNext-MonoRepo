@@ -79,6 +79,20 @@ class RailwayProfileManager(
 
     suspend fun updateProfile(profile: RailwayProfile) = profileCollection.replaceOne(Filters.eq("_id", profile.id), profile)
 
+    suspend fun renameActiveProfile(
+        player: Player,
+        newName: String,
+    ): RailwayProfile? {
+        if (newName.length > maxNameLength) return null
+
+        val activeProfileId = getActiveProfileId(player) ?: return null
+        val profile = getProfile(activeProfileId) ?: return null
+
+        val renamedProfile = profile.copy(name = newName)
+        updateProfile(renamedProfile)
+        return renamedProfile
+    }
+
     suspend fun getProfile(profileId: UUID): RailwayProfile? = profileCollection.find(Filters.eq("_id", profileId)).firstOrNull()
 
     suspend fun getProfiles(player: Player): List<RailwayProfile> {
