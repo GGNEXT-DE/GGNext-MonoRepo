@@ -134,7 +134,10 @@ class Railway : SuspendingJavaPlugin() {
             // Preload Railway profiles FIRST (HIGHEST priority) - before GGNextCore creates scoreboards
             registerEvents(RailwayProfilePreloadListener(this@Railway, railwayProfileManager), this@Railway)
             registerSuspendingEvents(ZoneListener(zoneManager), this@Railway)
-            registerSuspendingEvents(ProfileListener(railwayProfileManager, profileGui), this@Railway)
+            registerSuspendingEvents(
+                ProfileListener(railwayProfileManager, profileGui, railwayScoreBoardManager, this@Railway),
+                this@Railway,
+            )
             registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
             registerSuspendingEvents(SkilltreeListener(skilltreeOverviewGui, skillPathDetailGui), this@Railway)
             registerSuspendingEvents(QuestListener(questManager, railwayProfileManager), this@Railway)
