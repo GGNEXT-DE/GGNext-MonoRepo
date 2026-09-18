@@ -92,6 +92,7 @@ class RailwayProfileManager(
         updateProfile(renamedProfile)
         return renamedProfile
     }
+
     suspend fun unlockSkillTier(
         profile: RailwayProfile,
         cost: Int,
