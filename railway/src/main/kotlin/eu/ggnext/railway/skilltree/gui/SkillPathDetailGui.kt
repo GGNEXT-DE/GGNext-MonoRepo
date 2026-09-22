@@ -75,6 +75,8 @@ class SkillPathDetailGui(
             "motor" -> Material.DIAMOND_PICKAXE
             "speicher" -> Material.BARREL
             "zugkraft" -> Material.MINECART
+            "pumpe" -> Material.HOPPER
+            "nachbrenner" -> Material.BLAZE_POWDER
             else -> Material.BLUE_DYE
         }
 
@@ -182,10 +184,26 @@ class SkillPathDetailGui(
                                 val effectNameTranslation by
                                     TranslationStore(getEffectTranslationKey(effectType))
                                 val displayValue =
-                                    if (effectType == EffectType.ZONE_RARITY) {
-                                        "${value.toInt()}%"
-                                    } else {
-                                        "+${value.toLong()}"
+                                    when {
+                                        effectType == EffectType.ZONE_RARITY -> {
+                                            "${value.toInt()}%"
+                                        }
+
+                                        effectType == EffectType.FUEL_REGEN_SECONDS -> {
+                                            "${value.toLong()}s"
+                                        }
+
+                                        effectType == EffectType.AFTERBURNER_COOLDOWN_MINUTES && value == 0.0 -> {
+                                            if (player.language() == "de") "Freigeschaltet" else "Unlocked"
+                                        }
+
+                                        effectType == EffectType.AFTERBURNER_COOLDOWN_MINUTES -> {
+                                            "${value.toLong()}min"
+                                        }
+
+                                        else -> {
+                                            "+${value.toLong()}"
+                                        }
                                     }
                                 lore.add(
                                     effectNameTranslation

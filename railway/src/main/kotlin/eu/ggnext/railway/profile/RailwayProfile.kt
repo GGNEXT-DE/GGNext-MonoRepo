@@ -12,6 +12,19 @@ data class RailwayProfile(
     val level: RailwayLevel,
     val completedQuests: Set<String>,
     val activeQuests: Set<QuestProgress>,
+    val fuel: FuelState = FuelState(),
+)
+
+data class FuelState(
+    val amount: Double = 0.0,
+    val lastUpdate: Long = System.currentTimeMillis(),
+    val afterburner: AfterburnerState = AfterburnerState(),
+)
+
+data class AfterburnerState(
+    val chargesRemaining: Int = 0,
+    val windowEndsAt: Long? = null,
+    val cooldownUntil: Long? = null,
 )
 
 data class RailwayProfileIndex(

@@ -7,6 +7,10 @@ import eu.ggnext.railway.auction.AuctionCommand
 import eu.ggnext.railway.auction.AuctionGui
 import eu.ggnext.railway.auction.AuctionJob
 import eu.ggnext.railway.auction.AuctionManager
+import eu.ggnext.railway.fuel.FuelManager
+import eu.ggnext.railway.fuel.command.FuelCommand
+import eu.ggnext.railway.fuel.gui.FuelGui
+import eu.ggnext.railway.fuel.listener.FuelListener
 import eu.ggnext.railway.profile.ProfileCommand
 import eu.ggnext.railway.profile.ProfileGui
 import eu.ggnext.railway.profile.ProfileListener
@@ -50,6 +54,8 @@ class Railway : SuspendingJavaPlugin() {
     lateinit var skilltreeOverviewGui: SkilltreeOverviewGui
     lateinit var skillPathDetailGui: SkillPathDetailGui
     lateinit var railwayScoreBoardManager: RailwayScoreBoardManager
+    lateinit var fuelManager: FuelManager
+    lateinit var fuelGui: FuelGui
 
     override suspend fun onEnableAsync() {
         val zoneConfigs =
@@ -65,6 +71,10 @@ class Railway : SuspendingJavaPlugin() {
             AuctionGui(this, auctionManager, railwayProfileManager)
         profileGui =
             ProfileGui(this, railwayProfileManager)
+        effectManager =
+            EffectManager()
+        fuelManager =
+            FuelManager(railwayProfileManager, effectManager)
         zoneManager =
             ZoneManager(this, zoneConfigs, railwayProfileManager)
         tradeManager =
@@ -73,17 +83,19 @@ class Railway : SuspendingJavaPlugin() {
             TradeGui(this, tradeManager)
         skillTreeManager =
             SkillTreeManager(railwayProfileManager)
-        effectManager =
-            EffectManager()
         skillPathDetailGui =
             SkillPathDetailGui(this, railwayProfileManager, skillTreeManager)
         skilltreeOverviewGui =
             SkilltreeOverviewGui(this, railwayProfileManager, skillPathDetailGui)
         menuGui =
             MenuGui(this, railwayProfileManager, skilltreeOverviewGui)
+        fuelGui =
+            FuelGui(this, railwayProfileManager, fuelManager)
         // Set up cross-references for navigation
         skillPathDetailGui.setSkilltreeOverviewGui(skilltreeOverviewGui)
         skilltreeOverviewGui.setMenuGui(menuGui)
+        menuGui.setFuelGui(fuelGui)
+        fuelGui.setMenuGui(menuGui)
         railwayScoreBoardManager =
             RailwayScoreBoardManager(
                 this,
@@ -120,6 +132,7 @@ class Railway : SuspendingJavaPlugin() {
             commands.register(ZoneCCommand(this, zoneManager).command)
             commands.register(ProfileCommand(profileGui, railwayProfileManager, this).command)
             commands.register(MenuCommand(menuGui, this).command)
+            commands.register(FuelCommand(fuelGui, this).command)
             commands.register(TradeCommand(tradeManager, tradeGui).command)
             commands.register(
                 AuctionCommand(this, auctionGui).command,
@@ -140,6 +153,7 @@ class Railway : SuspendingJavaPlugin() {
             )
             registerSuspendingEvents(TradeListener(tradeManager), this@Railway)
             registerSuspendingEvents(SkilltreeListener(skilltreeOverviewGui, skillPathDetailGui), this@Railway)
+            registerEvents(FuelListener(fuelGui), this@Railway)
             registerSuspendingEvents(QuestListener(questManager, railwayProfileManager), this@Railway)
             registerEvents(RailwayScoreBoardListener(this@Railway, railwayScoreBoardManager, railwayProfileManager), this@Railway)
         }

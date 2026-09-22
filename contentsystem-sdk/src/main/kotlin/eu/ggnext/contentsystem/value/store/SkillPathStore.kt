@@ -39,8 +39,8 @@ class SkillPathStore(
                         pathId,
                         listOf(
                             SkillTier(5, mapOf(EffectType.MAX_FUEL to 100.0)),
-                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 200.0)),
-                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 300.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 100.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 200.0)),
                         ),
                     )
                 }
@@ -52,6 +52,28 @@ class SkillPathStore(
                             SkillTier(5, mapOf(EffectType.MAX_WAGONS to 1.0)),
                             SkillTier(14, mapOf(EffectType.MAX_WAGONS to 2.0)),
                             SkillTier(28, mapOf(EffectType.MAX_WAGONS to 3.0)),
+                        ),
+                    )
+                }
+
+                "pumpe" -> {
+                    SkillPath(
+                        pathId,
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.FUEL_REGEN_SECONDS to -1.0)),
+                            SkillTier(14, mapOf(EffectType.FUEL_REGEN_SECONDS to -2.0)),
+                            SkillTier(28, mapOf(EffectType.FUEL_REGEN_SECONDS to -2.0)),
+                        ),
+                    )
+                }
+
+                "nachbrenner" -> {
+                    SkillPath(
+                        pathId,
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to 0.0)),
+                            SkillTier(14, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to -30.0)),
+                            SkillTier(28, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to -60.0)),
                         ),
                     )
                 }
@@ -88,8 +110,8 @@ class SkillPathStore(
                         "speicher",
                         listOf(
                             SkillTier(5, mapOf(EffectType.MAX_FUEL to 100.0)),
-                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 200.0)),
-                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 300.0)),
+                            SkillTier(14, mapOf(EffectType.MAX_FUEL to 100.0)),
+                            SkillTier(28, mapOf(EffectType.MAX_FUEL to 200.0)),
                         ),
                     ),
                     SkillPath(
@@ -98,6 +120,22 @@ class SkillPathStore(
                             SkillTier(5, mapOf(EffectType.MAX_WAGONS to 1.0)),
                             SkillTier(14, mapOf(EffectType.MAX_WAGONS to 2.0)),
                             SkillTier(28, mapOf(EffectType.MAX_WAGONS to 3.0)),
+                        ),
+                    ),
+                    SkillPath(
+                        "pumpe",
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.FUEL_REGEN_SECONDS to -1.0)),
+                            SkillTier(14, mapOf(EffectType.FUEL_REGEN_SECONDS to -2.0)),
+                            SkillTier(28, mapOf(EffectType.FUEL_REGEN_SECONDS to -2.0)),
+                        ),
+                    ),
+                    SkillPath(
+                        "nachbrenner",
+                        listOf(
+                            SkillTier(5, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to 0.0)),
+                            SkillTier(14, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to -30.0)),
+                            SkillTier(28, mapOf(EffectType.AFTERBURNER_COOLDOWN_MINUTES to -60.0)),
                         ),
                     ),
                 )
