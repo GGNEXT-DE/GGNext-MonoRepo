@@ -130,7 +130,7 @@ class FuelGui(
                             }
 
                             isActive -> {
-val minutesLeft = (checkNotNull(afterburnerState.windowEndsAt) - now) / 60_000L
+                                val minutesLeft = (checkNotNull(afterburnerState.windowEndsAt) - now) / 60_000L
                                 Material.BLAZE_POWDER to
                                     listOf(
                                         afterburnerActiveLore.get(
