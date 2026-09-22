@@ -194,7 +194,11 @@ class RailwayProfileManager(
     ): Boolean =
         profileCollection
             .updateOne(
-                Filters.and(Filters.eq("_id", profile.id), Filters.gte("fuel.amount", profile.fuel.amount)),
+                Filters.and(
+                    Filters.eq("_id", profile.id),
+                    Filters.eq("fuel.amount", profile.fuel.amount),
+                    Filters.eq("fuel.lastUpdate", profile.fuel.lastUpdate),
+                ),
                 Updates.combine(
                     Updates.set("fuel.amount", recomputedAmount - cost),
                     Updates.set("fuel.lastUpdate", now),
@@ -217,7 +221,11 @@ class RailwayProfileManager(
     ): Boolean =
         profileCollection
             .updateOne(
-                Filters.eq("_id", profile.id),
+                Filters.and(
+                    Filters.eq("_id", profile.id),
+                    Filters.eq("fuel.amount", profile.fuel.amount),
+                    Filters.eq("fuel.lastUpdate", profile.fuel.lastUpdate),
+                ),
                 Updates.combine(
                     Updates.set("fuel.amount", minOf(maxFuel, recomputedAmount + delta)),
                     Updates.set("fuel.lastUpdate", now),

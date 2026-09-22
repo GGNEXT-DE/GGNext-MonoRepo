@@ -9,6 +9,8 @@ import eu.ggnext.railway.skilltree.effect.EffectManager
 import kotlin.math.floor
 import kotlin.math.min
 
+private const val MAX_FUEL_UPDATE_ATTEMPTS = 3
+
 class FuelManager(
     private val profileManager: RailwayProfileManager,
     private val effectManager: EffectManager,
@@ -45,33 +47,41 @@ class FuelManager(
     }
 
     suspend fun consumeForZoneEntry(profile: RailwayProfile): FuelConsumeResult {
-        val now = System.currentTimeMillis()
-        val afterburner = profile.fuel.afterburner
-        if (afterburner.chargesRemaining > 0 && afterburner.windowEndsAt != null && now < afterburner.windowEndsAt) {
-            return if (profileManager.consumeAfterburnerCharge(profile)) {
-                FuelConsumeResult.UsedAfterburnerCharge(afterburner.chargesRemaining - 1)
+        var current = profile
+        repeat(MAX_FUEL_UPDATE_ATTEMPTS) {
+            val afterburner = current.fuel.afterburner
+            val now = System.currentTimeMillis()
+            if (afterburner.chargesRemaining > 0 && afterburner.windowEndsAt != null && now < afterburner.windowEndsAt) {
+                if (profileManager.consumeAfterburnerCharge(current)) {
+                    return FuelConsumeResult.UsedAfterburnerCharge(afterburner.chargesRemaining - 1)
+                }
             } else {
-                FuelConsumeResult.InsufficientFuel(currentFuel(profile), zoneTravelCost)
+                val fuelAmount = currentFuel(current)
+                if (fuelAmount < zoneTravelCost) return FuelConsumeResult.InsufficientFuel(fuelAmount, zoneTravelCost)
+
+                if (profileManager.consumeFuel(current, fuelAmount, zoneTravelCost, now)) {
+                    return FuelConsumeResult.Success(fuelAmount - zoneTravelCost)
+                }
             }
-        }
 
-        val current = currentFuel(profile)
-        if (current < zoneTravelCost) return FuelConsumeResult.InsufficientFuel(current, zoneTravelCost)
-
-        return if (profileManager.consumeFuel(profile, current, zoneTravelCost, now)) {
-            FuelConsumeResult.Success(current - zoneTravelCost)
-        } else {
-            FuelConsumeResult.InsufficientFuel(current, zoneTravelCost)
+            current = profileManager.getProfile(current.id) ?: return FuelConsumeResult.InsufficientFuel(0.0, zoneTravelCost)
         }
+        return FuelConsumeResult.InsufficientFuel(currentFuel(current), zoneTravelCost)
     }
 
     suspend fun addFuel(
         profile: RailwayProfile,
         amount: Double,
     ): Boolean {
-        val now = System.currentTimeMillis()
-        val current = currentFuel(profile)
-        return profileManager.addFuel(profile, current, amount, effectiveMaxFuel(profile), now)
+        var current = profile
+        repeat(MAX_FUEL_UPDATE_ATTEMPTS) {
+            val now = System.currentTimeMillis()
+            val fuelAmount = currentFuel(current)
+            if (profileManager.addFuel(current, fuelAmount, amount, effectiveMaxFuel(current), now)) return true
+
+            current = profileManager.getProfile(current.id) ?: return false
+        }
+        return false
     }
 
     suspend fun canActivateAfterburner(profile: RailwayProfile): Boolean = previewAfterburner(profile) != null
