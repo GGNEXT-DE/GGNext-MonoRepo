@@ -41,7 +41,7 @@ class FuelManager(
         val now = System.currentTimeMillis()
         val cooldownUntil = profile.fuel.afterburner.cooldownUntil
         val regenApplies = cooldownUntil == null || now >= cooldownUntil
-val regenerationStart = maxOf(profile.fuel.lastUpdate, cooldownUntil ?: profile.fuel.lastUpdate)
+        val regenerationStart = maxOf(profile.fuel.lastUpdate, cooldownUntil ?: profile.fuel.lastUpdate)
         val elapsedSeconds = if (regenApplies) (now - regenerationStart) / 1000.0 else 0.0
         val regenerated = elapsedSeconds / effectiveRegenSeconds(profile)
     }
