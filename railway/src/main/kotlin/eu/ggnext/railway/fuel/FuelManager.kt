@@ -41,9 +41,9 @@ class FuelManager(
         val now = System.currentTimeMillis()
         val cooldownUntil = profile.fuel.afterburner.cooldownUntil
         val regenApplies = cooldownUntil == null || now >= cooldownUntil
-        val elapsedSeconds = (now - profile.fuel.lastUpdate) / 1000.0
-        val regenerated = if (regenApplies) elapsedSeconds / effectiveRegenSeconds(profile) else 0.0
-        return min(effectiveMaxFuel(profile), profile.fuel.amount + regenerated)
+val regenerationStart = maxOf(profile.fuel.lastUpdate, cooldownUntil ?: profile.fuel.lastUpdate)
+        val elapsedSeconds = if (regenApplies) (now - regenerationStart) / 1000.0 else 0.0
+        val regenerated = elapsedSeconds / effectiveRegenSeconds(profile)
     }
 
     suspend fun consumeForZoneEntry(profile: RailwayProfile): FuelConsumeResult {
