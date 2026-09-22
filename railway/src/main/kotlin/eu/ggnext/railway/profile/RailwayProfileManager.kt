@@ -22,6 +22,7 @@ class RailwayProfileManager(
     private val maxRailwayAccounts by NumberStore("numbers.railway.profile.max_railway_accounts")
     private val defaultRailwayDollars by NumberStore("numbers.railway.profile.default_railway_dollars")
     private val maxNameLength by NumberStore("numbers.railway.profile.max_name_length")
+    private val baseMaxFuel by NumberStore("numbers.railway.fuel.base_max_fuel")
 
     private val activeProfiles = ConcurrentHashMap<UUID, UUID>()
     private val logger = LogControl.logger(this::class.java)
@@ -64,6 +65,7 @@ class RailwayProfileManager(
                 level = RailwayLevel(0L, 0),
                 completedQuests = emptySet(),
                 activeQuests = emptySet(),
+                fuel = FuelState(amount = baseMaxFuel.toDouble(), lastUpdate = System.currentTimeMillis()),
             )
 
         profileCollection.insertOne(railwayProfile)
@@ -182,6 +184,62 @@ class RailwayProfileManager(
             .updateOne(
                 Filters.and(Filters.eq("_id", profile.id), Filters.gte("railwayDollars", amount)),
                 Updates.inc("railwayDollars", -amount),
+            ).modifiedCount == 1L
+
+    suspend fun consumeFuel(
+        profile: RailwayProfile,
+        recomputedAmount: Double,
+        cost: Int,
+        now: Long,
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.gte("fuel.amount", profile.fuel.amount)),
+                Updates.combine(
+                    Updates.set("fuel.amount", recomputedAmount - cost),
+                    Updates.set("fuel.lastUpdate", now),
+                ),
+            ).modifiedCount == 1L
+
+    suspend fun consumeAfterburnerCharge(profile: RailwayProfile): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.and(Filters.eq("_id", profile.id), Filters.gt("fuel.afterburner.chargesRemaining", 0)),
+                Updates.inc("fuel.afterburner.chargesRemaining", -1),
+            ).modifiedCount == 1L
+
+    suspend fun addFuel(
+        profile: RailwayProfile,
+        recomputedAmount: Double,
+        delta: Double,
+        maxFuel: Double,
+        now: Long,
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.eq("_id", profile.id),
+                Updates.combine(
+                    Updates.set("fuel.amount", minOf(maxFuel, recomputedAmount + delta)),
+                    Updates.set("fuel.lastUpdate", now),
+                ),
+            ).modifiedCount == 1L
+
+    suspend fun activateAfterburner(
+        profile: RailwayProfile,
+        charges: Int,
+        windowEndsAt: Long,
+        cooldownUntil: Long,
+    ): Boolean =
+        profileCollection
+            .updateOne(
+                Filters.eq("_id", profile.id),
+                Updates.combine(
+                    Updates.set("fuel.amount", 0.0),
+                    Updates.set("fuel.lastUpdate", System.currentTimeMillis()),
+                    Updates.set("fuel.afterburner.chargesRemaining", charges),
+                    Updates.set("fuel.afterburner.windowEndsAt", windowEndsAt),
+                    Updates.set("fuel.afterburner.cooldownUntil", cooldownUntil),
+                ),
             ).modifiedCount == 1L
 
     suspend fun addXp(

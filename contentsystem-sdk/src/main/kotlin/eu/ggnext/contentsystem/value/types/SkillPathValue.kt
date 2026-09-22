@@ -14,6 +14,8 @@ enum class EffectType(
     MAX_FUEL("maxFuel"),
     ZONE_RARITY("zoneRarity"),
     MAX_WAGONS("maxWagons"),
+    FUEL_REGEN_SECONDS("fuelRegenSeconds"),
+    AFTERBURNER_COOLDOWN_MINUTES("afterburnerCooldownMinutes"),
     ;
 
     companion object {

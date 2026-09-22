@@ -10,6 +10,7 @@ import eu.ggnext.core.utils.createFiller
 import eu.ggnext.core.utils.description
 import eu.ggnext.core.utils.language
 import eu.ggnext.core.utils.name
+import eu.ggnext.railway.fuel.gui.FuelGui
 import eu.ggnext.railway.profile.RailwayProfileManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -23,6 +24,12 @@ class MenuGui(
     private val profileManager: RailwayProfileManager,
     private val skilltreeOverviewGui: SkilltreeOverviewGui,
 ) {
+    private lateinit var fuelGui: FuelGui
+
+    fun setFuelGui(gui: FuelGui) {
+        this.fuelGui = gui
+    }
+
     private val menuTitle by TranslationStore("translations.railway.menu.title")
     private val dollarsItemName by TranslationStore("translations.railway.menu.dollars.name")
     private val levelItemName by TranslationStore("translations.railway.menu.level.name")
@@ -30,6 +37,7 @@ class MenuGui(
     private val xpLabel by TranslationStore("translations.railway.menu.level.xp_label")
     private val skillPointsItemName by TranslationStore("translations.railway.menu.skill_points.name")
     private val skilltreeItemName by TranslationStore("translations.railway.menu.skilltree.name")
+    private val fuelItemName by TranslationStore("translations.railway.menu.fuel.name")
 
     suspend fun openMenuGui(player: Player) {
         val activeProfileId =
@@ -125,6 +133,19 @@ class MenuGui(
                             plugin.launch {
                                 player.inventory.close()
                                 skilltreeOverviewGui.openSkilltreeOverviewGui(player)
+                            }
+                        }
+
+                    pane[3, 6] =
+                        StaticElement(
+                            drawable(
+                                ItemStack(Material.LAVA_BUCKET)
+                                    .name(fuelItemName.get(player.language())),
+                            ),
+                        ) {
+                            plugin.launch {
+                                player.inventory.close()
+                                fuelGui.openFuelGui(player)
                             }
                         }
                 }

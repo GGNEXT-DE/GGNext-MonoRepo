@@ -48,6 +48,8 @@ class SkilltreeOverviewGui(
             "motor" -> Material.DIAMOND_PICKAXE
             "speicher" -> Material.BARREL
             "zugkraft" -> Material.MINECART
+            "pumpe" -> Material.HOPPER
+            "nachbrenner" -> Material.BLAZE_POWDER
             else -> Material.BLUE_DYE
         }
 
