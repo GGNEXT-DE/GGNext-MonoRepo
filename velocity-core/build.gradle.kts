@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("com.velocitypowered:velocity-api:4.1.1")
-    kapt("com.velocitypowered:velocity-api:4.1.1")
+    compileOnly("com.velocitypowered:velocity-api:4.2.0")
+    kapt("com.velocitypowered:velocity-api:4.2.0")
 
     implementation(libs.bundles.ggnext.velocity)
     implementation(project(":contentsystem-sdk"))
