@@ -1,6 +1,6 @@
 [versions]
 fawe = "2.15.3"
-mongodb = "5.11.1"
+mongodb = "5.12.0"
 mccoroutine = "2.22.0"
 interfaces = "2.1.1-SNAPSHOT"
 kotlinxSerialization = "1.11.0"
