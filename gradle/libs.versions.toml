@@ -1,5 +1,5 @@
 [versions]
-fawe = "2.15.3"
+fawe = "2.16.0"
 mongodb = "5.12.0"
 mccoroutine = "2.22.0"
 interfaces = "2.1.1-SNAPSHOT"
